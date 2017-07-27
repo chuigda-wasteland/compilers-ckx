@@ -2,6 +2,9 @@
 #define DEFS_HPP
 
 #include <cstdint>
+#include <cstddef>
+
+#include <utility>
 
 namespace ckx
 {
@@ -16,7 +19,14 @@ using quint32 = std::uint32_t;
 using quint16 = std::uint16_t;
 using quint8  = std::uint8_t;
 
-using qchar = char;
+using qchar = unsigned char;
+
+using qsizet = size_t;
+using qptrdiff = std::ptrdiff_t;
+
+using qreal = double;
+
+using qcoord = std::pair<qsizet, qsizet>;
 
 } // namespace ckx
 

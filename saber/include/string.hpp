@@ -6,6 +6,7 @@
 namespace saber
 {
 using std::string;
+using std::char_traits;
 }
 
 #endif // STRING_HPP
