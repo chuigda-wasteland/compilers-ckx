@@ -16,46 +16,26 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
   */
 
-#ifndef DEFS_HPP
-#define DEFS_HPP
+#ifndef CKX_ERROR_HPP
+#define CKX_ERROR_HPP
 
-#include <cstdint>
-#include <cstddef>
-
-#include <utility>
+#include "defs.hpp"
+#include "string.hpp"
+#include "memory.hpp"
 
 namespace ckx
 {
 
-using qint64 = std::int64_t;
-using qint32 = std::int32_t;
-using qint16 = std::int16_t;
-using qint8  = std::int8_t;
+class ckx_error
+{
+public:
+    ckx_error(const qcoord& _pos, saber::string&& _desc) :
+        pos(_pos), desc(saber::move(_desc))
+    {}
 
-using quint64 = std::uint64_t;
-using quint32 = std::uint32_t;
-using quint16 = std::uint16_t;
-using quint8  = std::uint8_t;
+    qcoord pos;
+    saber::string desc;
+};
 
-using qchar = signed char;
-
-using qsizet = size_t;
-using qptrdiff = std::ptrdiff_t;
-
-using qreal = double;
-
-using qcoord = std::pair<qsizet, qsizet>;
-
-template <typename T1, typename T2>
-using qpair = std::pair<T1, T2>;
-
-} // namespace ckx
-
-#define interface class
-#define pod_struct struct
-#define open_class struct
-#define variant union
-
-#define implements : public
-
-#endif // DEFS_HPP
+}
+#endif // CKX_ERROR_HPP

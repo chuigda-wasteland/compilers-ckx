@@ -67,7 +67,7 @@ ckx_fp_reader::~ckx_fp_reader()
     delete this->impl;
 }
 
-char ckx_fp_reader::get_next_char()
+qchar ckx_fp_reader::get_next_char()
 {
     return this->impl->get_next_char_impl();
 }

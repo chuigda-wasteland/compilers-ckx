@@ -9,7 +9,9 @@ SOURCES += main.cpp \
     saber/src/safe_stl_general.cpp \
     ckx_token_stream.cpp \
     ckx_parser.cpp \
-    ckx_ast_node.cpp
+    ckx_ast_node.cpp \
+    ckx_type.cpp \
+    ckx_env_table.cpp
 
 HEADERS += \
     ckx_file_reader.hpp \
@@ -35,7 +37,10 @@ HEADERS += \
     defs.hpp \
     ckx_token_stream.hpp \
     ckx_parser.hpp \
-    ckx_ast_node.hpp
+    ckx_ast_node.hpp \
+    ckx_error.hpp \
+    ckx_type.hpp \
+    ckx_env_table.hpp
 
 INCLUDEPATH += saber/include/
 

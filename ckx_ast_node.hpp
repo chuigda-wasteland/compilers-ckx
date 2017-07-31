@@ -19,20 +19,77 @@
 #ifndef CKX_AST_NODE_HPP
 #define CKX_AST_NODE_HPP
 
+#include "defs.hpp"
+
+#include "memory.hpp"
+#include "string.hpp"
+#include "vector.hpp"
+
+#include "ckx_type.hpp"
+
 namespace ckx
 {
 
-class ckx_ast_node
+using saber::saber_ptr;
+
+interface ckx_ast_node
 {
 public:
     ckx_ast_node() = default;
     virtual ~ckx_ast_node() = 0;
+
+    // virtual void translate(saber::vector<int>& _ret);
 };
 
-class ckx_ast_translation_unit : public ckx_ast_node
+class ckx_ast_translation_unit implements ckx_ast_node
 {
 public:
+    ckx_ast_translation_unit() = default;
     ~ckx_ast_translation_unit() override final;
+};
+
+class ckx_ast_decl implements ckx_ast_node
+{
+private:
+    saber_ptr<ckx_type> type;
+    saber::vector<saber_ptr<saber::string>> names;
+};
+
+class ckx_ast_record_decl implements ckx_ast_node
+{
+private:
+    saber_ptr<ckx_record_type> type;
+};
+
+class ckx_ast_expr implements ckx_ast_node
+{
+    // On hold
+};
+
+class ckx_ast_if_stmt implements ckx_ast_node
+{
+private:
+    ckx_ast_expr *condition;
+    ckx_ast_node *then_execution;
+    ckx_ast_node *else_execution;
+};
+
+class ckx_ast_switch_stmt implements ckx_ast_node
+{
+    // On hold
+};
+
+open_class ckx_function_param
+{
+    saber_ptr<ckx_type> type;
+    saber_ptr<saber::string> name;
+};
+
+class ckx_ast_function implements ckx_ast_node
+{
+private:
+    saber_ptr<ckx_function_type> type;
+    ckx_ast_node *function_body;
 };
 
 } // namespace ckx

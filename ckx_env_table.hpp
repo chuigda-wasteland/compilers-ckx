@@ -16,55 +16,51 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
   */
 
-#ifndef CKX_TOKEN_STREAM_HPP
-#define CKX_TOKEN_STREAM_HPP
+#ifndef CKX_ENV_TABLE_HPP
+#define CKX_ENV_TABLE_HPP
 
-#include "ckx_token.hpp"
-#include "ckx_file_reader.hpp"
+#include "ckx_type.hpp"
 
-#include "memory.hpp"
 #include "string.hpp"
 #include "vector.hpp"
 
-#include "ckx_error.hpp"
+#include "defs.hpp"
 
 namespace ckx
 {
 
 using saber::saber_ptr;
 
-
-interface ckx_token_stream
+open_class ckx_table_entry
 {
-public:
-    ckx_token_stream() = default;
-    virtual ~ckx_token_stream() = 0;
+    enum class category: char
+    {
+        entry_data,
+        entry_type
+    } entry_category;
 
-    virtual saber_ptr<ckx_token> operator[] (int _offset) = 0;
-    virtual saber::vector<ckx_error>& get_error() = 0;
-    virtual void operator++ () = 0;
+    variant
+    {
+        pod_struct
+        {
+            saber_ptr<ckx_type> data_type;
+        } data;
+
+        pod_struct
+        {
+            saber_ptr<ckx_type> ref;
+        } type;
+    } v;
+
+    saber_ptr<saber::string> name;
 };
 
-
-namespace detail
+open_class ckx_env_table
 {
-class ckx_default_token_stream_impl;
-} // namespace detail
-
-
-class ckx_default_token_stream implements ckx_token_stream
-{
-public:
-    ckx_default_token_stream(ckx_file_reader& _file_reader);
-    ~ckx_default_token_stream();
-
-    saber_ptr<ckx_token> operator[] (int _offset) override final;
-    void operator++ () override final;
-
-private:
-    detail::ckx_default_token_stream_impl *impl;
+    saber::vector<ckx_table_entry*> entries;
+    ckx_env_table *parent;
 };
 
 } // namespace ckx
 
-#endif // CKX_TOKEN_STREAM_HPP
+#endif // CKX_ENV_TABLE_HPP

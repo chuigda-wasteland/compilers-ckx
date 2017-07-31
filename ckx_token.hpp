@@ -26,9 +26,9 @@
 namespace ckx
 {
 
-struct ckx_token
+open_class ckx_token
 {
-    enum class ckx_token_type : unsigned char
+    enum class type : unsigned char
     {
         token_assign,             // =
 
@@ -84,10 +84,10 @@ struct ckx_token
         token_uint32,             // vu32
         token_uint64,             // vu64
 
-        token_char,               // vchar
+        token_char,               // vch
 
-        token_real4,              // vr4
-        token_real8,              // vr8
+        token_real32,             // vr32
+        token_real64,             // vr64
 
         token_void,               // void
 
@@ -106,6 +106,8 @@ struct ckx_token
         token_switch,             // switch
         token_case,               // case
         token_return,             // return
+        token_break,              // break
+        token_continue,           // continue
 
         token_operator,           // operator
 
@@ -118,12 +120,12 @@ struct ckx_token
         token_ckx,                // ckx
     };
 
-    ckx_token(const qcoord& _pos, ckx_token_type _operator);
+    ckx_token(const qcoord& _pos, type _operator);
     ckx_token(const qcoord& _pos, qint64 _int_literal);
     ckx_token(const qcoord& _pos, quint64 _unsigned_literal);
     ckx_token(const qcoord& _pos, qreal _real_literal);
     ckx_token(const qcoord& _pos, qchar _char_literal);
-    ckx_token(const qcoord& _pos,saber::string&& _str);
+    ckx_token(const qcoord& _pos, saber::string&& _str);
 
     ckx_token() = delete;
     ckx_token(const ckx_token&) = delete;
@@ -131,9 +133,9 @@ struct ckx_token
 
     ~ckx_token();
 
-    ckx_token_type token_type;
+    type token_type;
 
-    union
+    variant
     {
         qchar ch;
         qint64 i64;
@@ -141,7 +143,7 @@ struct ckx_token
         qreal r;
         saber::string *p_str;
     }
-    variant;
+    v;
 
     qcoord position;
 

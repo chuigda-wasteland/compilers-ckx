@@ -35,7 +35,7 @@ namespace detail
 } // namespace detail
 
 
-class ckx_file_reader
+interface ckx_file_reader
 {
 public:
     ckx_file_reader() = default;
@@ -45,7 +45,7 @@ public:
 };
 
 
-class ckx_fp_reader : public ckx_file_reader
+class ckx_fp_reader implements ckx_file_reader
 {
 public:
     ckx_fp_reader(std::FILE* _fp);
@@ -57,7 +57,7 @@ private:
 };
 
 
-class ckx_istream_reader : public ckx_file_reader
+class ckx_istream_reader implements ckx_file_reader
 {
 public:
     ckx_istream_reader(std::istream& _stream);

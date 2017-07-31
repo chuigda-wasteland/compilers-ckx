@@ -33,7 +33,7 @@ public:
     ckx_parser();
     ~ckx_parser();
 
-    ckx_ast_node* parse(TokenStream& _token_stream);
+    ckx_ast_translation_unit* parse(TokenStream& _token_stream);
 };
 
 extern template class ckx_parser<ckx_default_token_stream>;
