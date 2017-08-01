@@ -49,6 +49,12 @@ using qcoord = std::pair<qsizet, qsizet>;
 template <typename T1, typename T2>
 using qpair = std::pair<T1, T2>;
 
+template <typename ArrayType>
+constexpr qsizet countof(const ArrayType& _array)
+{
+    return sizeof(_array) / sizeof(_array[0]);
+}
+
 } // namespace ckx
 
 #define interface class

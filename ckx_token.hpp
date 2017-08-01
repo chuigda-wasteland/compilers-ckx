@@ -59,6 +59,7 @@ open_class ckx_token
         token_gt,                 // >
         token_leq,                // <=
         token_geq,                // >=
+        token_neq,                // !=
 
         token_colon,              // :
         token_scope,              // ::
@@ -111,6 +112,8 @@ open_class ckx_token
 
         token_operator,           // operator
 
+        token_identifier,         // identifier
+
         token_vi_literal,         // int literal
         token_vu_literal,         // unsigned literal
         token_vr_literal,         // real literal
@@ -118,6 +121,7 @@ open_class ckx_token
         token_string_literal,     // string literal
 
         token_ckx,                // ckx
+        token_eoi                 // EOI
     };
 
     ckx_token(const qcoord& _pos, type _operator);

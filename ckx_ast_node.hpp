@@ -38,7 +38,7 @@ public:
     ckx_ast_node() = default;
     virtual ~ckx_ast_node() = 0;
 
-    // virtual void translate(saber::vector<int>& _ret);
+    // virtual void translate(saber::vector<ckx_ir_instance>& ret);
 };
 
 class ckx_ast_translation_unit implements ckx_ast_node

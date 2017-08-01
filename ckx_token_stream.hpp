@@ -25,6 +25,7 @@
 #include "memory.hpp"
 #include "string.hpp"
 #include "vector.hpp"
+#include "unordered_map.hpp"
 
 #include "ckx_error.hpp"
 

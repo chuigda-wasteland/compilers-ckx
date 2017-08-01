@@ -34,13 +34,15 @@ HEADERS += \
     saber/include/utility.hpp \
     saber/include/vector.hpp \
     saber/include/string.hpp \
+    saber/include/unordered_map.hpp \
     defs.hpp \
     ckx_token_stream.hpp \
     ckx_parser.hpp \
     ckx_ast_node.hpp \
     ckx_error.hpp \
     ckx_type.hpp \
-    ckx_env_table.hpp
+    ckx_env_table.hpp \
+    gg.h \
 
 INCLUDEPATH += saber/include/
 
