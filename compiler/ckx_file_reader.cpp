@@ -107,7 +107,8 @@ ckx_istream_reader_impl::ckx_istream_reader_impl(std::istream &_stream) :
 qchar ckx_istream_reader_impl::get_next_char_impl()
 {
     qchar ch;
-    return stream >> ch ? ch : std::char_traits<char>::eof();
+    return stream >> ch ? ch :
+                          static_cast<qchar>(std::char_traits<qchar>::eof());
 }
 
 

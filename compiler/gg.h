@@ -1,5 +1,4 @@
-﻿
-#ifndef GGLEX
+﻿#ifndef GGLEX
 #define GGLEX(X, Y)
 #endif
 

@@ -18,7 +18,6 @@
 
 
 #include "ckx_token.hpp"
-
 #include "memory.hpp"
 
 namespace ckx
@@ -58,16 +57,16 @@ ckx_token::ckx_token(const qcoord &_pos, qchar _char_literal) :
     this->v.ch = _char_literal;
 }
 
-ckx_token::ckx_token(const qcoord &_pos, std::string &&_str) :
+ckx_token::ckx_token(const qcoord &_pos, std::string &&_id) :
     ckx_token(_pos)
 {
-    this->token_type = type::token_string_literal;
-    this->v.p_str = new saber::string(saber::move(_str));
+    this->token_type = type::token_identifier;
+    this->v.p_str = new saber::string(saber::move(_id));
 }
 
 ckx_token::~ckx_token()
 {
-    if (this->token_type == type::token_string_literal)
+    if (this->token_type == type::token_identifier)
     {
         delete this->v.p_str;
     }

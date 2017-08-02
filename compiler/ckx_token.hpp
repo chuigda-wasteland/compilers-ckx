@@ -115,9 +115,11 @@ open_class ckx_token
         token_identifier,         // identifier
 
         token_vi_literal,         // int literal
+        // reserved
         token_vu_literal,         // unsigned literal
         token_vr_literal,         // real literal
         token_vchar_literal,      // char literal
+        // reserved
         token_string_literal,     // string literal
 
         token_ckx,                // ckx
@@ -129,7 +131,7 @@ open_class ckx_token
     ckx_token(const qcoord& _pos, quint64 _unsigned_literal);
     ckx_token(const qcoord& _pos, qreal _real_literal);
     ckx_token(const qcoord& _pos, qchar _char_literal);
-    ckx_token(const qcoord& _pos, saber::string&& _str);
+    ckx_token(const qcoord& _pos, saber::string&& _id);
 
     ckx_token() = delete;
     ckx_token(const ckx_token&) = delete;

@@ -1,0 +1,26 @@
+QMAKE_CXX.INCDIRS = \
+    /usr/include/c++/5.4.0 \
+    /usr/include/x86_64-linux-gnu/c++/5.4.0 \
+    /usr/include/c++/5.4.0/backward \
+    /usr/local/include \
+    /usr/lib/llvm-3.8/lib/clang/3.8.0/include \
+    /usr/include/x86_64-linux-gnu \
+    /usr/include
+QMAKE_CXX.LIBDIRS = \
+    /lib \
+    /usr/lib
+QMAKE_CXX.QT_COMPILER_STDCXX = 199711L
+QMAKE_CXX.QT_CLANG_MAJOR_VERSION = 3
+QMAKE_CXX.QT_CLANG_MINOR_VERSION = 8
+QMAKE_CXX.QT_CLANG_PATCH_VERSION = 0
+QMAKE_CXX.QT_GCC_MAJOR_VERSION = 4
+QMAKE_CXX.QT_GCC_MINOR_VERSION = 2
+QMAKE_CXX.QT_GCC_PATCH_VERSION = 1
+QMAKE_CXX.COMPILER_MACROS = \
+    QT_COMPILER_STDCXX \
+    QT_CLANG_MAJOR_VERSION \
+    QT_CLANG_MINOR_VERSION \
+    QT_CLANG_PATCH_VERSION \
+    QT_GCC_MAJOR_VERSION \
+    QT_GCC_MINOR_VERSION \
+    QT_GCC_PATCH_VERSION

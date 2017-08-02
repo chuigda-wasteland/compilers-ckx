@@ -52,10 +52,10 @@ destroy_at(T* _xptr)
 template <class ForwardIterator>
 void destroy(ForwardIterator _first, ForwardIterator _last)
 {
-  for (; _first != _last; ++_first)
-  {
-    destroy_at(std::addressof(*_first));
-  }
+    for (; _first != _last; ++_first)
+    {
+        destroy_at(std::addressof(*_first));
+    }
 }
 
 template <typename InputIterator, typename ForwardIterator>

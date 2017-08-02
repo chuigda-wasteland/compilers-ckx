@@ -60,6 +60,7 @@ public:
     ~ckx_default_token_stream();
 
     saber_ptr<ckx_token> operator[] (int _offset) override final;
+    saber::vector<ckx_error>& get_error() override final;
     void operator++ () override final;
 
 private:

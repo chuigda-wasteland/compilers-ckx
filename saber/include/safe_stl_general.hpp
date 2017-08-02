@@ -40,7 +40,9 @@
 #include <limits>
 #include <cassert>
 
+#ifndef Q_UNUSED
 #define Q_UNUSED(_VARNAME) ((void)(_VARNAME))
+#endif
 
 namespace saber
 {

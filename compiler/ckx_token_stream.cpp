@@ -51,6 +51,7 @@ public:
     ~ckx_default_token_stream_impl();
 
     saber_ptr<ckx_token> operator_index_impl(int _offset);
+    saber::vector<ckx_error>& get_error_impl(void);
     void operator_incr_impl(void);
 
 private:
@@ -107,6 +108,11 @@ saber_ptr<ckx_token> ckx_default_token_stream::operator [](
         int _offset)
 {
     return impl->operator_index_impl(_offset);
+}
+
+saber::vector<ckx_error>& ckx_default_token_stream::get_error()
+{
+    return impl->get_error_impl();
 }
 
 void ckx_default_token_stream::operator ++ ()
@@ -196,6 +202,11 @@ saber_ptr<ckx_token> ckx_default_token_stream_impl::operator_index_impl(
     }
 }
 
+saber::vector<ckx_error> &ckx_default_token_stream_impl::get_error_impl()
+{
+    return errors;
+}
+
 void ckx_default_token_stream_impl::operator_incr_impl()
 {
     current_pos++;
@@ -212,7 +223,7 @@ void ckx_default_token_stream_impl::do_split_tokens()
         case '\n':
             next_line(); break;
 
-        case '\f': case '\v': case '\t': case '\r':
+        case '\f': case '\v': case '\t': case '\r': case ' ':
             next_char(); break;
 
         case '0': case '1': case '2': case '3': case '4':
@@ -238,21 +249,22 @@ void ckx_default_token_stream_impl::do_split_tokens()
         case '}': case '[': case ']': case '(': case ')':
             solve_ordinary_op();
 
-        case 'b': case 'c': case 'e': case 'f': case 'i':
-        case 'o': case 'r': case 's': case 'v': case 'w':
+        case 'b': case 'c': case 'd': case 'e': case 'f':
+        case 'i': case 'o': case 'r': case 's': case 'v':
+        case 'w':
             scan_full_id_string();
             if (!solve_keyword()) goto ordinary_identifier_tag;
             break;
 
-        case 'a': case 'd': case 'g': case 'h': case 'j':
-        case 'k': case 'l': case 'm': case 'n': case 'p':
-        case 'q': case 't': case 'u': case 'x': case 'y':
-        case 'z': case 'A': case 'B': case 'C': case 'D':
-        case 'E': case 'F': case 'G': case 'H': case 'I':
-        case 'J': case 'K': case 'L': case 'M': case 'N':
-        case 'O': case 'P': case 'Q': case 'R': case 'S':
-        case 'T': case 'U': case 'V': case 'W': case 'X':
-        case 'Y': case 'Z': case '_':
+        case 'a': case 'g': case 'h': case 'j': case 'k':
+        case 'l': case 'm': case 'n': case 'p': case 'q':
+        case 't': case 'u': case 'x': case 'y': case 'z':
+        case 'A': case 'B': case 'C': case 'D': case 'E':
+        case 'F': case 'G': case 'H': case 'I': case 'J':
+        case 'K': case 'L': case 'M': case 'N': case 'O':
+        case 'P': case 'Q': case 'R': case 'S': case 'T':
+        case 'U': case 'V': case 'W': case 'X': case 'Y':
+        case 'Z': case '_':
             scan_full_id_string();
         ordinary_identifier_tag:
             solve_identifier(); break;
@@ -262,6 +274,9 @@ void ckx_default_token_stream_impl::do_split_tokens()
             issue_error("Unrecognized character");
         }
     }
+
+    token_buffer.emplace_back(
+                new ckx_token(char_coord(), ckx_token::type::token_eoi));
 }
 
 
@@ -492,8 +507,7 @@ bool ckx_default_token_stream_impl::solve_keyword()
 void ckx_default_token_stream_impl::solve_identifier()
 {
     token_buffer.emplace_back(
-                new ckx_token(char_coord(), ckx_token::type::token_identifier));
-
+        new ckx_token(char_coord(), saber::move(str())) );
 }
 
 
