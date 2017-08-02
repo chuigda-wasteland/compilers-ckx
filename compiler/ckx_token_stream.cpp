@@ -166,7 +166,7 @@ void ckx_identifier_table::initialize()
 
 
 
-static constexpr size_t default_reserved_size = 8192;
+static constexpr size_t default_reserved_size = 1024;
 
 ckx_default_token_stream_impl::ckx_default_token_stream_impl(
         ckx_file_reader &_file_reader) :
@@ -247,7 +247,7 @@ void ckx_default_token_stream_impl::do_split_tokens()
 
         case '~': case ';': case ',': case '.': case '{':
         case '}': case '[': case ']': case '(': case ')':
-            solve_ordinary_op();
+            solve_ordinary_op(); break;
 
         case 'b': case 'c': case 'd': case 'e': case 'f':
         case 'i': case 'o': case 'r': case 's': case 'v':
@@ -285,8 +285,7 @@ void ckx_default_token_stream_impl::solve_numbers()
 {
     qint64 i = scan_integer();
     qreal r = i;
-
-    bool is_real;
+    bool is_real = false;
 
     if (ch() == '.')
     {
@@ -304,7 +303,14 @@ void ckx_default_token_stream_impl::solve_numbers()
     if (ch() == 'E' || ch() == 'e')
     {
         next_char();
-        if (ch() < '0' || ch() > '9')
+        bool is_negative = false;
+        if (ch() == '-')
+        {
+            is_negative = true;
+            next_char();
+        }
+
+        if ((ch() < '0' || ch() > '9'))
         {
             issue_error("expected digits after exponent.");
             return;
@@ -312,7 +318,8 @@ void ckx_default_token_stream_impl::solve_numbers()
 
         is_real = true;
         qint64 exponent = scan_integer();
-        for (qint64 i = 0; i < exponent; i++) r *= 10;
+        if (!is_negative) for (qint64 i = 0; i < exponent; i++) r *= 10;
+        else for (qint64 i = 0; i < exponent; i++) r /= 10;
     }
 
     if (is_real)
@@ -472,6 +479,7 @@ void ckx_default_token_stream_impl::solve_ordinary_op()
     }
 
     token_buffer.emplace_back(new ckx_token(char_coord(), new_token_type));
+    next_char();
 }
 
 void ckx_default_token_stream_impl::scan_full_id_string()
@@ -515,6 +523,13 @@ void ckx_default_token_stream_impl::solve_identifier()
 qint64 ckx_default_token_stream_impl::scan_integer()
 {
     qint64 ret = 0;
+    bool is_negative = false;
+    if (ch() == '-')
+    {
+        is_negative = true;
+        next_char();
+    }
+
     while (ch() >= '0' && ch() <= '9')
     {
         ret *= 10;
@@ -527,11 +542,18 @@ qint64 ckx_default_token_stream_impl::scan_integer()
 qreal ckx_default_token_stream_impl::scan_floating_part()
 {
     qreal ret = 0;
+    quint8 digit_count = 0;
+
     while (ch() >= '0' && ch() <= '9')
     {
-        ret /= 10;
+        ret *= 10;
         ret += (qreal(ch() - '0'))/10;
+        digit_count++;
+        next_char();
     }
+
+    for (quint8 i = 0; i < digit_count; i++) ret /= 10;
+
     return ret;
 }
 

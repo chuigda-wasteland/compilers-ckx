@@ -43,7 +43,9 @@ HEADERS += \
     ../../compiler/defs.hpp \
     ../../compiler/gg.h \
     vy.h \
-    vy2.h
+    vy2.h \
+    vy3.h \
+    vy4.h
 
 INCLUDEPATH += \
     ../../compiler \

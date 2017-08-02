@@ -17,7 +17,7 @@ public:
     {
         pos++;
         if (pos-1 < str.size()) return str[pos-1];
-        else return saber::char_traits<qchar>::eof();
+        else return static_cast<qchar>(saber::char_traits<qchar>::eof());
     }
 
 private:
@@ -68,12 +68,12 @@ static bool do_test_ckx_token_stream_2(void)
     ckx_test_filereader reader = ckx_test_filereader(saber::move(str));
     ckx_default_token_stream stream = ckx_default_token_stream(reader);
 
-    saber::vector<saber_ptr<ckx_token>> comparsion =
+    saber::vector<saber::string> comparsion =
     {
-#define VYLEX(X) saber_ptr<ckx_token>(new ckx_token(qcoord(0, 0), saber::string(X))),
+#define VYLEX(X) saber::string(X),
 #include "vy.h"
 #undef VYLEX
-        saber_ptr<ckx_token>(new ckx_token(qcoord(0, 0), ""))
+        ""
     };
 
     for (qsizet i = 0;
@@ -81,9 +81,118 @@ static bool do_test_ckx_token_stream_2(void)
          ++i, ++stream)
     {
         if (stream[0].get()->token_type != ckx_token::type::token_identifier
-            || *(stream[0].get()->v.p_str) != *(comparsion[i].get()->v.p_str))
+            || *(stream[0].get()->v.p_str) != comparsion[i])
         {
             qDebug() << "Failed at token" << i << '\n';
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool float_equal(qreal r1, qreal r2)
+{
+    return (r1 - r2) < std::numeric_limits<qreal>::epsilon();
+}
+
+static bool do_test_ckx_token_stream_3()
+{
+    saber::string str =
+#define VY2LEX(X, Y) X" "
+#include "vy2.h"
+#undef VY2LEX
+            ;
+
+    qreal comparsion[] =
+    {
+#define VY2LEX(X, Y) Y,
+#include "vy2.h"
+#undef VY2LEX
+    };
+
+    ckx_test_filereader reader = ckx_test_filereader(saber::move(str));
+    ckx_default_token_stream stream = ckx_default_token_stream(reader);
+
+    for (qsizet i = 0;
+         stream[0].get()->token_type != ckx_token::type::token_eoi;
+         ++i, ++stream)
+    {
+        if (stream[0].get()->token_type != ckx_token::type::token_vr_literal
+            || !float_equal(stream[0].get()->v.r, comparsion[i]) )
+        {
+            qDebug() << "Failed at token" << i << '\n';
+            qDebug() << stream[0].get()->v.r << '\n';
+            qDebug() << comparsion[i] << '\n';
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool do_test_ckx_token_stream_4()
+{
+    saber::string str =
+#define VY3LEX(X, Y) X" "
+#include "vy3.h"
+#undef VY3LEX
+            ;
+
+    qint64 comparsion[] =
+    {
+#define VY3LEX(X, Y) Y,
+#include "vy3.h"
+#undef VY3LEX
+    };
+
+    ckx_test_filereader reader = ckx_test_filereader(saber::move(str));
+    ckx_default_token_stream stream = ckx_default_token_stream(reader);
+
+    for (qsizet i = 0;
+         stream[0].get()->token_type != ckx_token::type::token_eoi;
+         ++i, ++stream)
+    {
+        if (stream[0].get()->token_type != ckx_token::type::token_vi_literal
+            || stream[0].get()->v.i64 != comparsion[i] )
+        {
+            qDebug() << "Failed at token" << i << '\n';
+            qDebug() << stream[0].get()->v.i64 << '\n';
+            qDebug() << comparsion[i] << '\n';
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool do_test_ckx_token_stream_5()
+{
+    saber::string str =
+#define VY4LEX(X, Y) X" "
+#include "vy4.h"
+#undef VY4LEX
+            ;
+
+    ckx_token::type comparsion[] =
+    {
+#define VY4LEX(X, Y) ckx_token::type::token_##Y,
+#include "vy4.h"
+#undef VY4LEX
+    };
+
+    ckx_test_filereader reader = ckx_test_filereader(saber::move(str));
+    ckx_default_token_stream stream = ckx_default_token_stream(reader);
+
+    for (qsizet i = 0;
+         stream[0].get()->token_type != ckx_token::type::token_eoi;
+         ++i, ++stream)
+    {
+        if (stream[0].get()->token_type != comparsion[i])
+        {
+            qDebug() << "Failed at token" << i << '\n';
+            qDebug() << (int)stream[0].get()->token_type << '\n';
+            qDebug() << (int)comparsion[i] << '\n';
             return false;
         }
     }
@@ -102,8 +211,11 @@ public:
     DefaultTokenStreamTest();
 
 private Q_SLOTS:
-    void test_tokenstream_1();
-    void test_tokenstream_2();
+    void test_tokenstream_1(); // testcase for keywords
+    void test_tokenstream_2(); // testcase for identifiers
+    void test_tokenstream_3(); // testcase for real literals
+    void test_tokenstream_4(); // testcase for integers
+    void test_tokenstream_5(); // testcase for symbols
 };
 
 DefaultTokenStreamTest::DefaultTokenStreamTest()
@@ -112,12 +224,27 @@ DefaultTokenStreamTest::DefaultTokenStreamTest()
 
 void DefaultTokenStreamTest::test_tokenstream_1()
 {
-    QVERIFY2(ckx::do_test_ckx_token_stream_1(), "Failure");
+    QVERIFY2(ckx::do_test_ckx_token_stream_1(), "Failure in test for kwds");
 }
 
 void DefaultTokenStreamTest::test_tokenstream_2()
 {
-    QVERIFY2(ckx::do_test_ckx_token_stream_2(), "Failure");
+    QVERIFY2(ckx::do_test_ckx_token_stream_2(), "Failure in test for ids");
+}
+
+void DefaultTokenStreamTest::test_tokenstream_3()
+{
+    QVERIFY2(ckx::do_test_ckx_token_stream_3(), "Failure in test for reals");
+}
+
+void DefaultTokenStreamTest::test_tokenstream_4()
+{
+    QVERIFY2(ckx::do_test_ckx_token_stream_4(), "Failure in test for integers");
+}
+
+void DefaultTokenStreamTest::test_tokenstream_5()
+{
+    QVERIFY2(ckx::do_test_ckx_token_stream_5(), "Failure in test for symbols");
 }
 
 QTEST_APPLESS_MAIN(DefaultTokenStreamTest)
