@@ -21,4 +21,7 @@
 
 namespace ckx
 {
+
+ckx_ast_node::~ckx_ast_node() {}
+
 }

@@ -26,6 +26,14 @@
 namespace ckx
 {
 
+namespace detail
+{
+
+template <typename TokenStream>
+class ckx_parser_impl;
+
+} // namespace detail
+
 template <typename TokenStream>
 class ckx_parser
 {
@@ -34,6 +42,9 @@ public:
     ~ckx_parser();
 
     ckx_ast_translation_unit* parse(TokenStream& _token_stream);
+
+private:
+    detail::ckx_parser_impl<TokenStream>* p_impl;
 };
 
 extern template class ckx_parser<ckx_default_token_stream>;

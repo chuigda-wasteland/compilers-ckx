@@ -21,4 +21,23 @@
 
 namespace ckx
 {
-}
+
+namespace detail
+{
+
+template <typename TokenStream>
+class ckx_parser_impl
+{
+public:
+    ckx_parser_impl();
+    ~ckx_parser_impl();
+
+    ckx_ast_translation_unit* parse_impl(TokenStream& _token_stream);
+
+private:
+
+};
+
+} // namespace detail
+
+} // namespace ckx
