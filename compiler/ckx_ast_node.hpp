@@ -37,8 +37,6 @@ interface ckx_ast_node
 public:
     ckx_ast_node() = default;
     virtual ~ckx_ast_node() = 0;
-
-    // virtual void translate(saber::vector<ckx_ir_instance>& ret) = 0;
 };
 
 class ckx_ast_translation_unit implements ckx_ast_node
@@ -46,6 +44,8 @@ class ckx_ast_translation_unit implements ckx_ast_node
 public:
     ckx_ast_translation_unit() = default;
     ~ckx_ast_translation_unit() override final;
+
+    // virtual std::list<ckx_ir_instance> translate() = 0;
 };
 
 class ckx_ast_stmt implements ckx_ast_node
@@ -59,11 +59,9 @@ class ckx_ast_decl implements ckx_ast_stmt
 {
 public:
     ckx_ast_decl(saber_ptr<ckx_type> _type);
-    ~ckx_ast_decl() override final;
+    ~ckx_ast_decl() override;
 
-    void add_decl(saber_ptr<saber::string> _name);
-
-private:
+protected:
     saber_ptr<ckx_type> type;
     saber::vector<saber_ptr<saber::string>> names;
 };
@@ -147,18 +145,30 @@ private:
 // Fixme : find a better way to implement functions
 //         after we have a symbol table
 
-open_class ckx_function_param
-{
-    saber_ptr<ckx_type> type;
-    saber_ptr<saber::string> name;
-};
-
-class ckx_ast_function implements ckx_ast_node
+class ckx_ast_function implements ckx_ast_decl
 {
 private:
-    saber_ptr<ckx_function_type> type;
-    saber::vector<ckx_function_param> args;
+    saber_ptr<ckx_function_type> function_type;
+    saber::vector<ckx_ast_decl*> param_decls;
     ckx_ast_compound_stmt *function_body;
+};
+
+class ckx_ast_struct_decl implements ckx_ast_node
+{
+private:
+    saber_ptr<ckx_type> struct_type;
+};
+
+class ckx_ast_variant_decl implements ckx_ast_node
+{
+private:
+    saber_ptr<ckx_type> variant_type;
+};
+
+class ckx_ast_enum_decl implements ckx_ast_node
+{
+private:
+    saber::string name;
 };
 
 } // namespace ckx

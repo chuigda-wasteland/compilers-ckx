@@ -101,6 +101,7 @@ open_class ckx_token
         token_const,              // const
 
         token_if,                 // if
+        token_else,               // else
         token_for,                // for
         token_while,              // while
         token_do,                 // do
