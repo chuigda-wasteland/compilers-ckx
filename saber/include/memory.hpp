@@ -209,8 +209,11 @@ public:
         }
     }
 
-    inline T* get() {return ptr;}
-    inline const T* get() const {return ptr;}
+    inline T* get() { return ptr; }
+    inline const T* get() const { return ptr; }
+
+    inline T* operator->() { return ptr; }
+    inline const T* operator->() const { return ptr; }
 
     void swap(saber_ptr& _another) noexcept
     {
@@ -253,6 +256,9 @@ public:
 
     inline T& operator* () { return *raw; }
     inline const T& operator* () const { return *raw; }
+
+    inline T* operator->() { return raw; }
+    inline const T* operator->() const { return raw; }
 
     void swap(caster_ptr& _another) noexcept
     {

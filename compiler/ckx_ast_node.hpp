@@ -45,6 +45,7 @@ public:
     ckx_ast_translation_unit() = default;
     ~ckx_ast_translation_unit() override final;
 
+    // Faker
     // virtual std::list<ckx_ir_instance> translate() = 0;
 };
 
@@ -81,7 +82,7 @@ private:
     ckx_ast_expr *expr;
 };
 
-class ckx_ast_compound_stmt implements ckx_ast_stmt
+class ckx_ast_compound_stmt final implements ckx_ast_stmt
 {
 public:
     ckx_ast_compound_stmt();
@@ -93,7 +94,7 @@ private:
     saber::vector<ckx_ast_stmt*> stmts;
 };
 
-class ckx_ast_if_stmt implements ckx_ast_stmt
+class ckx_ast_if_stmt final implements ckx_ast_stmt
 {
 public:
     ckx_ast_if_stmt(ckx_ast_expr *_condition,
@@ -107,10 +108,10 @@ private:
     ckx_ast_stmt *else_execution;
 };
 
-class ckx_ast_while_stmt implements ckx_ast_stmt
+class ckx_ast_while_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_while_stmt(ckx_ast_expr *_condition, ckx_ast_stmt _execution);
+    ckx_ast_while_stmt(ckx_ast_expr *_condition, ckx_ast_stmt* _execution);
     ~ckx_ast_while_stmt() override final;
 
 private:
@@ -118,7 +119,7 @@ private:
     ckx_ast_stmt *execution;
 };
 
-class ckx_ast_for_stmt implements ckx_ast_stmt
+class ckx_ast_for_stmt final implements ckx_ast_stmt
 {
 public:
     ckx_ast_for_stmt(ckx_ast_expr *_init,
@@ -141,6 +142,29 @@ private:
     ckx_ast_stmt *execution;
 };
 
+class ckx_ast_return_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_return_stmt(ckx_ast_expr* _ret_expr);
+    ~ckx_ast_return_stmt() override final;
+
+private:
+    ckx_ast_expr* ret_expr;
+};
+
+class ckx_ast_break_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_break_stmt() = default;
+    ~ckx_ast_break_stmt() override final = default;
+};
+
+class ckx_ast_continue_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_continue_stmt() = default;
+    ~ckx_ast_continue_stmt() override final = default;
+};
 
 // Fixme : find a better way to implement functions
 //         after we have a symbol table
