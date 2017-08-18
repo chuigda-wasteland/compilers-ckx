@@ -16,7 +16,6 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
   */
 
-
 #include "ckx_parser.hpp"
 
 namespace ckx
@@ -66,7 +65,8 @@ private:
 };
 
 template <typename TokenStream>
-ckx_ast_stmt* ckx_parser_impl<TokenStream>::parse_stmt()
+ckx_ast_stmt*
+ckx_parser_impl<TokenStream>::parse_stmt()
 {
     switch (stream()[0]->token_type)
     {

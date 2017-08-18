@@ -30,7 +30,9 @@
 namespace ckx
 {
 
-class ckx_type
+using saber::saber_ptr;
+
+interface ckx_type
 {
 public:
     enum class category : unsigned char
@@ -58,14 +60,15 @@ public:
         type_variant,
 
         type_pointer,
-        type_typedef
+        type_qualifier,
+
+        type_alias
     };
 
     ckx_type(category _category);
     virtual ~ckx_type() = 0;
 
-    category get_category() const;
-    virtual bool is_const() const = 0;
+    const category& get_category() const;
     virtual qsizet size() const = 0;
 
 protected:
@@ -73,29 +76,89 @@ protected:
 };
 
 
-class ckx_basic_type : public ckx_type
+class ckx_basic_type final implements ckx_type
 {
 public:
-    ckx_basic_type(category _basic_category, bool _is_const);
-    ~ckx_basic_type() = default;
+    ckx_basic_type(category _basic_category);
+    ~ckx_basic_type() override final = default;
 
-    bool is_const() const override final;
+    qsizet size() const override final;
+};
+
+class ckx_struct_type final implements ckx_type
+{
+public:
+    // field tuple : name, type, offset
+    using field = qtuple<saber::string, saber_ptr<ckx_type>, qsizet>;
+
+    ckx_struct_type();
+    ~ckx_struct_type() override final = default;
+
+    qsizet size() const override final;
+    // on hold
+    // void add_field(field&& _field);
+
+    // field helper functions
+    static saber::string& field_name(field& _field);
+    static ckx_type& field_type(field& _field);
+    static qsizet& field_offset(field& _field);
+
+    static const saber::string& field_name(const field& _field);
+    static const ckx_type& field_type(const field& _field);
+    static const qsizet& field_offset(const field &_field);
+
+private:
+    saber::vector<field> fields;
+};
+
+class ckx_function_type final implements ckx_type
+{
+public:
+    ckx_function_type(saber_ptr<ckx_type> _return_type,
+                      saber::vector<saber_ptr<ckx_type>>&& _param_type_list);
+    ~ckx_function_type() override final = default;
+
     qsizet size() const override final;
 
 private:
-    bool is_const_value;
+    saber_ptr<ckx_type> return_type;
+    saber::vector<saber_ptr<ckx_type>> param_type_list;
 };
 
-class ckx_record_type : public ckx_type
+class ckx_pointer_type final implements ckx_type
 {
+public:
+    ckx_pointer_type(saber_ptr<ckx_type> _target);
+    ~ckx_pointer_type() override final = default;
+
+    qsizet size() const override final;
+
+private:
+    saber_ptr<ckx_type> target;
 };
 
-class ckx_function_type : public ckx_type
+class ckx_type_alias final implements ckx_type
 {
+public:
+    ckx_type_alias(saber_ptr<ckx_type> _origin);
+    ~ckx_type_alias() override final = default;
+
+    qsizet size() const override final;
+
+private:
+    saber_ptr<ckx_type> origin;
 };
 
-class ckx_pointer_type : public ckx_type
+class ckx_qualification final implements ckx_type
 {
+public:
+    ckx_qualification(saber_ptr<ckx_type> _qualified);
+    ~ckx_qualification() override final = default;
+
+    qsizet size() const override final;
+
+private:
+    saber_ptr<ckx_type> qualified;
 };
 
 } // namespace ckx

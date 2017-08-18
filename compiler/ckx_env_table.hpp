@@ -23,6 +23,7 @@
 
 #include "string.hpp"
 #include "vector.hpp"
+#include "unordered_map.hpp"
 
 #include "defs.hpp"
 
@@ -51,8 +52,6 @@ open_class ckx_table_entry
             saber_ptr<ckx_type> ref;
         } type;
     } v;
-
-    saber_ptr<saber::string> name;
 };
 
 class ckx_env_table
@@ -60,10 +59,10 @@ class ckx_env_table
 public:
     ckx_table_entry* lookup(const saber::string& _name);
     void add_entry(saber_ptr<saber::string> _name,
-                   saber_ptr<ckx_type> _type,
-                   ckx_table_entry::category _category);
+                   ckx_table_entry _entry);
 private:
-    saber::vector<ckx_table_entry*> entries;
+    // On hold. until I can find a good hash function
+    // saber::unordered_map<saber_ptr<saber::string>, ckx_table_entry*> entries;
     ckx_env_table *parent;
 };
 

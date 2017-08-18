@@ -27,20 +27,16 @@ ckx_type::ckx_type(category _category) :
 
 ckx_type::~ckx_type() {}
 
-ckx_type::category ckx_type::get_category() const
+const ckx_type::category &ckx_type::get_category() const
 {
     return this_category;
 }
 
-ckx_basic_type::ckx_basic_type(category _basic_category, bool _is_const) :
-    ckx_type(_basic_category),
-    is_const_value(_is_const)
-{}
 
-bool ckx_basic_type::is_const() const
-{
-    return is_const_value;
-}
+
+ckx_basic_type::ckx_basic_type(category _basic_category) :
+    ckx_type(_basic_category)
+{}
 
 qsizet ckx_basic_type::size() const
 {
@@ -73,5 +69,65 @@ qsizet ckx_basic_type::size() const
         return 0;
     }
 }
+
+
+
+ckx_struct_type::ckx_struct_type() :
+    ckx_type(ckx_type::category::type_struct)
+{
+}
+
+qsizet ckx_struct_type::size() const
+{
+    if ( fields.empty() ) return 0;
+
+    return field_offset(*fields.rbegin())
+           + field_type(*fields.rbegin()).size();
+}
+
+saber::string& ckx_struct_type::field_name(field &_field)
+{
+    return std::get<0>(_field);
+}
+
+ckx_type& ckx_struct_type::field_type(field &_field)
+{
+    return *(std::get<1>(_field).get());
+}
+
+qsizet &ckx_struct_type::field_offset(field &_field)
+{
+    return std::get<2>(_field);
+}
+
+const saber::string& ckx_struct_type::field_name(const field &_field)
+{
+    return std::get<0>(_field);
+}
+
+const ckx_type& ckx_struct_type::field_type(const field &_field)
+{
+    return *(std::get<1>(_field).get());
+}
+
+const qsizet &ckx_struct_type::field_offset(const field &_field)
+{
+    return std::get<2>(_field);
+}
+
+
+ckx_function_type::ckx_function_type(
+        saber_ptr<ckx_type> _return_type,
+        saber::vector<saber_ptr<ckx_type>> &&_param_type_list) :
+    return_type(saber::move(_return_type)),
+    param_type_list(saber::move(_param_type_list))
+{}
+
+qsizet ckx_function_type::size()
+{
+    return 8;
+}
+
+
 
 } // namespace ckx

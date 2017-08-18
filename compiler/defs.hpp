@@ -49,6 +49,9 @@ using qcoord = std::pair<qsizet, qsizet>;
 template <typename T1, typename T2>
 using qpair = std::pair<T1, T2>;
 
+template <typename T1, typename T2, typename T3>
+using qtuple = std::tuple<T1, T2, T3>;
+
 template <typename ArrayType>
 constexpr qsizet countof(const ArrayType& _array)
 {
