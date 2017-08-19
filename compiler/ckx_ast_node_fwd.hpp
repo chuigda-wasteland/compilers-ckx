@@ -16,12 +16,41 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
   */
 
-
-#include "ckx_ast_node.hpp"
+#ifndef CKX_AST_NODE_FWD_HPP
+#define CKX_AST_NODE_FWD_HPP
 
 namespace ckx
 {
 
-ckx_ast_stmt::~ckx_ast_stmt() {}
+class ckx_ast_node;
+
+class ckx_ast_translation_unit;
+
+class ckx_ast_stmt;
+
+    class ckx_ast_compound_stmt;
+    class ckx_ast_if_stmt;
+    class ckx_ast_while_stmt;
+    class ckx_ast_for_stmt;
+    class ckx_ast_do_while_stmt;
+    class ckx_ast_break_stmt;
+    class ckx_ast_continue_stmt;
+    class ckx_ast_return_stmt;
+
+    class ckx_ast_struct_stmt;
+    class ckx_ast_variant_stmt;
+    class ckx_ast_enum_stmt;
+    class ckx_ast_decl_stmt;
+    class ckx_ast_func_stmt;
+    class ckx_ast_expr_stmt;
+
+class ckx_ast_expr;
+class ckx_ast_func;
+class ckx_ast_init_decl;
+class ckx_ast_struct;
+class ckx_ast_variant;
+class ckx_ast_enum;
 
 } // namespace ckx
+
+#endif // CKX_AST_NODE_FWD_HPP

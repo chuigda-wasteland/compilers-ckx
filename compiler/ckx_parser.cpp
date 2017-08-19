@@ -24,6 +24,9 @@ namespace ckx
 namespace detail
 {
 
+Q_ON_HOLD(...)
+/*
+
 template <typename TokenStream>
 class ckx_parser_impl
 {
@@ -203,7 +206,7 @@ ckx_parser_impl<TokenStream>::expect_n_eat(ckx_token::type _token_type)
     if (stream()[0]->token_type == _token_type)
         ++stream();
     else
-        /*On hold*/ ;
+        Q_ON_HOLD(...) ;
 }
 
 template <typename TokenStream>
@@ -213,6 +216,8 @@ ckx_parser_impl<TokenStream>::stream()
 {
     return *token_stream;
 }
+
+*/
 
 } // namespace detail
 

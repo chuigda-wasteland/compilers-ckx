@@ -24,176 +24,260 @@
 #include "memory.hpp"
 #include "string.hpp"
 #include "vector.hpp"
+#include "list.hpp"
 
 #include "ckx_type.hpp"
+#include "ckx_env_table.hpp"
+
+#include "ckx_token.hpp"
+
+#include "ckx_ast_node_fwd.hpp"
 
 namespace ckx
 {
 
 using saber::saber_ptr;
 
-interface ckx_ast_node
+class ckx_ast_node
 {
 public:
-    ckx_ast_node() = default;
-    virtual ~ckx_ast_node() = 0;
+    ckx_ast_node(saber_ptr<ckx_token> _at_token);
+    ~ckx_ast_node() = default;
+
+    saber_ptr<ckx_token> get_at_token();
+
+private:
+    saber_ptr<ckx_token> at_token;
 };
 
-class ckx_ast_translation_unit implements ckx_ast_node
+
+
+class ckx_ast_translation_unit make_use_of ckx_ast_node
 {
 public:
-    ckx_ast_translation_unit() = default;
-    ~ckx_ast_translation_unit() override final;
+    ckx_ast_translation_unit(saber_ptr<ckx_token> _at_token);
+    ~ckx_ast_translation_unit() = default;
 
-    // Faker
-    // virtual std::list<ckx_ir_instance> translate() = 0;
+    void add_new_stmt(ckx_ast_stmt *_stmt);
+
+private:
+    saber::vector<ckx_ast_stmt*> stmts;
+    ckx_env_table *global_table;
 };
 
-class ckx_ast_stmt implements ckx_ast_node
+
+
+interface ckx_ast_stmt make_use_of ckx_ast_node
 {
 public:
-    ckx_ast_stmt() = default;
-    ~ckx_ast_stmt() override;
+    ckx_ast_stmt(saber_ptr<ckx_token> _at_token);
+    virtual ~ckx_ast_stmt() = 0;
+
+    // SKTT1Faker
+    // This function will be finished after we get a proper intermediate
+    // representation and start to write syntax-directed translation
+
+    Q_ON_HOLD(virtual void translate(saber::list<ckx_ir_instance>& ret) = 0;)
 };
 
-class ckx_ast_decl implements ckx_ast_stmt
+class ckx_ast_compound_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_decl(saber_ptr<ckx_type> _type);
-    ~ckx_ast_decl() override;
+    ckx_ast_compound_stmt(saber_ptr<ckx_token> _at_token);
+    ~ckx_ast_compound_stmt() override final;
 
-protected:
-    saber_ptr<ckx_type> type;
-    saber::vector<saber_ptr<saber::string>> names;
+    void add_new_stmt(ckx_ast_stmt *_stmt);
+
+private:
+    saber::vector<ckx_ast_stmt*> stmts;
+    ckx_env_table *local_table;
 };
 
-class ckx_ast_expr implements ckx_ast_node
-{
-    // On hold
-};
-
-class ckx_ast_expr_stmt implements ckx_ast_stmt
+class ckx_ast_if_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_expr_stmt(ckx_ast_expr* _expr);
+    ckx_ast_if_stmt(saber_ptr<ckx_token> _at_token,
+                    ckx_ast_expr* _condition,
+                    ckx_ast_stmt* _then_clause,
+                    ckx_ast_stmt* _else_clause);
+    ~ckx_ast_if_stmt() override final;
+
+private:
+    ckx_ast_expr *condition;
+    ckx_ast_stmt *then_clause;
+    ckx_ast_stmt *else_clause;
+};
+
+class ckx_ast_while_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_while_stmt(saber_ptr<ckx_token> _at_token,
+                       ckx_ast_expr *_condition,
+                       ckx_ast_stmt *_clause);
+    ~ckx_ast_while_stmt() override final;
+
+private:
+    ckx_ast_expr *condition;
+    ckx_ast_stmt *clause;
+};
+
+class ckx_ast_do_while_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_do_while_stmt(saber_ptr<ckx_token> _at_token,
+                          ckx_ast_expr *_condition,
+                          ckx_ast_stmt *_clause);
+    ~ckx_ast_do_while_stmt() override final;
+
+private:
+    ckx_ast_expr *condition;
+    ckx_ast_stmt *clause;
+};
+
+class ckx_ast_break_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_break_stmt(saber_ptr<ckx_token> _at_token);
+    ~ckx_ast_break_stmt() override final;
+};
+
+class ckx_ast_continue_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_continue_stmt(saber_ptr<ckx_token> _at_token);
+    ~ckx_ast_continue_stmt() override final;
+};
+
+class ckx_ast_return_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_return_stmt(saber_ptr<ckx_token> _at_token,
+                        ckx_ast_expr* _return_expr);
+    ~ckx_ast_return_stmt() override final;
+
+private:
+    ckx_ast_expr *return_expr;
+};
+
+class ckx_ast_struct_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_struct_stmt(ckx_ast_struct *_the_struct);
+    ~ckx_ast_struct_stmt() override final;
+
+private:
+    ckx_ast_struct *the_struct;
+};
+
+class ckx_ast_variant_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_variant_stmt(ckx_ast_variant *_the_variant);
+    ~ckx_ast_variant_stmt() override final;
+
+private:
+    ckx_ast_variant *the_variant;
+};
+
+class ckx_ast_enum_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_enum_stmt(ckx_ast_enum *_the_enum);
+    ~ckx_ast_enum_stmt() override final;
+
+private:
+    ckx_ast_enum *the_enum;
+};
+
+class ckx_ast_decl_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_decl_stmt(saber_ptr<ckx_token> _at_token);
+    ~ckx_ast_decl_stmt() override final;
+
+private:
+    saber::vector<ckx_ast_init_decl*> decls;
+};
+
+class ckx_ast_func_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_func_stmt(ckx_ast_func* _func);
+    ~ckx_ast_func_stmt() override final;
+
+private:
+    ckx_ast_func* _func;
+};
+
+class ckx_ast_expr_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_expr_stmt(saber_ptr<ckx_token> _at_token, ckx_ast_expr* _expr);
     ~ckx_ast_expr_stmt() override final;
 
 private:
     ckx_ast_expr *expr;
 };
 
-class ckx_ast_compound_stmt final implements ckx_ast_stmt
+
+class ckx_ast_expr make_use_of ckx_ast_node
 {
-public:
-    ckx_ast_compound_stmt();
-    ~ckx_ast_compound_stmt() override final;
-
-    void add_stmt(ckx_ast_stmt* _stmt);
-
-private:
-    saber::vector<ckx_ast_stmt*> stmts;
+    Q_ON_HOLD(...)
 };
 
-class ckx_ast_if_stmt final implements ckx_ast_stmt
+class ckx_ast_func make_use_of ckx_ast_node
 {
 public:
-    ckx_ast_if_stmt(ckx_ast_expr *_condition,
-                    ckx_ast_stmt *_then_execution,
-                    ckx_ast_stmt *_else_execution);
-    ~ckx_ast_if_stmt() override final;
+    ckx_ast_func(saber_ptr<ckx_token> _at_token, ckx_func_entry *_entry);
+    ~ckx_ast_func() = default;
 
 private:
-    ckx_ast_expr *condition;
-    ckx_ast_stmt *then_execution;
-    ckx_ast_stmt *else_execution;
+    ckx_func_entry *entry;
 };
 
-class ckx_ast_while_stmt final implements ckx_ast_stmt
+class ckx_ast_init_decl make_use_of ckx_ast_node
 {
 public:
-    ckx_ast_while_stmt(ckx_ast_expr *_condition, ckx_ast_stmt* _execution);
-    ~ckx_ast_while_stmt() override final;
+    ckx_ast_init_decl(saber_ptr<ckx_token> _at_token,
+                      ckx_var_entry* _entry,
+                      ckx_ast_expr* _init);
+    ~ckx_ast_init_decl();
 
 private:
-    ckx_ast_expr *condition;
-    ckx_ast_stmt *execution;
-};
-
-class ckx_ast_for_stmt final implements ckx_ast_stmt
-{
-public:
-    ckx_ast_for_stmt(ckx_ast_expr *_init,
-                     ckx_ast_expr *_condition,
-                     ckx_ast_expr *_increment,
-                     ckx_ast_stmt *_execution);
-
-    ckx_ast_for_stmt(ckx_ast_decl *_init_decl,
-                     ckx_ast_expr *_condition,
-                     ckx_ast_expr *_increment,
-                     ckx_ast_stmt *_execution);
-
-    ~ckx_ast_for_stmt() override final;
-
-private:
-    ckx_ast_decl *init_decl;
+    ckx_var_entry *entry;
     ckx_ast_expr *init;
-    ckx_ast_expr *condition;
-    ckx_ast_expr *increment;
-    ckx_ast_stmt *execution;
 };
 
-class ckx_ast_return_stmt final implements ckx_ast_stmt
+class ckx_ast_struct make_use_of ckx_ast_node
 {
 public:
-    ckx_ast_return_stmt(ckx_ast_expr* _ret_expr);
-    ~ckx_ast_return_stmt() override final;
+    ckx_ast_struct(saber_ptr<ckx_token> _at_token, ckx_type_entry* _entry);
+    ~ckx_ast_struct();
 
 private:
-    ckx_ast_expr* ret_expr;
+    ckx_type_entry *_entry;
 };
 
-class ckx_ast_break_stmt final implements ckx_ast_stmt
+class ckx_ast_variant make_use_of ckx_ast_node
 {
 public:
-    ckx_ast_break_stmt() = default;
-    ~ckx_ast_break_stmt() override final = default;
+    ckx_ast_variant(saber_ptr<ckx_token> _at_token, ckx_type_entry* _entry);
+    ~ckx_ast_variant();
+
+private:
+    ckx_type_entry *_entry;
 };
 
-class ckx_ast_continue_stmt final implements ckx_ast_stmt
+class ckx_ast_enum make_use_of ckx_ast_node
 {
 public:
-    ckx_ast_continue_stmt() = default;
-    ~ckx_ast_continue_stmt() override final = default;
-};
+    ckx_ast_enum(saber_ptr<ckx_token> _at_token, ckx_type_entry* _entry);
+    ~ckx_ast_enum();
 
-// Fixme : find a better way to implement functions
-//         after we have a symbol table
-
-class ckx_ast_function implements ckx_ast_decl
-{
 private:
-    saber_ptr<ckx_function_type> function_type;
-    saber::vector<ckx_ast_decl*> param_decls;
-    ckx_ast_compound_stmt *function_body;
+    ckx_type_entry *_entry;
 };
 
-class ckx_ast_struct_decl implements ckx_ast_node
-{
-private:
-    saber_ptr<ckx_type> struct_type;
-};
-
-class ckx_ast_variant_decl implements ckx_ast_node
-{
-private:
-    saber_ptr<ckx_type> variant_type;
-};
-
-class ckx_ast_enum_decl implements ckx_ast_node
-{
-private:
-    saber::string name;
-};
 
 } // namespace ckx
 

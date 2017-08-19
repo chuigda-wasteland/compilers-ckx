@@ -42,7 +42,8 @@ HEADERS += \
     ckx_error.hpp \
     ckx_type.hpp \
     ckx_env_table.hpp \
-    gg.h
+    gg.h \
+    ckx_ast_node_fwd.hpp
 
 INCLUDEPATH += ../saber/include/
 

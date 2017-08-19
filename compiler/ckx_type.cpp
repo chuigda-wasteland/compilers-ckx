@@ -119,11 +119,12 @@ const qsizet &ckx_struct_type::field_offset(const field &_field)
 ckx_function_type::ckx_function_type(
         saber_ptr<ckx_type> _return_type,
         saber::vector<saber_ptr<ckx_type>> &&_param_type_list) :
+    ckx_type(ckx_type::category::type_function),
     return_type(saber::move(_return_type)),
     param_type_list(saber::move(_param_type_list))
 {}
 
-qsizet ckx_function_type::size()
+qsizet ckx_function_type::size() const
 {
     return 8;
 }

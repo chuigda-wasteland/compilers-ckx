@@ -32,37 +32,60 @@ namespace ckx
 
 using saber::saber_ptr;
 
-open_class ckx_table_entry
+open_class ckx_var_entry
 {
-    enum class category: char
-    {
-        entry_data,
-        entry_type
-    } entry_category;
+    ckx_var_entry(saber_ptr<ckx_type> _var_type);
+    ~ckx_var_entry() = default;
 
-    variant
-    {
-        pod_struct
-        {
-            saber_ptr<ckx_type> data_type;
-        } data;
+    saber_ptr<ckx_type> var_type;
+};
 
-        pod_struct
-        {
-            saber_ptr<ckx_type> ref;
-        } type;
-    } v;
+open_class ckx_func_entry
+{
+    ckx_func_entry(saber_ptr<ckx_function_type> _func_type);
+    ~ckx_func_entry() = default;
+
+    saber_ptr<ckx_function_type> func_type;
+};
+
+open_class ckx_type_entry
+{
+    ckx_type_entry(saber_ptr<ckx_type> type);
+    ~ckx_type_entry() = default;
+
+    saber_ptr<ckx_type> type;
 };
 
 class ckx_env_table
 {
 public:
-    ckx_table_entry* lookup(const saber::string& _name);
-    void add_entry(saber_ptr<saber::string> _name,
-                   ckx_table_entry _entry);
+    ckx_env_table(ckx_env_table *_parent);
+    ~ckx_env_table() = default;
+
+    void add_new_type(
+            saber::string&& _name, saber_ptr<ckx_type> _type);
+    void add_new_func(
+            saber::string&& _name, saber_ptr<ckx_function_type> _type);
+    void add_new_var(
+            saber::string&& _name, saber_ptr<ckx_type> _type);
+
+    saber_ptr<ckx_type> query_var(const saber::string& _name);
+    saber_ptr<ckx_type> query_type(const saber::string& _name);
+
+    // We have independent representation for function table
+    // since we need to solve function overloading in the future.
+    saber::vector<saber_ptr<ckx_function_type>>
+        query_func(const saber::string& _name);
+
 private:
-    // On hold. until I can find a good hash function
-    // saber::unordered_map<saber_ptr<saber::string>, ckx_table_entry*> entries;
+    saber::unordered_map<saber::string, ckx_var_entry> var_entry_table;
+    saber::unordered_map<saber::string, ckx_type_entry> type_entry_table;
+
+    // We have independent representation for function table
+    // since we need to solve function overloading in the future.
+    saber::unordered_map<saber::string, saber_ptr<ckx_func_entry>>
+        func_entry_table;
+
     ckx_env_table *parent;
 };
 
