@@ -56,7 +56,7 @@ class ckx_ast_translation_unit make_use_of ckx_ast_node
 {
 public:
     ckx_ast_translation_unit(saber_ptr<ckx_token> _at_token);
-    ~ckx_ast_translation_unit() = default;
+    ~ckx_ast_translation_unit();
 
     void add_new_stmt(ckx_ast_stmt *_stmt);
 
@@ -76,14 +76,14 @@ public:
     // SKTT1Faker
     // This function will be finished after we get a proper intermediate
     // representation and start to write syntax-directed translation
-
     Q_ON_HOLD(virtual void translate(saber::list<ckx_ir_instance>& ret) = 0;)
 };
 
 class ckx_ast_compound_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_compound_stmt(saber_ptr<ckx_token> _at_token);
+    ckx_ast_compound_stmt(saber_ptr<ckx_token> _at_token,
+                          ckx_env_table *_parent_scope_table);
     ~ckx_ast_compound_stmt() override final;
 
     void add_new_stmt(ckx_ast_stmt *_stmt);
@@ -195,6 +195,8 @@ public:
     ckx_ast_decl_stmt(saber_ptr<ckx_token> _at_token);
     ~ckx_ast_decl_stmt() override final;
 
+    void add_decl(ckx_ast_init_decl* _decl);
+
 private:
     saber::vector<ckx_ast_init_decl*> decls;
 };
@@ -206,7 +208,7 @@ public:
     ~ckx_ast_func_stmt() override final;
 
 private:
-    ckx_ast_func* _func;
+    ckx_ast_func* func;
 };
 
 class ckx_ast_expr_stmt final implements ckx_ast_stmt
@@ -255,7 +257,7 @@ public:
     ~ckx_ast_struct();
 
 private:
-    ckx_type_entry *_entry;
+    ckx_type_entry *entry;
 };
 
 class ckx_ast_variant make_use_of ckx_ast_node
@@ -265,7 +267,7 @@ public:
     ~ckx_ast_variant();
 
 private:
-    ckx_type_entry *_entry;
+    ckx_type_entry *entry;
 };
 
 class ckx_ast_enum make_use_of ckx_ast_node
@@ -275,7 +277,7 @@ public:
     ~ckx_ast_enum();
 
 private:
-    ckx_type_entry *_entry;
+    ckx_type_entry *entry;
 };
 
 

@@ -221,6 +221,12 @@ public:
         saber::swap(shared_count, _another.shared_count);
     }
 
+    inline bool operator== (const saber_ptr& _another) const
+    { return ptr == _another.ptr; }
+
+    inline bool operator!= (const saber_ptr& _another) const
+    { return !operator== (_another); }
+
 private:
     T *ptr;
     size_t *shared_count;

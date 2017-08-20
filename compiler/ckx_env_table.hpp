@@ -59,14 +59,20 @@ open_class ckx_type_entry
 class ckx_env_table
 {
 public:
+    enum add_status : qchar
+    {
+        success,
+        duplicate
+    };
+
     ckx_env_table(ckx_env_table *_parent);
     ~ckx_env_table() = default;
 
-    void add_new_type(
+    add_status add_new_type(
             saber::string&& _name, saber_ptr<ckx_type> _type);
-    void add_new_func(
+    add_status add_new_func(
             saber::string&& _name, saber_ptr<ckx_function_type> _type);
-    void add_new_var(
+    add_status add_new_var(
             saber::string&& _name, saber_ptr<ckx_type> _type);
 
     saber_ptr<ckx_type> query_var(const saber::string& _name);
@@ -83,7 +89,7 @@ private:
 
     // We have independent representation for function table
     // since we need to solve function overloading in the future.
-    saber::unordered_map<saber::string, saber_ptr<ckx_func_entry>>
+    saber::unordered_multimap<saber::string, saber_ptr<ckx_func_entry>>
         func_entry_table;
 
     ckx_env_table *parent;

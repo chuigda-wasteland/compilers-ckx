@@ -21,7 +21,7 @@
 #define CKX_PARSER_HPP
 
 #include "ckx_token_stream.hpp"
-#include "ckx_ast_node.hpp"
+#include "ckx_ast_node_fwd.hpp"
 
 namespace ckx
 {

@@ -7,6 +7,7 @@ namespace saber
 {
 
 using std::unordered_map;
+using std::unordered_multimap;
 
 } // namespace saber
 
