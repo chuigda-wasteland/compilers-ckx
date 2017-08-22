@@ -1,0 +1,132 @@
+﻿translation-unit
+    global-statement
+
+global-statement
+    declaration
+    function
+    newtype
+    ckx-block
+
+    import
+    export
+
+statement
+    declaration
+    expression-statement
+    control
+    compound-statement
+
+expression-statement
+    expression ;
+
+declaration
+    declarator init-declaration-list;
+
+function
+    "function" id ( param-type-list ) -> declarator SKTT1Faker
+
+expression
+    Q_ON_HOLD(...)
+
+ckx-block
+    ckx compound-statement
+
+param-type-list
+    paramater-declaration [, paramater-type-list]opt
+
+paramater-declaration
+    declarator [id]opt
+
+SKTT1Faker
+    ;
+    function-body
+
+control
+    if-statement
+    while-statement
+    do-while-statement
+    for-statement
+    break-statement
+    continue-statement
+    return-statement
+
+newtype
+    using-statement
+    struct-decl
+    variant-decl
+    enum-decl
+
+compound-statement
+    { statements... }
+
+import
+    "import" package;
+
+export
+    "export" package;
+
+declarator
+    typename declarator
+    cv-qualifier declarator
+    pointer-declarator declarator
+
+typename
+    vi8 | vi16 | vi32 | vi64 | vu8 | vu16 | vu32 | vu64 | vr32 | vr64 | vch
+    enum-type-id
+    struct-type-id
+    variant-type-id
+
+cv-qualifier
+    const
+
+pointer-declarator
+    *
+
+init-declaration-list
+    init-declaration [, init-declaration-list]opt
+
+init-declaration
+    id [= expression]opt
+
+if-statement
+    if ( expression ) statement [else statement]opt
+
+while-statement
+    while ( expression ) statement
+
+do-while-statement
+    do statement while ( expression )
+
+for-statement
+    for ( [for-init]opt ; [expression]opt ; [expression]opt ) statement
+
+for-init
+    declaration
+    expression
+
+break-statement
+    break ;
+
+continue-statement
+    continue ;
+
+return-statement
+    return [expression]opt
+
+struct-decl
+    struct id { fields }
+
+variant-decl
+    variant id { fields }
+
+field
+    declaration ;
+
+enum-decl
+    enum id { enumerators }
+
+enumerators
+    enumerator [, enumerators]opt
+
+enumerator
+    id [= integral-literal]opt

@@ -48,4 +48,5 @@ HEADERS += \
 INCLUDEPATH += ../saber/include/
 
 DISTFILES += \
-    LICENSE
+    LICENSE \
+    production.txt
