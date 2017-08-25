@@ -250,6 +250,17 @@ private:
     ckx_ast_expr *init;
 };
 
+class ckx_ast_param_decl make_use_of ckx_ast_node
+{
+public:
+    ckx_ast_param_decl(saber_ptr<ckx_token> _at_token,
+                       ckx_var_entry* _entry);
+    ~ckx_ast_param_decl();
+
+private:
+    ckx_var_entry *entry;
+};
+
 class ckx_ast_struct make_use_of ckx_ast_node
 {
 public:
@@ -279,7 +290,6 @@ public:
 private:
     ckx_type_entry *entry;
 };
-
 
 } // namespace ckx
 

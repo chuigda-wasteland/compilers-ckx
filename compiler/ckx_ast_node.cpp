@@ -226,6 +226,15 @@ ckx_ast_init_decl::~ckx_ast_init_decl()
     delete init;
 }
 
+ckx_ast_param_decl::ckx_ast_param_decl(saber_ptr<ckx_token> _at_token,
+                                       ckx_var_entry *_entry) :
+    ckx_ast_node(_at_token),
+    entry(_entry)
+{}
+
+ckx_ast_param_decl::~ckx_ast_param_decl()
+{}
+
 ckx_ast_struct::ckx_ast_struct(saber_ptr<ckx_token> _at_token,
                                ckx_type_entry *_entry) :
     ckx_ast_node(_at_token),
