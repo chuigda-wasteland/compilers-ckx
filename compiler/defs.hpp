@@ -66,7 +66,7 @@ constexpr qsizet countof(const ArrayType& _array)
 #define variant union
 
 #define implements : public
-#define make_use_of : private
+#define make_use_of : public
 
 #define Q_ON_HOLD(ANYTHING)
 

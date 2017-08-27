@@ -74,8 +74,7 @@ qsizet ckx_basic_type::size() const
 
 ckx_struct_type::ckx_struct_type() :
     ckx_type(ckx_type::category::type_struct)
-{
-}
+{}
 
 qsizet ckx_struct_type::size() const
 {
@@ -129,6 +128,156 @@ qsizet ckx_function_type::size() const
     return 8;
 }
 
+ckx_qualification::ckx_qualification(saber_ptr<ckx_type> _qualified) :
+    ckx_type(ckx_type::category::type_qualifier),
+    qualified(_qualified)
+{}
 
+qsizet ckx_qualification::size() const
+{
+    return qualified->size();
+}
+
+ckx_pointer_type::ckx_pointer_type(saber_ptr<ckx_type> _target) :
+    ckx_type(ckx_type::category::type_pointer),
+    target(_target)
+{}
+
+qsizet ckx_pointer_type::size() const
+{
+    return target->size();
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::get_type(ckx_token::type _basic_type_token)
+{
+    switch ( _basic_type_token )
+    {
+    case ckx_token::type::token_int8:   return get_vi8_type();
+    case ckx_token::type::token_int16:  return get_vi16_type();
+    case ckx_token::type::token_int32:  return get_vi32_type();
+    case ckx_token::type::token_int64:  return get_vi64_type();
+    case ckx_token::type::token_uint8:  return get_vu8_type();
+    case ckx_token::type::token_uint16: return get_vu16_type();
+    case ckx_token::type::token_uint32: return get_vu32_type();
+    case ckx_token::type::token_uint64: return get_vu64_type();
+    case ckx_token::type::token_char:   return get_vch_type();
+    case ckx_token::type::token_real32: return get_vr32_type();
+    case ckx_token::type::token_real64: return get_vr64_type();
+    case ckx_token::type::token_void:   return get_void_type();
+
+    default: assert(0);
+    }
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::qual_const(saber_ptr<ckx_type> _base)
+{
+    return saber_ptr<ckx_type>(
+        new ckx_qualification(_base));
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::pointer_to(saber_ptr<ckx_type> _base)
+{
+    return saber_ptr<ckx_type>(
+        new ckx_pointer_type(_base));
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::get_vi8_type()
+{
+    static saber_ptr<ckx_type> ret(
+        new ckx_basic_type(ckx_type::category::type_vi8) );
+    return ret;
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::get_vi16_type()
+{
+    static saber_ptr<ckx_type> ret(
+        new ckx_basic_type(ckx_type::category::type_vi16) );
+    return ret;
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::get_vi32_type()
+{
+    static saber_ptr<ckx_type> ret(
+        new ckx_basic_type(ckx_type::category::type_vi32) );
+    return ret;
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::get_vi64_type()
+{
+    static saber_ptr<ckx_type> ret(
+        new ckx_basic_type(ckx_type::category::type_vi64) );
+    return ret;
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::get_vu8_type()
+{
+    static saber_ptr<ckx_type> ret(
+        new ckx_basic_type(ckx_type::category::type_vu8) );
+    return ret;
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::get_vu16_type()
+{
+    static saber_ptr<ckx_type> ret(
+        new ckx_basic_type(ckx_type::category::type_vu16) );
+    return ret;
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::get_vu32_type()
+{
+    static saber_ptr<ckx_type> ret(
+        new ckx_basic_type(ckx_type::category::type_vu32) );
+    return ret;
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::get_vu64_type()
+{
+    static saber_ptr<ckx_type> ret(
+        new ckx_basic_type(ckx_type::category::type_vu64) );
+    return ret;
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::get_vch_type()
+{
+    static saber_ptr<ckx_type> ret(
+        new ckx_basic_type(ckx_type::category::type_vch) );
+    return ret;
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::get_vr32_type()
+{
+    static saber_ptr<ckx_type> ret(
+        new ckx_basic_type(ckx_type::category::type_vr32) );
+    return ret;
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::get_vr64_type()
+{
+    static saber_ptr<ckx_type> ret(
+        new ckx_basic_type(ckx_type::category::type_vr64) );
+    return ret;
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::get_void_type()
+{
+    static saber_ptr<ckx_type> ret(
+        new ckx_basic_type(ckx_type::category::type_void));
+    return ret;
+}
 
 } // namespace ckx

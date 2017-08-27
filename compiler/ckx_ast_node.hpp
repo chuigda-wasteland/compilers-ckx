@@ -138,14 +138,14 @@ class ckx_ast_break_stmt final implements ckx_ast_stmt
 {
 public:
     ckx_ast_break_stmt(saber_ptr<ckx_token> _at_token);
-    ~ckx_ast_break_stmt() override final;
+    ~ckx_ast_break_stmt() override final = default;
 };
 
 class ckx_ast_continue_stmt final implements ckx_ast_stmt
 {
 public:
     ckx_ast_continue_stmt(saber_ptr<ckx_token> _at_token);
-    ~ckx_ast_continue_stmt() override final;
+    ~ckx_ast_continue_stmt() override final = default;
 };
 
 class ckx_ast_return_stmt final implements ckx_ast_stmt
@@ -153,7 +153,7 @@ class ckx_ast_return_stmt final implements ckx_ast_stmt
 public:
     ckx_ast_return_stmt(saber_ptr<ckx_token> _at_token,
                         ckx_ast_expr* _return_expr);
-    ~ckx_ast_return_stmt() override final;
+    ~ckx_ast_return_stmt() override final = default;
 
 private:
     ckx_ast_expr *return_expr;
@@ -231,7 +231,7 @@ class ckx_ast_func make_use_of ckx_ast_node
 {
 public:
     ckx_ast_func(saber_ptr<ckx_token> _at_token, ckx_func_entry *_entry);
-    ~ckx_ast_func() = default;
+    ~ckx_ast_func();
 
 private:
     ckx_func_entry *entry;
@@ -255,7 +255,7 @@ class ckx_ast_param_decl make_use_of ckx_ast_node
 public:
     ckx_ast_param_decl(saber_ptr<ckx_token> _at_token,
                        ckx_var_entry* _entry);
-    ~ckx_ast_param_decl();
+    ~ckx_ast_param_decl() = default;
 
 private:
     ckx_var_entry *entry;

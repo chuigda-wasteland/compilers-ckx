@@ -55,7 +55,7 @@ ckx_env_table::add_new_var(saber::string &&_name, saber_ptr<ckx_type> _type)
 ckx_env_table::add_status
 ckx_env_table::add_new_type(saber::string &&_name, saber_ptr<ckx_type> _type)
 {
-    if ( query_type(_name) != nullptr )
+    if ( lookup_type(_name) != nullptr )
     {
          return add_status::duplicate;
     }
@@ -72,7 +72,7 @@ ckx_env_table::add_new_func(saber::string &&_name,
                             saber_ptr<ckx_function_type> _type)
 {
     saber::vector<saber_ptr<ckx_function_type>>
-            query_result = query_func(_name);
+            query_result = lookup_func(_name);
 
     if (query_result.size() != 0)
     {
@@ -89,7 +89,7 @@ ckx_env_table::add_new_func(saber::string &&_name,
 }
 
 saber_ptr<ckx_type>
-ckx_env_table::query_var(const saber::string& _name)
+ckx_env_table::lookup_var(const saber::string& _name)
 {
     ckx_env_table *this_iter = this;
 
@@ -110,7 +110,7 @@ ckx_env_table::query_var(const saber::string& _name)
 }
 
 saber_ptr<ckx_type>
-ckx_env_table::query_type(const saber::string& _name)
+ckx_env_table::lookup_type(const saber::string& _name)
 {
     ckx_env_table *this_iter = this;
 
@@ -131,7 +131,7 @@ ckx_env_table::query_type(const saber::string& _name)
 }
 
 saber::vector<saber_ptr<ckx_function_type>>
-ckx_env_table::query_func(const std::string &_name)
+ckx_env_table::lookup_func(const std::string &_name)
 {
     // ckx_env_table *this_iter = this;
     Q_ON_HOLD(...)

@@ -75,13 +75,15 @@ public:
     add_status add_new_var(
             saber::string&& _name, saber_ptr<ckx_type> _type);
 
-    saber_ptr<ckx_type> query_var(const saber::string& _name);
-    saber_ptr<ckx_type> query_type(const saber::string& _name);
+    saber_ptr<ckx_type> lookup_var(const saber::string& _name);
+    saber_ptr<ckx_type> lookup_type(const saber::string& _name);
 
     // We have independent representation for function table
     // since we need to solve function overloading in the future.
     saber::vector<saber_ptr<ckx_function_type>>
-        query_func(const saber::string& _name);
+        lookup_func(const saber::string& _name);
+
+    inline ckx_env_table* get_parent() { return parent; }
 
 private:
     saber::unordered_map<saber::string, ckx_var_entry> var_entry_table;

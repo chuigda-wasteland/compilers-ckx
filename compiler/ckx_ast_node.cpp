@@ -26,7 +26,8 @@ ckx_ast_node::ckx_ast_node(saber_ptr<ckx_token> _at_token) :
     at_token(_at_token)
 {}
 
-
+saber_ptr<ckx_token> ckx_ast_node::get_at_token()
+{ return at_token; }
 
 ckx_ast_translation_unit::ckx_ast_translation_unit(
         saber_ptr<ckx_token> _at_token) :
@@ -51,6 +52,9 @@ ckx_ast_translation_unit::add_new_stmt(ckx_ast_stmt *_stmt)
 }
 
 
+ckx_ast_stmt::ckx_ast_stmt(saber_ptr<ckx_token> _at_token) :
+    ckx_ast_node(_at_token)
+{}
 
 ckx_ast_stmt::~ckx_ast_stmt() {}
 
@@ -141,7 +145,7 @@ ckx_ast_struct_stmt::ckx_ast_struct_stmt(ckx_ast_struct *_the_struct) :
     the_struct(_the_struct)
 {}
 
-ckx_ast_struct_stmt::~ckx_ast_stmt()
+ckx_ast_struct_stmt::~ckx_ast_struct_stmt()
 {
     delete the_struct;
 }
@@ -212,9 +216,8 @@ ckx_ast_func::ckx_ast_func(saber_ptr<ckx_token> _at_token,
 
 ckx_ast_func::~ckx_ast_func() {}
 
-
 ckx_ast_init_decl::ckx_ast_init_decl(saber_ptr<ckx_token> _at_token,
-                                     ckx_var_entry *_entry,
+                                     ckx_var_entry* _entry,
                                      ckx_ast_expr *_init) :
     ckx_ast_node(_at_token),
     entry(_entry),
@@ -227,12 +230,9 @@ ckx_ast_init_decl::~ckx_ast_init_decl()
 }
 
 ckx_ast_param_decl::ckx_ast_param_decl(saber_ptr<ckx_token> _at_token,
-                                       ckx_var_entry *_entry) :
+                                       ckx_var_entry* _entry) :
     ckx_ast_node(_at_token),
     entry(_entry)
-{}
-
-ckx_ast_param_decl::~ckx_ast_param_decl()
 {}
 
 ckx_ast_struct::ckx_ast_struct(saber_ptr<ckx_token> _at_token,
@@ -241,7 +241,7 @@ ckx_ast_struct::ckx_ast_struct(saber_ptr<ckx_token> _at_token,
     entry(_entry)
 {}
 
-ckx_ast_struct::~ckx_ast_node() {}
+ckx_ast_struct::~ckx_ast_struct() {}
 
 ckx_ast_variant::ckx_ast_variant(saber_ptr<ckx_token> _at_token,
                                  ckx_type_entry *_entry) :

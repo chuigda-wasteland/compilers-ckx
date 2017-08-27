@@ -24,6 +24,8 @@
 #include "string.hpp"
 #include "vector.hpp"
 
+#include "ckx_token.hpp"
+
 #include "defs.hpp"
 
 
@@ -125,6 +127,18 @@ private:
     saber::vector<saber_ptr<ckx_type>> param_type_list;
 };
 
+class ckx_qualification final implements ckx_type
+{
+public:
+    ckx_qualification(saber_ptr<ckx_type> _qualified);
+    ~ckx_qualification() override final = default;
+
+    qsizet size() const override final;
+
+private:
+    saber_ptr<ckx_type> qualified;
+};
+
 class ckx_pointer_type final implements ckx_type
 {
 public:
@@ -149,16 +163,29 @@ private:
     saber_ptr<ckx_type> origin;
 };
 
-class ckx_qualification final implements ckx_type
+class ckx_type_helper
 {
 public:
-    ckx_qualification(saber_ptr<ckx_type> _qualified);
-    ~ckx_qualification() override final = default;
-
-    qsizet size() const override final;
+    static saber_ptr<ckx_type> get_type(ckx_token::type _basic_type_token);
+    static saber_ptr<ckx_type> qual_const(saber_ptr<ckx_type> _base);
+    static saber_ptr<ckx_type> pointer_to(saber_ptr<ckx_type> _base);
 
 private:
-    saber_ptr<ckx_type> qualified;
+    static saber_ptr<ckx_type> get_vi8_type();
+    static saber_ptr<ckx_type> get_vi16_type();
+    static saber_ptr<ckx_type> get_vi32_type();
+    static saber_ptr<ckx_type> get_vi64_type();
+
+    static saber_ptr<ckx_type> get_vu8_type();
+    static saber_ptr<ckx_type> get_vu16_type();
+    static saber_ptr<ckx_type> get_vu32_type();
+    static saber_ptr<ckx_type> get_vu64_type();
+
+    static saber_ptr<ckx_type> get_vch_type();
+    static saber_ptr<ckx_type> get_vr32_type();
+    static saber_ptr<ckx_type> get_vr64_type();
+
+    static saber_ptr<ckx_type> get_void_type();
 };
 
 } // namespace ckx

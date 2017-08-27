@@ -123,6 +123,11 @@ open_class ckx_token
         // reserved
         token_string_literal,     // string literal
 
+        token_static_cast,        // static_cast
+        token_reinterpret_cast,   // reinterpret_cast
+        token_const_cast,         // const_cast
+        token_ckx_cast,           // ckx_cast
+
         token_ckx,                // ckx
         token_eoi                 // EOI
     };
