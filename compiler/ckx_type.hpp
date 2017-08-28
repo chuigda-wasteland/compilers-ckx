@@ -90,27 +90,70 @@ public:
 class ckx_struct_type final implements ckx_type
 {
 public:
-    // field tuple : name, type, offset
-    using field = qtuple<saber::string, saber_ptr<ckx_type>, qsizet>;
+    open_class field
+    {
+        saber::string name;
+        saber_ptr<ckx_type> type;
+        qsizet offset;
+
+        field(saber::string&& _name, saber_ptr<ckx_type> _type, qsizet _offset)
+            : name(_name), type(_type), offset(_offset) {}
+    };
 
     ckx_struct_type();
     ~ckx_struct_type() override final = default;
 
     qsizet size() const override final;
-    // on hold
-    // void add_field(field&& _field);
-
-    // field helper functions
-    static saber::string& field_name(field& _field);
-    static ckx_type& field_type(field& _field);
-    static qsizet& field_offset(field& _field);
-
-    static const saber::string& field_name(const field& _field);
-    static const ckx_type& field_type(const field& _field);
-    static const qsizet& field_offset(const field &_field);
+    bool add_field(saber::string&& _name, saber_ptr<ckx_type> _type);
 
 private:
     saber::vector<field> fields;
+};
+
+class ckx_variant_type final implements ckx_type
+{
+public:
+    open_class field
+    {
+        saber::string name;
+        saber_ptr<ckx_type> type;
+        qsizet offset;
+
+        field(saber::string&& _name, saber_ptr<ckx_type> _type, qsizet _offset)
+            : name(saber::move(_name)), type(_type), offset(_offset) {}
+    };
+
+    ckx_variant_type();
+    ~ckx_variant_type() override final = default;
+
+    qsizet size() const override final;
+    bool add_field(saber::string&& _name, saber_ptr<ckx_type> _type);
+
+private:
+    saber::vector<field> fields;
+    qsizet field_size_max = 0;
+};
+
+class ckx_enum_type final implements ckx_type
+{
+public:
+    open_class enumerator
+    {
+        saber::string name;
+        qint64 value;
+
+        enumerator(saber::string&& _name, qint64 _value)
+            : name(saber::move(_name)), value(_value) {}
+    };
+
+    ckx_enum_type();
+    ~ckx_enum_type() override final = default;
+
+    qsizet size() const override final;
+    bool add_enumerator(saber::string&& _name, qint64 _value);
+
+private:
+    saber::vector<enumerator> enumerators;
 };
 
 class ckx_function_type final implements ckx_type

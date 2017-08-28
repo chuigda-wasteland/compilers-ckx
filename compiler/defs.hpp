@@ -49,6 +49,8 @@ using qcoord = std::pair<qsizet, qsizet>;
 template <typename T1, typename T2>
 using qpair = std::pair<T1, T2>;
 
+using std::make_pair;
+
 template <typename T1, typename T2, typename T3>
 using qtuple = std::tuple<T1, T2, T3>;
 

@@ -37,58 +37,59 @@ ckx_env_table::ckx_env_table(ckx_env_table *_parent) :
     parent(_parent)
 {}
 
-ckx_env_table::add_status
+qpair<ckx_env_table::add_status, ckx_var_entry*>
 ckx_env_table::add_new_var(saber::string &&_name, saber_ptr<ckx_type> _type)
 {
     if ( var_entry_table.find(_name) != var_entry_table.end() )
     {
-        return add_status::duplicate;
+        return make_pair(add_status::duplicate, nullptr);
     }
 
+    ckx_var_entry *entry = new ckx_var_entry(_type);
     var_entry_table.insert(
-                qpair<saber::string, ckx_var_entry>(
-                    saber::move(_name), ckx_var_entry(_type) ) );
+                qpair<const saber::string, ckx_var_entry*>(
+                    saber::move(_name), entry) );
 
-    return add_status::success;
+    return make_pair(add_status::success, entry);
 }
 
-ckx_env_table::add_status
+qpair<ckx_env_table::add_status, ckx_type_entry*>
 ckx_env_table::add_new_type(saber::string &&_name, saber_ptr<ckx_type> _type)
 {
     if ( lookup_type(_name) != nullptr )
     {
-         return add_status::duplicate;
+         return make_pair(add_status::duplicate, nullptr);
     }
 
+    ckx_type_entry *entry = new ckx_type_entry(_type);
     type_entry_table.insert(
-                qpair<const saber::string, ckx_type_entry>(
-                    saber::move(_name), ckx_type_entry(_type) ) );
+                qpair<const saber::string, ckx_type_entry*>(
+                    saber::move(_name), entry ) );
 
-    return add_status::success;
+    return make_pair(add_status::success, entry);
 }
 
-ckx_env_table::add_status
+qpair<ckx_env_table::add_status, ckx_func_entry*>
 ckx_env_table::add_new_func(saber::string &&_name,
                             saber_ptr<ckx_function_type> _type)
 {
-    saber::vector<saber_ptr<ckx_function_type>>
-            query_result = lookup_func(_name);
+    saber::vector<ckx_func_entry*> query_result = lookup_func(_name);
 
     if (query_result.size() != 0)
     {
-        Q_ON_HOLD(...)
-        return add_status::duplicate;
+        Q_ON_HOLD("Function overloading")
+        return make_pair(add_status::duplicate, nullptr);
     }
 
+    ckx_func_entry *entry = new ckx_func_entry(_type);
     func_entry_table.insert(
-                qpair<const saber::string, saber_ptr<ckx_func_entry>>(
-                    saber::move(_name),
-                    saber_ptr<ckx_func_entry>(new ckx_func_entry(_type)) ) );
+                qpair<const saber::string, ckx_func_entry*>(
+                    saber::move(_name), entry ) );
 
-    return add_status::success;
+    return make_pair(add_status::success, entry);
 }
 
-saber_ptr<ckx_type>
+ckx_var_entry*
 ckx_env_table::lookup_var(const saber::string& _name)
 {
     ckx_env_table *this_iter = this;
@@ -99,8 +100,8 @@ ckx_env_table::lookup_var(const saber::string& _name)
 
         if (it != var_entry_table.end())
         {
-            qpair<const saber::string, ckx_var_entry> &tref = *it;
-            return tref.second.var_type;
+            qpair<const saber::string, ckx_var_entry*> &tref = *it;
+            return tref.second;
         }
 
         this_iter = this_iter->parent;
@@ -109,8 +110,7 @@ ckx_env_table::lookup_var(const saber::string& _name)
     return nullptr;
 }
 
-saber_ptr<ckx_type>
-ckx_env_table::lookup_type(const saber::string& _name)
+ckx_type_entry *ckx_env_table::lookup_type(const saber::string& _name)
 {
     ckx_env_table *this_iter = this;
 
@@ -120,8 +120,8 @@ ckx_env_table::lookup_type(const saber::string& _name)
 
         if (it != type_entry_table.end())
         {
-            qpair<const saber::string, ckx_type_entry> &tref = *it;
-            return tref.second.type;
+            qpair<const saber::string, ckx_type_entry*> &tref = *it;
+            return tref.second;
         }
 
         this_iter = this_iter->parent;
@@ -130,14 +130,22 @@ ckx_env_table::lookup_type(const saber::string& _name)
     return nullptr;
 }
 
-saber::vector<saber_ptr<ckx_function_type>>
+saber::vector<ckx_func_entry*>
 ckx_env_table::lookup_func(const std::string &_name)
 {
     // ckx_env_table *this_iter = this;
     Q_ON_HOLD(...)
     Q_UNUSED(_name)
 
-    return saber::vector<saber_ptr<ckx_function_type>>();
+    return saber::vector<ckx_func_entry*>();
+}
+
+ckx_var_entry*
+ckx_env_table::lookup_var_local(const std::string &_name)
+{
+    auto it = var_entry_table.find(_name);
+
+    return (it == var_entry_table.end()) ? (*it).second : nullptr;
 }
 
 } // namespace ckx

@@ -80,39 +80,66 @@ qsizet ckx_struct_type::size() const
 {
     if ( fields.empty() ) return 0;
 
-    return field_offset(*fields.rbegin())
-           + field_type(*fields.rbegin()).size();
+    return (*fields.rbegin()).offset
+           + (*fields.rbegin()).type->size();
 }
 
-saber::string& ckx_struct_type::field_name(field &_field)
+bool ckx_struct_type::add_field(saber::string &&_name,
+                                saber_ptr<ckx_type> _type)
 {
-    return std::get<0>(_field);
+    for (auto it = fields.cbegin(); it != fields.cend(); ++it)
+        if ((*it).name == _name)
+            return false;
+
+    fields.emplace_back(saber::move(_name), _type, size());
+    return true;
 }
 
-ckx_type& ckx_struct_type::field_type(field &_field)
+
+
+ckx_variant_type::ckx_variant_type() :
+    ckx_type(ckx_type::category::type_variant)
+{}
+
+qsizet ckx_variant_type::size() const
 {
-    return *(std::get<1>(_field).get());
+    return field_size_max;
 }
 
-qsizet &ckx_struct_type::field_offset(field &_field)
+bool ckx_variant_type::add_field(saber::string &&_name,
+                                 saber_ptr<ckx_type> _type)
 {
-    return std::get<2>(_field);
+    for (auto it = fields.cbegin(); it != fields.cend(); ++it)
+        if ((*it).name == _name)
+            return false;
+
+    fields.emplace_back(saber::move(_name), _type, size());
+    field_size_max = (field_size_max > _type->size()) ?
+                         field_size_max : _type->size();
+    return true;
 }
 
-const saber::string& ckx_struct_type::field_name(const field &_field)
+
+
+ckx_enum_type::ckx_enum_type() :
+    ckx_type(ckx_type::category::type_enum)
+{}
+
+qsizet ckx_enum_type::size() const
 {
-    return std::get<0>(_field);
+    return 8;
 }
 
-const ckx_type& ckx_struct_type::field_type(const field &_field)
+bool ckx_enum_type::add_enumerator(std::string &&_name, qint64 _value)
 {
-    return *(std::get<1>(_field).get());
+    for (auto it = enumerators.cbegin(); it != enumerators.cend(); ++it)
+        if ((*it).name == _name)
+            return false;
+
+    enumerators.emplace_back(saber::move(_name), _value);
+    return true;
 }
 
-const qsizet &ckx_struct_type::field_offset(const field &_field)
-{
-    return std::get<2>(_field);
-}
 
 
 ckx_function_type::ckx_function_type(
@@ -173,15 +200,13 @@ ckx_type_helper::get_type(ckx_token::type _basic_type_token)
 saber_ptr<ckx_type>
 ckx_type_helper::qual_const(saber_ptr<ckx_type> _base)
 {
-    return saber_ptr<ckx_type>(
-        new ckx_qualification(_base));
+    return saber_ptr<ckx_type>(new ckx_qualification(_base));
 }
 
 saber_ptr<ckx_type>
 ckx_type_helper::pointer_to(saber_ptr<ckx_type> _base)
 {
-    return saber_ptr<ckx_type>(
-        new ckx_pointer_type(_base));
+    return saber_ptr<ckx_type>(new ckx_pointer_type(_base));
 }
 
 saber_ptr<ckx_type>

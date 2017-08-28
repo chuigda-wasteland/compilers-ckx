@@ -58,13 +58,9 @@ private:
     ckx_ast_return_stmt* parse_return_stmt();
     ckx_ast_compound_stmt* parse_compound_stmt();
 
-    ckx_ast_param_decl* parse_param();
     ckx_ast_expr* parse_expr();
 
-    ckx_ast_struct* parse_struct();
-    ckx_ast_variant* parse_variant();
-    ckx_ast_enum* parse_enum();
-
+    qpair<saber::string, saber_ptr<ckx_type>> parse_struct_field();
     saber_ptr<ckx_type> parse_type();
 
     inline saber_ptr<ckx_token> current_token();
@@ -239,6 +235,7 @@ ckx_ast_decl_stmt*
 ckx_parser_impl<CkxTokenStream>::parse_decl_stmt()
 {
     ckx_ast_decl_stmt* ret = new ckx_ast_decl_stmt(current_token());
+    move2_next_token();
 
     saber_ptr<ckx_type> type = parse_type();
     while (1)
@@ -247,13 +244,14 @@ ckx_parser_impl<CkxTokenStream>::parse_decl_stmt()
             Q_ON_HOLD("Error recover");
 
         saber_ptr<ckx_token> token = current_token();
-        ckx_var_entry *entry = new ckx_var_entry(type);
         ckx_ast_expr *init = nullptr;
         if ( expect_n_eat(ckx_token::type::token_assign) )
             init = parse_expr();
 
-        env()->add_new_var(*(token->v.p_str), type);
-        ret->add_decl(new ckx_ast_init_decl(token, entry, init));
+        auto status = env()->add_new_var(*(token->v.p_str), type);
+        if(!status.first)
+            Q_ON_HOLD("Error recover");
+        ret->add_decl(new ckx_ast_init_decl(token, status.second, init));
 
         if ( !expect_n_eat(ckx_token::type::token_comma) ) break;
     }
@@ -261,6 +259,66 @@ ckx_parser_impl<CkxTokenStream>::parse_decl_stmt()
     if ( !expect_n_eat(ckx_token::type::token_semicolon) )
         Q_ON_HOLD("Error recover");
     return ret;
+}
+
+template <typename CkxTokenStream>
+ckx_ast_struct_stmt*
+ckx_parser_impl<CkxTokenStream>::parse_struct_stmt()
+{
+    saber_ptr<ckx_token> at_token = current_token();
+    move2_next_token();
+
+    if (!expect(ckx_token::type::token_identifier))
+        Q_ON_HOLD("Error recover");
+    saber::string struct_name = *(current_token()->v.p_str);
+
+    ckx_struct_type *type = new ckx_struct_type();
+    if (!expect_n_eat(ckx_token::type::token_lbrace))
+        Q_ON_HOLD("Error recover");
+    while (current_token()->token_type != ckx_token::type::token_rbrace)
+    {
+        Q_ON_HOLD("Adding fields to struct");
+    }
+    if (!expect_n_eat(ckx_token::type::token_rbrace))
+        Q_ON_HOLD("Error recover");
+
+    saber_ptr<ckx_type> saber_type(type);
+    auto status = env()->add_new_type(saber::move(struct_name), saber_type);
+    if(!status.first)
+        Q_ON_HOLD("Error recover");
+
+    ckx_ast_struct* the_struct = new ckx_ast_struct(at_token, status.second);
+    return new  ckx_ast_struct_stmt(the_struct);
+}
+
+template <typename CkxTokenStream>
+ckx_ast_variant_stmt*
+ckx_parser_impl<CkxTokenStream>::parse_variant_stmt()
+{
+    saber_ptr<ckx_token> at_token = current_token();
+    move2_next_token();
+
+    if (!expect(ckx_token::type::token_identifier))
+        Q_ON_HOLD("Error recover");
+    saber::string variant_name = *(current_token()->v.p_str);
+
+    ckx_variant_type *type = new ckx_variant_type();
+    if (!expect_n_eat(ckx_token::type::token_lbrace))
+        Q_ON_HOLD("Error recover");
+    while (current_token()->token_type != ckx_token::type::token_rbrace)
+    {
+        Q_ON_HOLD("Adding fields to struct");
+    }
+    if (!expect_n_eat(ckx_token::type::token_rbrace))
+        Q_ON_HOLD("Error recover");
+
+    saber_ptr<ckx_type> saber_type(type);
+    auto status = env()->add_new_type(saber::move(variant_name), saber_type);
+    if(!status.first)
+        Q_ON_HOLD("Error recover");
+
+    ckx_ast_variant* the_struct = new ckx_ast_variant(at_token, status.second);
+    return new  ckx_ast_variant_stmt(the_struct);
 }
 
 template <typename CkxTokenStream>

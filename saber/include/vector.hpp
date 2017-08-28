@@ -17,11 +17,6 @@ template <typename T,
           typename Allocator = default_allocator<T>>
 class vector
 {
-    static_assert(std::is_copy_constructible<T>::value,
-                  C8_STAT__TEMPLATE_ARG__T__COPY_CONSTRUCT_ERROR);
-    static_assert(std::is_destructible<T>::value,
-                  C8_STAT__TEMPLATE_ARG__T__DESTROY_ERROR);
-
 public:
     using value_type      = T;
     using pointer         = T*;

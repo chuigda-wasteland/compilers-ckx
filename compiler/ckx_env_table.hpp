@@ -68,31 +68,32 @@ public:
     ckx_env_table(ckx_env_table *_parent);
     ~ckx_env_table() = default;
 
-    add_status add_new_type(
+    qpair<add_status, ckx_type_entry*> add_new_type(
             saber::string&& _name, saber_ptr<ckx_type> _type);
-    add_status add_new_func(
+    qpair<add_status, ckx_func_entry*> add_new_func(
             saber::string&& _name, saber_ptr<ckx_function_type> _type);
-    add_status add_new_var(
+    qpair<add_status, ckx_var_entry*> add_new_var(
             saber::string&& _name, saber_ptr<ckx_type> _type);
 
-    saber_ptr<ckx_type> lookup_var(const saber::string& _name);
-    saber_ptr<ckx_type> lookup_type(const saber::string& _name);
+    ckx_var_entry* lookup_var(const saber::string& _name);
+    ckx_type_entry* lookup_type(const saber::string& _name);
 
     // We have independent representation for function table
     // since we need to solve function overloading in the future.
-    saber::vector<saber_ptr<ckx_function_type>>
+    saber::vector<ckx_func_entry*>
         lookup_func(const saber::string& _name);
+
+    ckx_var_entry* lookup_var_local(const saber::string& _name);
 
     inline ckx_env_table* get_parent() { return parent; }
 
 private:
-    saber::unordered_map<saber::string, ckx_var_entry> var_entry_table;
-    saber::unordered_map<saber::string, ckx_type_entry> type_entry_table;
+    saber::unordered_map<saber::string, ckx_var_entry*> var_entry_table;
+    saber::unordered_map<saber::string, ckx_type_entry*> type_entry_table;
 
     // We have independent representation for function table
     // since we need to solve function overloading in the future.
-    saber::unordered_multimap<saber::string, saber_ptr<ckx_func_entry>>
-        func_entry_table;
+    saber::unordered_multimap<saber::string, ckx_func_entry*> func_entry_table;
 
     ckx_env_table *parent;
 };
