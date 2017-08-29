@@ -104,7 +104,7 @@ Pointers in ckx is the same as pointers in C. The powerful low-level operator.
 
 ### Other special features
 
-#####Type casts
+##### Type casts
 * Only integers could be implicitly promoted. for example, promoting from `vi8` to `vi16`, or from `vu8` to `vu64`.
 * Signed integers will not be implicitly converted to unsigned ints. Vice versa.
 * Integers will not be implicitly converted to floats. And floats will also not be implicitly converted to ints.
