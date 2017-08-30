@@ -33,9 +33,19 @@ ckx_type_entry::ckx_type_entry(saber_ptr<ckx_type> _type) :
     type(_type)
 {}
 
+
+
 ckx_env_table::ckx_env_table(ckx_env_table *_parent) :
     parent(_parent)
 {}
+
+ckx_env_table::~ckx_env_table()
+{
+    for (auto &v : var_entry_table)   delete v.second;
+    for (auto &t : type_entry_table)  delete t.second;
+    for (auto &f : func_entry_table)  delete f.second;
+}
+
 
 qpair<ckx_env_table::add_status, ckx_var_entry*>
 ckx_env_table::add_new_var(saber::string &&_name, saber_ptr<ckx_type> _type)
@@ -89,6 +99,14 @@ ckx_env_table::add_new_func(saber::string &&_name,
     return make_pair(add_status::success, entry);
 }
 
+bool
+ckx_env_table::lookup_name(const std::string &_name)
+{
+    return lookup_var(_name)
+           || lookup_type(_name)
+           || !( lookup_func(_name).empty() );
+}
+
 ckx_var_entry*
 ckx_env_table::lookup_var(const saber::string& _name)
 {
@@ -110,7 +128,8 @@ ckx_env_table::lookup_var(const saber::string& _name)
     return nullptr;
 }
 
-ckx_type_entry *ckx_env_table::lookup_type(const saber::string& _name)
+ckx_type_entry*
+ckx_env_table::lookup_type(const saber::string& _name)
 {
     ckx_env_table *this_iter = this;
 
@@ -131,17 +150,15 @@ ckx_type_entry *ckx_env_table::lookup_type(const saber::string& _name)
 }
 
 saber::vector<ckx_func_entry*>
-ckx_env_table::lookup_func(const std::string &_name)
+ckx_env_table::lookup_func(const saber::string &_name)
 {
-    // ckx_env_table *this_iter = this;
-    Q_ON_HOLD(...)
-    Q_UNUSED(_name)
-
-    return saber::vector<ckx_func_entry*>();
+    /// @todo fully rework this function.
+    saber::vector<ckx_func_entry*> ret;
+    return ret;
 }
 
 ckx_var_entry*
-ckx_env_table::lookup_var_local(const std::string &_name)
+ckx_env_table::lookup_var_local(const saber::string &_name)
 {
     auto it = var_entry_table.find(_name);
 

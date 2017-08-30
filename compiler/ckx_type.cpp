@@ -84,15 +84,15 @@ qsizet ckx_struct_type::size() const
            + (*fields.rbegin()).type->size();
 }
 
-bool ckx_struct_type::add_field(saber::string &&_name,
-                                saber_ptr<ckx_type> _type)
+ckx_struct_type::add_status
+ckx_struct_type::add_field(saber::string &&_name, saber_ptr<ckx_type> _type)
 {
-    for (auto it = fields.cbegin(); it != fields.cend(); ++it)
-        if ((*it).name == _name)
-            return false;
+    for (field& x : fields)
+        if (x.name == _name)
+            return add_status::add_duplicate;
 
     fields.emplace_back(saber::move(_name), _type, size());
-    return true;
+    return add_status::add_success;
 }
 
 
@@ -106,17 +106,17 @@ qsizet ckx_variant_type::size() const
     return field_size_max;
 }
 
-bool ckx_variant_type::add_field(saber::string &&_name,
-                                 saber_ptr<ckx_type> _type)
+ckx_variant_type::add_status
+ckx_variant_type::add_field(saber::string &&_name, saber_ptr<ckx_type> _type)
 {
-    for (auto it = fields.cbegin(); it != fields.cend(); ++it)
-        if ((*it).name == _name)
-            return false;
+    for (field& x : fields)
+        if (x.name == _name)
+            return add_status::add_duplicate;
 
     fields.emplace_back(saber::move(_name), _type, size());
     field_size_max = (field_size_max > _type->size()) ?
                          field_size_max : _type->size();
-    return true;
+    return add_status::add_success;
 }
 
 
@@ -130,14 +130,15 @@ qsizet ckx_enum_type::size() const
     return 8;
 }
 
-bool ckx_enum_type::add_enumerator(std::string &&_name, qint64 _value)
+ckx_enum_type::add_status
+ckx_enum_type::add_enumerator(std::string &&_name, qint64 _value)
 {
-    for (auto it = enumerators.cbegin(); it != enumerators.cend(); ++it)
-        if ((*it).name == _name)
-            return false;
+    for (enumerator& x : enumerators)
+        if (x.name == _name)
+            return add_status::add_duplicate;
 
     enumerators.emplace_back(saber::move(_name), _value);
-    return true;
+    return add_status::add_success;
 }
 
 

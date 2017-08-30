@@ -90,6 +90,12 @@ public:
 class ckx_struct_type final implements ckx_type
 {
 public:
+    enum class add_status : qchar
+    {
+        add_success,
+        add_duplicate
+    };
+
     open_class field
     {
         saber::string name;
@@ -104,7 +110,7 @@ public:
     ~ckx_struct_type() override final = default;
 
     qsizet size() const override final;
-    bool add_field(saber::string&& _name, saber_ptr<ckx_type> _type);
+    add_status add_field(saber::string&& _name, saber_ptr<ckx_type> _type);
 
 private:
     saber::vector<field> fields;
@@ -113,6 +119,12 @@ private:
 class ckx_variant_type final implements ckx_type
 {
 public:
+    enum class add_status : qchar
+    {
+        add_success,
+        add_duplicate
+    };
+
     open_class field
     {
         saber::string name;
@@ -127,7 +139,7 @@ public:
     ~ckx_variant_type() override final = default;
 
     qsizet size() const override final;
-    bool add_field(saber::string&& _name, saber_ptr<ckx_type> _type);
+    add_status add_field(saber::string&& _name, saber_ptr<ckx_type> _type);
 
 private:
     saber::vector<field> fields;
@@ -137,6 +149,12 @@ private:
 class ckx_enum_type final implements ckx_type
 {
 public:
+    enum class add_status : qchar
+    {
+        add_success,
+        add_duplicate
+    };
+
     open_class enumerator
     {
         saber::string name;
@@ -150,7 +168,7 @@ public:
     ~ckx_enum_type() override final = default;
 
     qsizet size() const override final;
-    bool add_enumerator(saber::string&& _name, qint64 _value);
+    add_status add_enumerator(saber::string&& _name, qint64 _value);
 
 private:
     saber::vector<enumerator> enumerators;

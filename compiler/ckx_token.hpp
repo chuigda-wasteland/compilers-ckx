@@ -160,7 +160,9 @@ open_class ckx_token
     qcoord position;
 
 private:
-    ckx_token(const qcoord& _coord);
+    // This constructor reserved for internal use.
+    // All other public constructors invokes this constructor
+    explicit ckx_token(const qcoord& _coord);
 };
 
 }

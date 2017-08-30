@@ -140,36 +140,6 @@ ckx_ast_return_stmt::ckx_ast_return_stmt(saber_ptr<ckx_token> _at_token,
     return_expr(_return_expr)
 {}
 
-ckx_ast_struct_stmt::ckx_ast_struct_stmt(ckx_ast_struct *_the_struct) :
-    ckx_ast_stmt(_the_struct->get_at_token()),
-    the_struct(_the_struct)
-{}
-
-ckx_ast_struct_stmt::~ckx_ast_struct_stmt()
-{
-    delete the_struct;
-}
-
-ckx_ast_variant_stmt::ckx_ast_variant_stmt(ckx_ast_variant *_the_variant) :
-    ckx_ast_stmt(_the_variant->get_at_token()),
-    the_variant(_the_variant)
-{}
-
-ckx_ast_variant_stmt::~ckx_ast_variant_stmt()
-{
-    delete the_variant;
-}
-
-ckx_ast_enum_stmt::ckx_ast_enum_stmt(ckx_ast_enum *_the_enum) :
-    ckx_ast_stmt(_the_enum->get_at_token()),
-    the_enum(_the_enum)
-{}
-
-ckx_ast_enum_stmt::~ckx_ast_enum_stmt()
-{
-    delete the_enum;
-}
-
 ckx_ast_decl_stmt::ckx_ast_decl_stmt(saber_ptr<ckx_token> _at_token) :
     ckx_ast_stmt(_at_token)
 {}
@@ -185,16 +155,6 @@ ckx_ast_decl_stmt::~ckx_ast_decl_stmt()
     for (auto it = decls.begin(); it != decls.end(); ++it) delete *it;
 }
 
-ckx_ast_func_stmt::ckx_ast_func_stmt(ckx_ast_func *_func) :
-    ckx_ast_stmt(_func->get_at_token()),
-    func(_func)
-{}
-
-ckx_ast_func_stmt::~ckx_ast_func_stmt()
-{
-    delete func;
-}
-
 ckx_ast_expr_stmt::ckx_ast_expr_stmt(saber_ptr<ckx_token> _at_token,
                                      ckx_ast_expr *_expr) :
     ckx_ast_stmt(_at_token),
@@ -208,13 +168,15 @@ ckx_ast_expr_stmt::~ckx_ast_expr_stmt()
 
 
 
-ckx_ast_func::ckx_ast_func(saber_ptr<ckx_token> _at_token,
-                           ckx_func_entry *_entry) :
+ckx_ast_func_stmt::ckx_ast_func_stmt(saber_ptr<ckx_token> _at_token,
+                                     ckx_func_entry *_entry,
+                                     ckx_env_table *_param_env_table) :
     ckx_ast_node(_at_token),
-    entry(_entry)
+    entry(_entry),
+    param_env_table(_param_env_table)
 {}
 
-ckx_ast_func::~ckx_ast_func() {}
+ckx_ast_func_stmt::~ckx_ast_func_stmt() {}
 
 ckx_ast_init_decl::ckx_ast_init_decl(saber_ptr<ckx_token> _at_token,
                                      ckx_var_entry* _entry,
@@ -235,28 +197,28 @@ ckx_ast_param_decl::ckx_ast_param_decl(saber_ptr<ckx_token> _at_token,
     entry(_entry)
 {}
 
-ckx_ast_struct::ckx_ast_struct(saber_ptr<ckx_token> _at_token,
+ckx_ast_struct_stmt::ckx_ast_struct_stmt(saber_ptr<ckx_token> _at_token,
                                ckx_type_entry *_entry) :
     ckx_ast_node(_at_token),
     entry(_entry)
 {}
 
-ckx_ast_struct::~ckx_ast_struct() {}
+ckx_ast_struct_stmt::~ckx_ast_struct_stmt() {}
 
-ckx_ast_variant::ckx_ast_variant(saber_ptr<ckx_token> _at_token,
+ckx_ast_variant_stmt::ckx_ast_variant_stmt(saber_ptr<ckx_token> _at_token,
                                  ckx_type_entry *_entry) :
     ckx_ast_node(_at_token),
     entry(_entry)
 {}
 
-ckx_ast_variant::~ckx_ast_variant() {}
+ckx_ast_variant_stmt::~ckx_ast_variant_stmt() {}
 
-ckx_ast_enum::ckx_ast_enum(saber_ptr<ckx_token> _at_token,
+ckx_ast_enum_stmt::ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token,
                            ckx_type_entry *_entry) :
     ckx_ast_node(_at_token),
     entry(_entry)
 {}
 
-ckx_ast_enum::~ckx_ast_enum() {}
+ckx_ast_enum_stmt::~ckx_ast_enum_stmt() {}
 
 } // namespace ckx

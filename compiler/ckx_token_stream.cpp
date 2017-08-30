@@ -44,6 +44,8 @@ private:
 bool ckx_identifier_table::initialized = false;
 saber::unordered_map<saber::string, ckx_token::type> ckx_identifier_table::map;
 
+
+
 class ckx_default_token_stream_impl
 {
 public:
@@ -83,7 +85,8 @@ private:
     inline void next_char();
     inline void next_line();
 
-    inline void issue_error(const char* _desc);
+    inline void lex_error(const char* _desc);
+    inline void lex_warn(const char* _desc);
 
     qcoord char_coord_temp;
     qsizet char_index_temp;
@@ -140,7 +143,7 @@ ckx_token::type::token_eoi
 };
 
 qpair<ckx_token::type, bool>
-ckx_identifier_table::lookup(const std::string &_name)
+ckx_identifier_table::lookup(const saber::string &_name)
 {
     if (!initialized) initialize();
     if (map.find(_name) != map.end())
@@ -270,8 +273,7 @@ void ckx_default_token_stream_impl::do_split_tokens()
             solve_identifier(); break;
 
         default:
-            // What the fuck!
-            issue_error("Unrecognized character");
+            lex_error("Unrecognized character");
         }
     }
 
@@ -292,7 +294,7 @@ void ckx_default_token_stream_impl::solve_numbers()
         next_char();
         if (ch() < '0' || ch() > '9')
         {
-            issue_error("expected digits after floating point.");
+            lex_error("expected digits after floating point.");
             return;
         }
 
@@ -312,7 +314,7 @@ void ckx_default_token_stream_impl::solve_numbers()
 
         if ((ch() < '0' || ch() > '9'))
         {
-            issue_error("expected digits after exponent.");
+            lex_error("expected digits after exponent.");
             return;
         }
 
@@ -339,7 +341,7 @@ void ckx_default_token_stream_impl::solve_char_literal()
 
     if (ch() != '\'')
     {
-        issue_error("Missing \' character after char literal.");
+        lex_error("Missing \' character after char literal.");
         return;
     }
 
@@ -573,7 +575,7 @@ qchar ckx_default_token_stream_impl::make_conversion()
 
     default:
         // what the fuck!
-        issue_error("Illegal conversion sequence");
+        lex_error("Illegal conversion sequence");
         return static_cast<qchar>(saber::char_traits<qchar>::eof());
     }
 }
@@ -617,9 +619,16 @@ inline void ckx_default_token_stream_impl::next_line()
     char_index_temp++;
 }
 
-inline void ckx_default_token_stream_impl::issue_error(const char *_desc)
+
+
+inline void ckx_default_token_stream_impl::lex_error(const char *_desc)
 {
-    errors.emplace_back(char_coord(), saber::string(_desc));
+    errors.emplace_back(char_coord(), saber::string(_desc), true);
+}
+
+inline void ckx_default_token_stream_impl::lex_warn(const char *_desc)
+{
+    errors.emplace_back(char_coord(), saber::string(_desc), false);
 }
 
 } // namespace detail

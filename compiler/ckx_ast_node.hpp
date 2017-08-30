@@ -159,36 +159,6 @@ private:
     ckx_ast_expr *return_expr;
 };
 
-class ckx_ast_struct_stmt final implements ckx_ast_stmt
-{
-public:
-    ckx_ast_struct_stmt(ckx_ast_struct *_the_struct);
-    ~ckx_ast_struct_stmt() override final;
-
-private:
-    ckx_ast_struct *the_struct;
-};
-
-class ckx_ast_variant_stmt final implements ckx_ast_stmt
-{
-public:
-    ckx_ast_variant_stmt(ckx_ast_variant *_the_variant);
-    ~ckx_ast_variant_stmt() override final;
-
-private:
-    ckx_ast_variant *the_variant;
-};
-
-class ckx_ast_enum_stmt final implements ckx_ast_stmt
-{
-public:
-    ckx_ast_enum_stmt(ckx_ast_enum *_the_enum);
-    ~ckx_ast_enum_stmt() override final;
-
-private:
-    ckx_ast_enum *the_enum;
-};
-
 class ckx_ast_decl_stmt final implements ckx_ast_stmt
 {
 public:
@@ -199,16 +169,6 @@ public:
 
 private:
     saber::vector<ckx_ast_init_decl*> decls;
-};
-
-class ckx_ast_func_stmt final implements ckx_ast_stmt
-{
-public:
-    ckx_ast_func_stmt(ckx_ast_func* _func);
-    ~ckx_ast_func_stmt() override final;
-
-private:
-    ckx_ast_func* func;
 };
 
 class ckx_ast_expr_stmt final implements ckx_ast_stmt
@@ -227,14 +187,22 @@ class ckx_ast_expr make_use_of ckx_ast_node
     Q_ON_HOLD(...)
 };
 
-class ckx_ast_func make_use_of ckx_ast_node
+class ckx_ast_func_stmt make_use_of ckx_ast_node
 {
 public:
-    ckx_ast_func(saber_ptr<ckx_token> _at_token, ckx_func_entry *_entry);
-    ~ckx_ast_func();
+    ckx_ast_func_stmt(saber_ptr<ckx_token> _at_token,
+                 ckx_func_entry *_entry,
+                 ckx_env_table *_param_env_table);
+    ~ckx_ast_func_stmt();
+
+    bool is_defined() const;
+
+    ckx_env_table* get_param_env_table();
+    void define(ckx_ast_compound_stmt* _fnbody) const;
 
 private:
     ckx_func_entry *entry;
+    ckx_env_table *param_env_table;
 };
 
 class ckx_ast_init_decl make_use_of ckx_ast_node
@@ -261,31 +229,33 @@ private:
     ckx_var_entry *entry;
 };
 
-class ckx_ast_struct make_use_of ckx_ast_node
+class ckx_ast_struct_stmt make_use_of ckx_ast_node
 {
 public:
-    ckx_ast_struct(saber_ptr<ckx_token> _at_token, ckx_type_entry* _entry);
-    ~ckx_ast_struct();
+    ckx_ast_struct_stmt(saber_ptr<ckx_token> _at_token,
+                   ckx_type_entry* _entry);
+    ~ckx_ast_struct_stmt();
 
 private:
     ckx_type_entry *entry;
 };
 
-class ckx_ast_variant make_use_of ckx_ast_node
+class ckx_ast_variant_stmt make_use_of ckx_ast_node
 {
 public:
-    ckx_ast_variant(saber_ptr<ckx_token> _at_token, ckx_type_entry* _entry);
-    ~ckx_ast_variant();
+    ckx_ast_variant_stmt(saber_ptr<ckx_token> _at_token,
+                    ckx_type_entry* _entry);
+    ~ckx_ast_variant_stmt();
 
 private:
     ckx_type_entry *entry;
 };
 
-class ckx_ast_enum make_use_of ckx_ast_node
+class ckx_ast_enum_stmt make_use_of ckx_ast_node
 {
 public:
-    ckx_ast_enum(saber_ptr<ckx_token> _at_token, ckx_type_entry* _entry);
-    ~ckx_ast_enum();
+    ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token, ckx_type_entry* _entry);
+    ~ckx_ast_enum_stmt();
 
 private:
     ckx_type_entry *entry;

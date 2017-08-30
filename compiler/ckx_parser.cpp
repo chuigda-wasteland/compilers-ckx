@@ -20,6 +20,7 @@
 
 #include "ckx_ast_node.hpp"
 #include "ckx_type.hpp"
+#include "ckx_error.hpp"
 
 namespace ckx
 {
@@ -38,6 +39,8 @@ public:
             saber_ptr<CkxTokenStream> _token_stream);
 
 private:
+    /// @brief General parsing functions
+    /// for productions, see compilers-ckx/compiler/production.txt
     ckx_ast_stmt* parse_global_stmt();
     ckx_ast_stmt* parse_stmt();
 
@@ -58,28 +61,37 @@ private:
     ckx_ast_return_stmt* parse_return_stmt();
     ckx_ast_compound_stmt* parse_compound_stmt();
 
+    /// @brief individual functions for expressions
+    /// @todo finish this part after we have a fully-designed expr-tree system
     ckx_ast_expr* parse_expr();
 
-    qpair<saber::string, saber_ptr<ckx_type>> parse_struct_field();
+    /// @fn we need this function to ease the type resolving.
     saber_ptr<ckx_type> parse_type();
 
+    /// @brief utility functions
+    bool is_typename(saber_ptr<ckx_token> _token) const;
+
+    /// @brief token-access functions
+    /// simply encapsuled token-stream again.
     inline saber_ptr<ckx_token> current_token();
     inline saber_ptr<ckx_token> peek_next_token();
-
     inline void move2_next_token();
     inline bool expect_n_eat(ckx_token::type _token_type);
     inline bool expect(ckx_token::type _token_type);
 
+    /// @brief interact with environment/symbol-table.
     inline ckx_env_table* env();
     inline void enter_scope(ckx_env_table* _new_scope_env);
     inline void leave_scope();
 
-    // For easing coding we replace the template TokenStream
-    // with ckx_token_stream. Remember to replace back!
-    Q_ON_HOLD(inline constexpr CkxTokenStream& stream();)
-    inline ckx_token_stream& stream();
+    /// @brief functions for reporting problem.
+    void syntax_error(saber::string&& _reason, const qcoord& _pos);
+    void syntax_warn(saber::string&& _reason, const qcoord& _pos);
 
-    bool is_typename(saber_ptr<ckx_token> _token) const;
+    /// @brief and here are functions for recovering from a syntax error.
+    /// @todo  implement these functions
+
+private:
 
     saber_ptr<CkxTokenStream> token_stream;
     ckx_env_table *current_env;
@@ -139,6 +151,9 @@ ckx_parser_impl<CkxTokenStream>::parse_global_stmt()
     case ckx_token::type::token_variant:
         return parse_variant_stmt();
 
+    case ckx_token::type::token_enum:
+        return parse_enum_stmt();
+
     case ckx_token::type::token_ckx:
         return parse_ckx_block();
 
@@ -153,8 +168,10 @@ ckx_parser_impl<CkxTokenStream>::parse_global_stmt()
             return parse_decl_stmt();
 
     default:
-        Q_ON_HOLD( issue_error(current_token(), "...") )
-        ;
+        syntax_error(
+            "Expected : typename, 'function', 'struct', 'variant' or 'enum'"
+            " as the commemce of global declaration.",
+            current_token()->position);
     }
 }
 
@@ -177,6 +194,7 @@ ckx_parser_impl<CkxTokenStream>::parse_stmt()
     case ckx_token::type::token_real64:
         return parse_decl_stmt();
 
+    /// @todo We met some trouble with enum type.
     case ckx_token::type::token_identifier:
         if ( current_env->lookup_type(*(current_token()->v.p_str))
              != nullptr )
@@ -197,29 +215,14 @@ ckx_parser_impl<CkxTokenStream>::parse_stmt()
     case ckx_token::type::token_ckx_cast:
         return parse_expr_stmt();
 
-    case ckx_token::type::token_if:
-        return parse_if_stmt();
-
-    case ckx_token::type::token_while:
-        return parse_while_stmt();
-
-    case ckx_token::type::token_do:
-        return parse_do_while_stmt();
-
-    case ckx_token::type::token_for:
-        return parse_for_stmt();
-
-    case ckx_token::type::token_break:
-        return parse_break_stmt();
-
-    case ckx_token::type::token_continue:
-        return parse_continue_stmt();
-
-    case ckx_token::type::token_return:
-        return parse_return_stmt();
-
-    case ckx_token::type::token_lbrace:
-        return parse_compound_stmt();
+    case ckx_token::type::token_if:        return parse_if_stmt();
+    case ckx_token::type::token_while:     return parse_while_stmt();
+    case ckx_token::type::token_do:        return parse_do_while_stmt();
+    case ckx_token::type::token_for:       return parse_for_stmt();
+    case ckx_token::type::token_break:     return parse_break_stmt();
+    case ckx_token::type::token_continue:  return parse_continue_stmt();
+    case ckx_token::type::token_return:    return parse_return_stmt();
+    case ckx_token::type::token_lbrace:    return parse_compound_stmt();
 
     case ckx_token::type::token_semicolon:
         Q_ON_HOLD("warning : empty declaration not permitted")
@@ -235,8 +238,6 @@ ckx_ast_decl_stmt*
 ckx_parser_impl<CkxTokenStream>::parse_decl_stmt()
 {
     ckx_ast_decl_stmt* ret = new ckx_ast_decl_stmt(current_token());
-    move2_next_token();
-
     saber_ptr<ckx_type> type = parse_type();
     while (1)
     {
@@ -265,60 +266,14 @@ template <typename CkxTokenStream>
 ckx_ast_struct_stmt*
 ckx_parser_impl<CkxTokenStream>::parse_struct_stmt()
 {
-    saber_ptr<ckx_token> at_token = current_token();
-    move2_next_token();
-
-    if (!expect(ckx_token::type::token_identifier))
-        Q_ON_HOLD("Error recover");
-    saber::string struct_name = *(current_token()->v.p_str);
-
-    ckx_struct_type *type = new ckx_struct_type();
-    if (!expect_n_eat(ckx_token::type::token_lbrace))
-        Q_ON_HOLD("Error recover");
-    while (current_token()->token_type != ckx_token::type::token_rbrace)
-    {
-        Q_ON_HOLD("Adding fields to struct");
-    }
-    if (!expect_n_eat(ckx_token::type::token_rbrace))
-        Q_ON_HOLD("Error recover");
-
-    saber_ptr<ckx_type> saber_type(type);
-    auto status = env()->add_new_type(saber::move(struct_name), saber_type);
-    if(!status.first)
-        Q_ON_HOLD("Error recover");
-
-    ckx_ast_struct* the_struct = new ckx_ast_struct(at_token, status.second);
-    return new  ckx_ast_struct_stmt(the_struct);
+    /// @todo rework!
 }
 
 template <typename CkxTokenStream>
 ckx_ast_variant_stmt*
 ckx_parser_impl<CkxTokenStream>::parse_variant_stmt()
 {
-    saber_ptr<ckx_token> at_token = current_token();
-    move2_next_token();
-
-    if (!expect(ckx_token::type::token_identifier))
-        Q_ON_HOLD("Error recover");
-    saber::string variant_name = *(current_token()->v.p_str);
-
-    ckx_variant_type *type = new ckx_variant_type();
-    if (!expect_n_eat(ckx_token::type::token_lbrace))
-        Q_ON_HOLD("Error recover");
-    while (current_token()->token_type != ckx_token::type::token_rbrace)
-    {
-        Q_ON_HOLD("Adding fields to struct");
-    }
-    if (!expect_n_eat(ckx_token::type::token_rbrace))
-        Q_ON_HOLD("Error recover");
-
-    saber_ptr<ckx_type> saber_type(type);
-    auto status = env()->add_new_type(saber::move(variant_name), saber_type);
-    if(!status.first)
-        Q_ON_HOLD("Error recover");
-
-    ckx_ast_variant* the_struct = new ckx_ast_variant(at_token, status.second);
-    return new  ckx_ast_variant_stmt(the_struct);
+    /// @todo rework!
 }
 
 template <typename CkxTokenStream>
@@ -358,21 +313,21 @@ template <typename CkxTokenStream>
 inline saber_ptr<ckx_token>
 ckx_parser_impl<CkxTokenStream>::current_token()
 {
-    return stream()[0];
+    return token_stream.get()->operator[](0);
 }
 
 template <typename CkxTokenStream>
 inline saber_ptr<ckx_token>
 ckx_parser_impl<CkxTokenStream>::peek_next_token()
 {
-    return stream()[1];
+    return token_stream.get()->operator[](1);
 }
 
 template <typename CkxTokenStream>
 inline void
 ckx_parser_impl<CkxTokenStream>::move2_next_token()
 {
-    stream().operator ++();
+    return token_stream.get()->operator++();
 }
 
 template <typename CkxTokenStream>
@@ -412,19 +367,31 @@ ckx_parser_impl<CkxTokenStream>::leave_scope()
 }
 
 template <typename CkxTokenStream>
-inline ckx_token_stream&
-Q_ON_HOLD(CkxTokenStream&)
-ckx_parser_impl<CkxTokenStream>::stream()
-{
-    return *(token_stream.get());
-}
-
-template <typename CkxTokenStream>
 bool
 ckx_parser_impl<CkxTokenStream>::is_typename(saber_ptr<ckx_token> _token) const
 {
     return env()->lookup_type(_token->v.p_str);
 }
+
+
+
+template <typename CkxTokenStream>
+void
+ckx_parser_impl<CkxTokenStream>::syntax_error(saber::string &&_reason,
+                                              const qcoord &_pos)
+{
+    /// @todo finalize this error processing system.
+}
+
+template <typename CkxTokenStream>
+void
+ckx_parser_impl<CkxTokenStream>::syntax_warn(saber::string&& _reason,
+                                             const qcoord& _pos)
+{
+    /// @todo finalize this error processing system.
+}
+
+
 
 } // namespace detail
 
