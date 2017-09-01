@@ -48,7 +48,7 @@ public:
 class ckx_fp_reader implements ckx_file_reader
 {
 public:
-    ckx_fp_reader(std::FILE* _fp);
+    explicit ckx_fp_reader(std::FILE* _fp);
     ~ckx_fp_reader() override;
     qchar get_next_char() override final;
 
@@ -60,7 +60,7 @@ private:
 class ckx_istream_reader implements ckx_file_reader
 {
 public:
-    ckx_istream_reader(std::istream& _stream);
+    explicit ckx_istream_reader(std::istream& _stream);
     ~ckx_istream_reader() override;
     qchar get_next_char() override final;
 

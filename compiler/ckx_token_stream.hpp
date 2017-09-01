@@ -38,7 +38,7 @@ using saber::saber_ptr;
 interface ckx_token_stream
 {
 public:
-    ckx_token_stream() = default;
+    explicit ckx_token_stream() = default;
     virtual ~ckx_token_stream() = 0;
 
     virtual saber_ptr<ckx_token> operator[] (int _offset) = 0;
@@ -56,7 +56,7 @@ class ckx_default_token_stream_impl;
 class ckx_default_token_stream implements ckx_token_stream
 {
 public:
-    ckx_default_token_stream(ckx_file_reader& _file_reader);
+    explicit ckx_default_token_stream(ckx_file_reader& _file_reader);
     ~ckx_default_token_stream();
 
     saber_ptr<ckx_token> operator[] (int _offset) override final;

@@ -32,7 +32,7 @@ template <typename CkxTokenStream>
 class ckx_parser_impl
 {
 public:
-    ckx_parser_impl() = default;
+    explicit ckx_parser_impl() = default;
     ~ckx_parser_impl() = default;
 
     ckx_ast_translation_unit* parse_impl(

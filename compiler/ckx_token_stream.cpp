@@ -49,7 +49,7 @@ saber::unordered_map<saber::string, ckx_token::type> ckx_identifier_table::map;
 class ckx_default_token_stream_impl
 {
 public:
-    ckx_default_token_stream_impl(ckx_file_reader &_file_reader);
+    explicit ckx_default_token_stream_impl(ckx_file_reader &_file_reader);
     ~ckx_default_token_stream_impl();
 
     saber_ptr<ckx_token> operator_index_impl(int _offset);

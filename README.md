@@ -1,4 +1,4 @@
-# The programming language - ckx
+﻿# The programming language - ckx
 A general purposed programming language -- for my honey -- chenkx
 
 <br/>
@@ -33,10 +33,10 @@ And finally I designed ckx which is absolutely not C.
 	5)  	vi16 a, b;
 	6)  	input(a);
 	7)  	input(b);
-	8)		vi16 c = a + b;  
+	8)  	vi16 c = a + b;
 	9)  	print(c);
-	A)		return 0;
-	B)	}
+	A)  	return 0;
+	B)  }
 	C)
 
 The first line `import std.io` uses ckx keyword `import` to import `io` utility module from package `std`. As you can see, ckx will have a very powerful module manage system, and we will use this package manage system in the future. But currently I ~~the programmer~~ does not know how to implement this module system. So in the early versions, ckx will include a preprocessor system, importing functions still uses `#include`.
@@ -58,10 +58,10 @@ You can `declare` a function like this:
 
 And you can define a function like this:
 
-	1) function add (vi16 a, vi16 b) -> vi16
-	2) {
-	3) 		return a + b;
-	4) }
+    1)  function add (vi16 a, vi16 b) -> vi16
+    2)  {
+    3)  	return a + b;
+    4)  }
 
 And invoking a function will be:
 
@@ -77,11 +77,11 @@ User-defined types grammer are also similar to C. You can use `struct` to define
 
 > example : Defining a struct student. Note no comma after the closing brace. Once defined, student will become a typename.
 
-	1) struct student
-	2) {
-	3)		vu64 id;
-	4) 		vr32 score;
-	5) }
+    1)  struct student
+    2)  {
+    3)  	vu64 id;
+    4)  	vr32 score;
+    5)  }
 
 ### Pointers
 
@@ -89,18 +89,18 @@ Pointers in ckx is the same as pointers in C. The powerful low-level operator.
 
 > I'm not about to include Garbage collection in this programming language.
 
-	1) vi8 i;
-	2) vi8 *p = &i;            // Taking address
-	3) vi8 *q = heap_alloc();  // Using heap allocation
-	4) heap_free(q);           // Remember to free!
+    1)  vi8 i;
+    2)  vi8 *p = &i;            // Taking address
+    3)  vi8 *q = heap_alloc();  // Using heap allocation
+    4)  heap_free(q);           // Remember to free!
 	5)
-	6) vi8 const* = &i;
+	6)  vi8 const* = &i;
 
 > Note: ckx supports `T const*` but does not support `const T*`.
 
 ### Arrays
 
-> Still under work. If you have a good idea about it, contact me and I'll be appreciate.
+> Still under work. If you have a good idea about it, contact me and I'll be appreciated.
 
 ### Other special features
 
@@ -115,4 +115,4 @@ Pointers in ckx is the same as pointers in C. The powerful low-level operator.
 * Currently I ~~The programmer~~ am not familiar with function overloading, name mangling... So I need some help.
 
 ##### Closures
-> Still under work. If you have a good idea about it, contact me and I'll be appreciate.
+> Still under work. If you have a good idea about it, contact me and I'll be appreciated.

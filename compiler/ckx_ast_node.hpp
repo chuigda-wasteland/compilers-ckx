@@ -41,7 +41,7 @@ using saber::saber_ptr;
 class ckx_ast_node
 {
 public:
-    ckx_ast_node(saber_ptr<ckx_token> _at_token);
+    explicit ckx_ast_node(saber_ptr<ckx_token> _at_token);
     ~ckx_ast_node() = default;
 
     saber_ptr<ckx_token> get_at_token();
@@ -55,13 +55,13 @@ private:
 class ckx_ast_translation_unit make_use_of ckx_ast_node
 {
 public:
-    ckx_ast_translation_unit(saber_ptr<ckx_token> _at_token);
+    explicit ckx_ast_translation_unit(saber_ptr<ckx_token> _at_token);
     ~ckx_ast_translation_unit();
 
     void add_new_stmt(ckx_ast_stmt *_stmt);
 
 private:
-    saber::vector<ckx_ast_stmt*> stmts;
+    explicit saber::vector<ckx_ast_stmt*> stmts;
     ckx_env_table *global_table;
 };
 
@@ -70,7 +70,7 @@ private:
 interface ckx_ast_stmt make_use_of ckx_ast_node
 {
 public:
-    ckx_ast_stmt(saber_ptr<ckx_token> _at_token);
+    explicit ckx_ast_stmt(saber_ptr<ckx_token> _at_token);
     virtual ~ckx_ast_stmt() = 0;
 
     // SKTT1Faker
@@ -137,14 +137,14 @@ private:
 class ckx_ast_break_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_break_stmt(saber_ptr<ckx_token> _at_token);
+    explicit ckx_ast_break_stmt(saber_ptr<ckx_token> _at_token);
     ~ckx_ast_break_stmt() override final = default;
 };
 
 class ckx_ast_continue_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_continue_stmt(saber_ptr<ckx_token> _at_token);
+    explicit ckx_ast_continue_stmt(saber_ptr<ckx_token> _at_token);
     ~ckx_ast_continue_stmt() override final = default;
 };
 
@@ -162,7 +162,7 @@ private:
 class ckx_ast_decl_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_decl_stmt(saber_ptr<ckx_token> _at_token);
+    explicit ckx_ast_decl_stmt(saber_ptr<ckx_token> _at_token);
     ~ckx_ast_decl_stmt() override final;
 
     void add_decl(ckx_ast_init_decl* _decl);
@@ -191,8 +191,8 @@ class ckx_ast_func_stmt make_use_of ckx_ast_node
 {
 public:
     ckx_ast_func_stmt(saber_ptr<ckx_token> _at_token,
-                 ckx_func_entry *_entry,
-                 ckx_env_table *_param_env_table);
+                      ckx_func_entry *_entry,
+                      ckx_env_table *_param_env_table);
     ~ckx_ast_func_stmt();
 
     bool is_defined() const;
@@ -254,7 +254,8 @@ private:
 class ckx_ast_enum_stmt make_use_of ckx_ast_node
 {
 public:
-    ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token, ckx_type_entry* _entry);
+    ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token,
+                      ckx_type_entry* _entry);
     ~ckx_ast_enum_stmt();
 
 private:

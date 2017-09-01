@@ -33,7 +33,7 @@ namespace detail
 class ckx_fp_reader_impl
 {
 public:
-    ckx_fp_reader_impl(std::FILE* _fp);
+    explicit ckx_fp_reader_impl(std::FILE* _fp);
     ~ckx_fp_reader_impl() = default;
 
     qchar get_next_char_impl();
@@ -46,7 +46,7 @@ private:
 class ckx_istream_reader_impl
 {
 public:
-    ckx_istream_reader_impl(std::istream& _stream);
+    explicit ckx_istream_reader_impl(std::istream& _stream);
     ~ckx_istream_reader_impl() = default;
 
     qchar get_next_char_impl();

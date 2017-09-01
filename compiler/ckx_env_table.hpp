@@ -36,7 +36,7 @@ using saber::saber_ptr;
 
 open_class ckx_var_entry
 {
-    ckx_var_entry(saber_ptr<ckx_type> _var_type);
+    explicit ckx_var_entry(saber_ptr<ckx_type> _var_type);
     ~ckx_var_entry() = default;
 
     saber_ptr<ckx_type> var_type;
@@ -44,7 +44,7 @@ open_class ckx_var_entry
 
 open_class ckx_func_entry
 {
-    ckx_func_entry(saber_ptr<ckx_function_type> _func_type);
+    explicit ckx_func_entry(saber_ptr<ckx_function_type> _func_type);
     ~ckx_func_entry() = default;
 
     saber_ptr<ckx_function_type> func_type;
@@ -54,7 +54,7 @@ open_class ckx_func_entry
 
 open_class ckx_type_entry
 {
-    ckx_type_entry(saber_ptr<ckx_type> type);
+    explicit ckx_type_entry(saber_ptr<ckx_type> type);
     ~ckx_type_entry() = default;
 
     saber_ptr<ckx_type> type;
@@ -69,7 +69,7 @@ public:
         duplicate
     };
 
-    ckx_env_table(ckx_env_table *_parent);
+    explicit ckx_env_table(ckx_env_table *_parent);
     ~ckx_env_table();
 
     qpair<add_status, ckx_type_entry*> add_new_type(
