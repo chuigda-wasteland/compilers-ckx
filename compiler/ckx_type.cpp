@@ -181,18 +181,18 @@ ckx_type_helper::get_type(ckx_token::type _basic_type_token)
 {
     switch ( _basic_type_token )
     {
-    case ckx_token::type::token_int8:   return get_vi8_type();
-    case ckx_token::type::token_int16:  return get_vi16_type();
-    case ckx_token::type::token_int32:  return get_vi32_type();
-    case ckx_token::type::token_int64:  return get_vi64_type();
-    case ckx_token::type::token_uint8:  return get_vu8_type();
-    case ckx_token::type::token_uint16: return get_vu16_type();
-    case ckx_token::type::token_uint32: return get_vu32_type();
-    case ckx_token::type::token_uint64: return get_vu64_type();
-    case ckx_token::type::token_char:   return get_vch_type();
-    case ckx_token::type::token_real32: return get_vr32_type();
-    case ckx_token::type::token_real64: return get_vr64_type();
-    case ckx_token::type::token_void:   return get_void_type();
+    case ckx_token::type::tk_vi8:   return get_vi8_type();
+    case ckx_token::type::tk_vi16:  return get_vi16_type();
+    case ckx_token::type::tk_vi32:  return get_vi32_type();
+    case ckx_token::type::tk_vi64:  return get_vi64_type();
+    case ckx_token::type::tk_vu8:  return get_vu8_type();
+    case ckx_token::type::tk_vu16: return get_vu16_type();
+    case ckx_token::type::tk_vu32: return get_vu32_type();
+    case ckx_token::type::tk_vu64: return get_vu64_type();
+    case ckx_token::type::tk_vch:   return get_vch_type();
+    case ckx_token::type::tk_vr32: return get_vr32_type();
+    case ckx_token::type::tk_vr64: return get_vr64_type();
+    case ckx_token::type::tk_void:   return get_void_type();
 
     default: assert(0);
     }

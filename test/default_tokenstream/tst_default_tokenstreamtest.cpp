@@ -35,7 +35,7 @@ static bool do_test_ckx_token_stream_1(void)
 
     saber::vector<ckx_token::type> tokens =
     {
-#define GGLEX(X, Y) ckx_token::type::token_##Y,
+#define GGLEX(X, Y) ckx_token::type::tk_##Y,
 #include "gg.h"
 #undef GGLEX
     };
@@ -44,7 +44,7 @@ static bool do_test_ckx_token_stream_1(void)
     ckx_default_token_stream stream = ckx_default_token_stream(reader);
 
     for (qsizet i = 0;
-         stream[0].get()->token_type != ckx_token::type::token_eoi;
+         stream[0].get()->token_type != ckx_token::type::tk_eoi;
          ++i, ++stream)
     {
         if (stream[0].get()->token_type != tokens[i])
@@ -77,10 +77,10 @@ static bool do_test_ckx_token_stream_2(void)
     };
 
     for (qsizet i = 0;
-         stream[0].get()->token_type != ckx_token::type::token_eoi;
+         stream[0].get()->token_type != ckx_token::type::tk_eoi;
          ++i, ++stream)
     {
-        if (stream[0].get()->token_type != ckx_token::type::token_identifier
+        if (stream[0].get()->token_type != ckx_token::type::tk_id
             || *(stream[0].get()->v.p_str) != comparsion[i])
         {
             qDebug() << "Failed at token" << i << '\n';
@@ -115,10 +115,10 @@ static bool do_test_ckx_token_stream_3()
     ckx_default_token_stream stream = ckx_default_token_stream(reader);
 
     for (qsizet i = 0;
-         stream[0].get()->token_type != ckx_token::type::token_eoi;
+         stream[0].get()->token_type != ckx_token::type::tk_eoi;
          ++i, ++stream)
     {
-        if (stream[0].get()->token_type != ckx_token::type::token_vr_literal
+        if (stream[0].get()->token_type != ckx_token::type::tk_vr_literal
             || !float_equal(stream[0].get()->v.r, comparsion[i]) )
         {
             qDebug() << "Failed at token" << i << '\n';
@@ -150,10 +150,10 @@ static bool do_test_ckx_token_stream_4()
     ckx_default_token_stream stream = ckx_default_token_stream(reader);
 
     for (qsizet i = 0;
-         stream[0].get()->token_type != ckx_token::type::token_eoi;
+         stream[0].get()->token_type != ckx_token::type::tk_eoi;
          ++i, ++stream)
     {
-        if (stream[0].get()->token_type != ckx_token::type::token_vi_literal
+        if (stream[0].get()->token_type != ckx_token::type::tk_vi_literal
             || stream[0].get()->v.i64 != comparsion[i] )
         {
             qDebug() << "Failed at token" << i << '\n';
@@ -176,7 +176,7 @@ static bool do_test_ckx_token_stream_5()
 
     ckx_token::type comparsion[] =
     {
-#define VY4LEX(X, Y) ckx_token::type::token_##Y,
+#define VY4LEX(X, Y) ckx_token::type::tk_##Y,
 #include "vy4.h"
 #undef VY4LEX
     };
@@ -185,7 +185,7 @@ static bool do_test_ckx_token_stream_5()
     ckx_default_token_stream stream = ckx_default_token_stream(reader);
 
     for (qsizet i = 0;
-         stream[0].get()->token_type != ckx_token::type::token_eoi;
+         stream[0].get()->token_type != ckx_token::type::tk_eoi;
          ++i, ++stream)
     {
         if (stream[0].get()->token_type != comparsion[i])

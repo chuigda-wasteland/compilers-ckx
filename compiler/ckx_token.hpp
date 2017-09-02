@@ -30,106 +30,106 @@ open_class ckx_token
 {
     enum class type : qchar
     {
-        token_assign,             // =
+        tk_assign,             // =
 
-        token_add,                // +
-        token_sub,                // -
-        token_mul,                // *
-        token_div,                // /
-        token_mod,                // %
+        tk_add,                // +
+        tk_sub,                // -
+        tk_mul,                // *
+        tk_div,                // /
+        tk_mod,                // %
 
-        token_add_assign,         // +=
-        token_sub_assign,         // -=
-        token_mul_assign,         // *=
-        token_div_assign,         // /=
-        token_mod_assign,         // %=
+        tk_add_assign,         // +=
+        tk_sub_assign,         // -=
+        tk_mul_assign,         // *=
+        tk_div_assign,         // /=
+        tk_mod_assign,         // %=
 
-        token_bit_and,            // &
-        token_bit_or,             // |
-        token_bit_not,            // ~
-        token_bit_xor,            // ^
+        tk_bit_and,            // &
+        tk_bit_or,             // |
+        tk_bit_not,            // ~
+        tk_bit_xor,            // ^
 
-        token_logic_and,          // &&
-        token_logic_or,           // ||
-        token_logic_not,          // !
-        token_logic_xor,          // ^^
+        tk_logic_and,          // &&
+        tk_logic_or,           // ||
+        tk_logic_not,          // !
+        tk_logic_xor,          // ^^
 
-        token_lt,                 // <
-        token_eq,                 // ==
-        token_gt,                 // >
-        token_leq,                // <=
-        token_geq,                // >=
-        token_neq,                // !=
+        tk_lt,                 // <
+        tk_eq,                 // ==
+        tk_gt,                 // >
+        tk_leq,                // <=
+        tk_geq,                // >=
+        tk_neq,                // !=
 
-        token_colon,              // :
-        token_scope,              // ::
-        token_semicolon,          // ;
-        token_comma,              // ,
-        token_dot,                // .
+        tk_colon,              // :
+        tk_scope,              // ::
+        tk_semicolon,          // ;
+        tk_comma,              // ,
+        tk_dot,                // .
 
-        token_lbrace,             // {
-        token_rbrace,             // }
-        token_lbracket,           // [
-        token_rbracket,           // ]
-        token_lparth,             // (
-        token_rparth,             // )
+        tk_lbrace,             // {
+        tk_rbrace,             // }
+        tk_lbracket,           // [
+        tk_rbracket,           // ]
+        tk_lparth,             // (
+        tk_rparth,             // )
 
 
-        token_int8,               // vi8
-        token_int16,              // vi16
-        token_int32,              // vi32
-        token_int64,              // vi64
+        tk_vi8,               // vi8
+        tk_vi16,              // vi16
+        tk_vi32,              // vi32
+        tk_vi64,              // vi64
 
-        token_uint8,              // vu8
-        token_uint16,             // vu16
-        token_uint32,             // vu32
-        token_uint64,             // vu64
+        tk_vu8,              // vu8
+        tk_vu16,             // vu16
+        tk_vu32,             // vu32
+        tk_vu64,             // vu64
 
-        token_char,               // vch
+        tk_vch,               // vch
 
-        token_real32,             // vr32
-        token_real64,             // vr64
+        tk_vr32,             // vr32
+        tk_vr64,             // vr64
 
-        token_void,               // void
+        tk_void,               // void
 
-        token_function,           // function
+        tk_function,           // function
 
-        token_struct,             // struct
-        token_variant,            // variant
-        token_enum,               // enum
+        tk_struct,             // struct
+        tk_variant,            // variant
+        tk_enum,               // enum
 
-        token_const,              // const
+        tk_const,              // const
 
-        token_if,                 // if
-        token_else,               // else
-        token_for,                // for
-        token_while,              // while
-        token_do,                 // do
-        token_switch,             // switch
-        token_case,               // case
-        token_return,             // return
-        token_break,              // break
-        token_continue,           // continue
+        tk_if,                 // if
+        tk_else,               // else
+        tk_for,                // for
+        tk_while,              // while
+        tk_do,                 // do
+        tk_switch,             // switch
+        tk_case,               // case
+        tk_return,             // return
+        tk_break,              // break
+        tk_continue,           // continue
 
-        token_operator,           // operator
+        tk_operator,           // operator
 
-        token_identifier,         // identifier
+        tk_id        ,         // identifier
 
-        token_vi_literal,         // int literal
+        tk_vi_literal,         // int literal
         // reserved
-        token_vu_literal,         // unsigned literal
-        token_vr_literal,         // real literal
-        token_vchar_literal,      // char literal
+        tk_vu_literal,         // unsigned literal
+        tk_vr_literal,         // real literal
+        tk_vchar_literal,      // char literal
         // reserved
-        token_string_literal,     // string literal
+        tk_string_literal,     // string literal
 
-        token_static_cast,        // static_cast
-        token_reinterpret_cast,   // reinterpret_cast
-        token_const_cast,         // const_cast
-        token_ckx_cast,           // ckx_cast
+        tk_static_cast,        // static_cast
+        tk_reinterpret_cast,   // reinterpret_cast
+        tk_const_cast,         // const_cast
+        tk_ckx_cast,           // ckx_cast
 
-        token_ckx,                // ckx
-        token_eoi                 // EOI
+        tk_ckx,                // ckx
+        tk_eoi                 // EOI
     };
 
     ckx_token(const qcoord& _pos, type _operator);

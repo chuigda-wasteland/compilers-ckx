@@ -30,40 +30,40 @@ ckx_token_sets::first_stmt_set()
     static ckx_token_set ret =
     {
         /// @brief elements may appear at the commence of a declaration
-        ckx_token::type::token_identifier,
-        ckx_token::type::token_int8,
-        ckx_token::type::token_int16,
-        ckx_token::type::token_int32,
-        ckx_token::type::token_int64,
-        ckx_token::type::token_uint8,
-        ckx_token::type::token_uint16,
-        ckx_token::type::token_uint32,
-        ckx_token::type::token_uint64,
-        ckx_token::type::token_char,
-        ckx_token::type::token_real32,
-        ckx_token::type::token_real64,
+        ckx_token::type::tk_id,
+        ckx_token::type::tk_vi8,
+        ckx_token::type::tk_vi16,
+        ckx_token::type::tk_vi32,
+        ckx_token::type::tk_vi64,
+        ckx_token::type::tk_vu8,
+        ckx_token::type::tk_vu16,
+        ckx_token::type::tk_vu32,
+        ckx_token::type::tk_vu64,
+        ckx_token::type::tk_vch,
+        ckx_token::type::tk_vr32,
+        ckx_token::type::tk_vr64,
 
         /// @brief elements may appear at the commence of an expression
-        ckx_token::type::token_add,
-        ckx_token::type::token_sub,
-        ckx_token::type::token_mul,
-        ckx_token::type::token_bit_and,
-        ckx_token::type::token_const_cast,
-        ckx_token::type::token_reinterpret_cast,
-        ckx_token::type::token_static_cast,
-        ckx_token::type::token_ckx_cast,
+        ckx_token::type::tk_add,
+        ckx_token::type::tk_sub,
+        ckx_token::type::tk_mul,
+        ckx_token::type::tk_bit_and,
+        ckx_token::type::tk_const_cast,
+        ckx_token::type::tk_reinterpret_cast,
+        ckx_token::type::tk_static_cast,
+        ckx_token::type::tk_ckx_cast,
 
         /// @brief control-statements
-        ckx_token::type::token_if,
-        ckx_token::type::token_while,
-        ckx_token::type::token_do,
-        ckx_token::type::token_for,
-        ckx_token::type::token_break,
-        ckx_token::type::token_continue,
-        ckx_token::type::token_return,
+        ckx_token::type::tk_if,
+        ckx_token::type::tk_while,
+        ckx_token::type::tk_do,
+        ckx_token::type::tk_for,
+        ckx_token::type::tk_break,
+        ckx_token::type::tk_continue,
+        ckx_token::type::tk_return,
 
         /// @brief may enter new scope
-        ckx_token::type::token_lbrace
+        ckx_token::type::tk_lbrace
     };
     return ret;
 }
@@ -79,26 +79,26 @@ ckx_token_sets::first_global_set()
 
         /// @brief elements may appear at the commence of a declaration
         /// identifiers may be typenames.
-        ckx_token::type::token_identifier,
-        ckx_token::type::token_int8,
-        ckx_token::type::token_int16,
-        ckx_token::type::token_int32,
-        ckx_token::type::token_int64,
-        ckx_token::type::token_uint8,
-        ckx_token::type::token_uint16,
-        ckx_token::type::token_uint32,
-        ckx_token::type::token_uint64,
-        ckx_token::type::token_char,
-        ckx_token::type::token_real32,
-        ckx_token::type::token_real64,
+        ckx_token::type::tk_id,
+        ckx_token::type::tk_vi8,
+        ckx_token::type::tk_vi16,
+        ckx_token::type::tk_vi32,
+        ckx_token::type::tk_vi64,
+        ckx_token::type::tk_vu8,
+        ckx_token::type::tk_vu16,
+        ckx_token::type::tk_vu32,
+        ckx_token::type::tk_vu64,
+        ckx_token::type::tk_vch,
+        ckx_token::type::tk_vr32,
+        ckx_token::type::tk_vr64,
 
         /// @brief function
-        ckx_token::type::token_function,
+        ckx_token::type::tk_function,
 
         /// @brief new-type statements
-        ckx_token::type::token_struct,
-        ckx_token::type::token_variant,
-        ckx_token::type::token_enum
+        ckx_token::type::tk_struct,
+        ckx_token::type::tk_variant,
+        ckx_token::type::tk_enum
     };
     return ret;
 }
@@ -106,7 +106,7 @@ ckx_token_sets::first_global_set()
 const ckx_token_set&
 ckx_token_sets::close_scope_set()
 {
-    static ckx_token_set ret = { ckx_token::type::token_rbrace };
+    static ckx_token_set ret = { ckx_token::type::tk_rbrace };
     return ret;
 }
 
@@ -116,48 +116,48 @@ ckx_token_sets::close_declarator_set()
     static ckx_token_set ret =
     {
         /// @brief usual termination
-        ckx_token::type::token_comma,
-        ckx_token::type::token_semicolon,
-        ckx_token::type::token_identifier,
+        ckx_token::type::tk_comma,
+        ckx_token::type::tk_semicolon,
+        ckx_token::type::tk_id,
 
         /// @brief any element may appear at next line
         /// if the current statement is not closed
 
         /// @brief elements may appear at the commence of a declaration
-        ckx_token::type::token_identifier,
-        ckx_token::type::token_int8,
-        ckx_token::type::token_int16,
-        ckx_token::type::token_int32,
-        ckx_token::type::token_int64,
-        ckx_token::type::token_uint8,
-        ckx_token::type::token_uint16,
-        ckx_token::type::token_uint32,
-        ckx_token::type::token_uint64,
-        ckx_token::type::token_char,
-        ckx_token::type::token_real32,
-        ckx_token::type::token_real64,
+        ckx_token::type::tk_id,
+        ckx_token::type::tk_vi8,
+        ckx_token::type::tk_vi16,
+        ckx_token::type::tk_vi32,
+        ckx_token::type::tk_vi64,
+        ckx_token::type::tk_vu8,
+        ckx_token::type::tk_vu16,
+        ckx_token::type::tk_vu32,
+        ckx_token::type::tk_vu64,
+        ckx_token::type::tk_vch,
+        ckx_token::type::tk_vr32,
+        ckx_token::type::tk_vr64,
 
         /// @brief elements may appear at the commence of an expression
-        ckx_token::type::token_add,
-        ckx_token::type::token_sub,
-        ckx_token::type::token_mul,
-        ckx_token::type::token_bit_and,
-        ckx_token::type::token_const_cast,
-        ckx_token::type::token_reinterpret_cast,
-        ckx_token::type::token_static_cast,
-        ckx_token::type::token_ckx_cast,
+        ckx_token::type::tk_add,
+        ckx_token::type::tk_sub,
+        ckx_token::type::tk_mul,
+        ckx_token::type::tk_bit_and,
+        ckx_token::type::tk_const_cast,
+        ckx_token::type::tk_reinterpret_cast,
+        ckx_token::type::tk_static_cast,
+        ckx_token::type::tk_ckx_cast,
 
         /// @brief control-statements
-        ckx_token::type::token_if,
-        ckx_token::type::token_while,
-        ckx_token::type::token_do,
-        ckx_token::type::token_for,
-        ckx_token::type::token_break,
-        ckx_token::type::token_continue,
-        ckx_token::type::token_return,
+        ckx_token::type::tk_if,
+        ckx_token::type::tk_while,
+        ckx_token::type::tk_do,
+        ckx_token::type::tk_for,
+        ckx_token::type::tk_break,
+        ckx_token::type::tk_continue,
+        ckx_token::type::tk_return,
 
         /// @brief may enter new scope
-        ckx_token::type::token_lbrace
+        ckx_token::type::tk_lbrace
     };
     return ret;
 }

@@ -136,10 +136,10 @@ static const saber::string __id_string_data[] =
 
 static const ckx_token::type __id_tokentype_data[] =
 {
-#define GGLEX(X, Y) ckx_token::type::token_##Y,
+#define GGLEX(X, Y) ckx_token::type::tk_##Y,
 #include "gg.h"
 #undef GGLEX
-ckx_token::type::token_eoi
+ckx_token::type::tk_eoi
 };
 
 qpair<ckx_token::type, bool>
@@ -153,7 +153,7 @@ ckx_identifier_table::lookup(const saber::string &_name)
     else
     {
         return qpair<ckx_token::type, bool>(
-                    ckx_token::type::token_eoi, false);
+                    ckx_token::type::tk_eoi, false);
     }
 }
 
@@ -278,7 +278,7 @@ void ckx_default_token_stream_impl::do_split_tokens()
     }
 
     token_buffer.emplace_back(
-                new ckx_token(char_coord(), ckx_token::type::token_eoi));
+                new ckx_token(char_coord(), ckx_token::type::tk_eoi));
 }
 
 
@@ -360,18 +360,18 @@ void ckx_default_token_stream_impl::solve_bitwise_or_logic_op()
     switch (pre)
     {
     case '&':
-        new_token_type = is_logic ? ckx_token::type::token_logic_and :
-                                    ckx_token::type::token_bit_and;
+        new_token_type = is_logic ? ckx_token::type::tk_logic_and :
+                                    ckx_token::type::tk_bit_and;
         break;
 
     case '|':
-        new_token_type = is_logic ? ckx_token::type::token_logic_or :
-                                    ckx_token::type::token_bit_or;
+        new_token_type = is_logic ? ckx_token::type::tk_logic_or :
+                                    ckx_token::type::tk_bit_or;
         break;
 
     case '^':
-        new_token_type = is_logic ? ckx_token::type::token_logic_xor :
-                                    ckx_token::type::token_bit_xor;
+        new_token_type = is_logic ? ckx_token::type::tk_logic_xor :
+                                    ckx_token::type::tk_bit_xor;
         break;
 
     default:
@@ -393,48 +393,48 @@ void ckx_default_token_stream_impl::solve_op_or_opassign()
     switch (op)
     {
     case '+':
-        new_token_type = is_opassign ? ckx_token::type::token_add_assign :
-                                       ckx_token::type::token_add;
+        new_token_type = is_opassign ? ckx_token::type::tk_add_assign :
+                                       ckx_token::type::tk_add;
         break;
 
     case '-':
-        new_token_type = is_opassign ? ckx_token::type::token_sub_assign :
-                                       ckx_token::type::token_sub;
+        new_token_type = is_opassign ? ckx_token::type::tk_sub_assign :
+                                       ckx_token::type::tk_sub;
         break;
 
     case '*':
-        new_token_type = is_opassign ? ckx_token::type::token_mul_assign :
-                                       ckx_token::type::token_mul;
+        new_token_type = is_opassign ? ckx_token::type::tk_mul_assign :
+                                       ckx_token::type::tk_mul;
         break;
 
     case '/':
-        new_token_type = is_opassign ? ckx_token::type::token_div_assign :
-                                       ckx_token::type::token_div;
+        new_token_type = is_opassign ? ckx_token::type::tk_div_assign :
+                                       ckx_token::type::tk_div;
         break;
 
     case '%':
-        new_token_type = is_opassign ? ckx_token::type::token_mod_assign :
-                                       ckx_token::type::token_mod;
+        new_token_type = is_opassign ? ckx_token::type::tk_mod_assign :
+                                       ckx_token::type::tk_mod;
         break;
 
     case '!':
-        new_token_type = is_opassign ? ckx_token::type::token_neq :
-                                       ckx_token::type::token_logic_not;
+        new_token_type = is_opassign ? ckx_token::type::tk_neq :
+                                       ckx_token::type::tk_logic_not;
         break;
 
     case '<':
-        new_token_type = is_opassign ? ckx_token::type::token_leq :
-                                       ckx_token::type::token_lt;
+        new_token_type = is_opassign ? ckx_token::type::tk_leq :
+                                       ckx_token::type::tk_lt;
         break;
 
     case '>':
-        new_token_type = is_opassign ? ckx_token::type::token_geq :
-                                       ckx_token::type::token_gt;
+        new_token_type = is_opassign ? ckx_token::type::tk_geq :
+                                       ckx_token::type::tk_gt;
         break;
 
     case '=':
-        new_token_type = is_opassign ? ckx_token::type::token_eq :
-                                       ckx_token::type::token_assign;
+        new_token_type = is_opassign ? ckx_token::type::tk_eq :
+                                       ckx_token::type::tk_assign;
         break;
     }
 
@@ -449,12 +449,12 @@ void ckx_default_token_stream_impl::solve_colon_or_scope()
     {
         next_char();
         token_buffer.emplace_back(
-                    new ckx_token(char_coord(), ckx_token::type::token_scope));
+                    new ckx_token(char_coord(), ckx_token::type::tk_scope));
     }
     else
     {
         token_buffer.emplace_back(
-                    new ckx_token(char_coord(), ckx_token::type::token_colon));
+                    new ckx_token(char_coord(), ckx_token::type::tk_colon));
     }
 }
 
@@ -464,16 +464,16 @@ void ckx_default_token_stream_impl::solve_ordinary_op()
 
     switch (ch())
     {
-    case '~': new_token_type = ckx_token::type::token_bit_not;   break;
-    case ';': new_token_type = ckx_token::type::token_semicolon; break;
-    case ',': new_token_type = ckx_token::type::token_comma;     break;
-    case '.': new_token_type = ckx_token::type::token_dot;       break;
-    case '{': new_token_type = ckx_token::type::token_lbrace;    break;
-    case '}': new_token_type = ckx_token::type::token_rbrace;    break;
-    case '[': new_token_type = ckx_token::type::token_lbracket;  break;
-    case ']': new_token_type = ckx_token::type::token_rbracket;  break;
-    case '(': new_token_type = ckx_token::type::token_lparth;    break;
-    case ')': new_token_type = ckx_token::type::token_rparth;    break;
+    case '~': new_token_type = ckx_token::type::tk_bit_not;   break;
+    case ';': new_token_type = ckx_token::type::tk_semicolon; break;
+    case ',': new_token_type = ckx_token::type::tk_comma;     break;
+    case '.': new_token_type = ckx_token::type::tk_dot;       break;
+    case '{': new_token_type = ckx_token::type::tk_lbrace;    break;
+    case '}': new_token_type = ckx_token::type::tk_rbrace;    break;
+    case '[': new_token_type = ckx_token::type::tk_lbracket;  break;
+    case ']': new_token_type = ckx_token::type::tk_rbracket;  break;
+    case '(': new_token_type = ckx_token::type::tk_lparth;    break;
+    case ')': new_token_type = ckx_token::type::tk_rparth;    break;
         break;
     default:
         // What the fuck!

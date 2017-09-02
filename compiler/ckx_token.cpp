@@ -32,41 +32,41 @@ ckx_token::ckx_token(const qcoord &_pos, type _operator) :
 ckx_token::ckx_token(const qcoord &_pos, qint64 _int_literal) :
     ckx_token(_pos)
 {
-    this->token_type = type::token_vi_literal;
+    this->token_type = type::tk_vi_literal;
     this->v.i64 = _int_literal;
 }
 
 ckx_token::ckx_token(const qcoord &_pos, quint64 _unsigned_literal) :
     ckx_token(_pos)
 {
-    this->token_type = type::token_vu_literal;
+    this->token_type = type::tk_vu_literal;
     this->v.u64 = _unsigned_literal;
 }
 
 ckx_token::ckx_token(const qcoord &_pos, qreal _real_literal) :
     ckx_token(_pos)
 {
-    this->token_type = type::token_vr_literal;
+    this->token_type = type::tk_vr_literal;
     this->v.r = _real_literal;
 }
 
 ckx_token::ckx_token(const qcoord &_pos, qchar _char_literal) :
     ckx_token(_pos)
 {
-    this->token_type = type::token_vchar_literal;
+    this->token_type = type::tk_vchar_literal;
     this->v.ch = _char_literal;
 }
 
 ckx_token::ckx_token(const qcoord &_pos, std::string &&_id) :
     ckx_token(_pos)
 {
-    this->token_type = type::token_identifier;
+    this->token_type = type::tk_id;
     this->v.p_str = new saber::string(saber::move(_id));
 }
 
 ckx_token::~ckx_token()
 {
-    if (this->token_type == type::token_identifier)
+    if (this->token_type == type::tk_id)
     {
         delete this->v.p_str;
     }

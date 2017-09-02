@@ -135,41 +135,41 @@ ckx_parser_impl<CkxTokenStream>::parse_global_stmt()
 {
     switch ( current_token()->token_type )
     {
-    case ckx_token::type::token_int8:
-    case ckx_token::type::token_int16:
-    case ckx_token::type::token_int32:
-    case ckx_token::type::token_int64:
-    case ckx_token::type::token_uint8:
-    case ckx_token::type::token_uint16:
-    case ckx_token::type::token_uint32:
-    case ckx_token::type::token_uint64:
-    case ckx_token::type::token_char:
-    case ckx_token::type::token_real32:
-    case ckx_token::type::token_real64:
+    case ckx_token::type::tk_vi8:
+    case ckx_token::type::tk_vi16:
+    case ckx_token::type::tk_vi32:
+    case ckx_token::type::tk_vi64:
+    case ckx_token::type::tk_vu8:
+    case ckx_token::type::tk_vu16:
+    case ckx_token::type::tk_vu32:
+    case ckx_token::type::tk_vu64:
+    case ckx_token::type::tk_vch:
+    case ckx_token::type::tk_vr32:
+    case ckx_token::type::tk_vr64:
         return parse_decl_stmt();
 
-    case ckx_token::type::token_function:
+    case ckx_token::type::tk_function:
         return parse_func_stmt();
 
-    case ckx_token::type::token_struct:
+    case ckx_token::type::tk_struct:
         return parse_struct_stmt();
 
-    case ckx_token::type::token_variant:
+    case ckx_token::type::tk_variant:
         return parse_variant_stmt();
 
-    case ckx_token::type::token_enum:
+    case ckx_token::type::tk_enum:
         return parse_enum_stmt();
 
-    case ckx_token::type::token_ckx:
+    case ckx_token::type::tk_ckx:
         return parse_ckx_block();
 
     // Module manage system still designing.
     // We will have C-like preprocessors before creating a powerful
     // module manage system.
-    Q_ON_HOLD(case ckx_token::type::token_import:)
-    Q_ON_HOLD(case ckx_token::type::token_export:)
+    Q_ON_HOLD(case ckx_token::type::tk_import:)
+    Q_ON_HOLD(case ckx_token::type::tk_export:)
 
-    case ckx_token::type::token_identifier:
+    case ckx_token::type::tk_id:
         if ( is_typename(current_token()) )
             return parse_decl_stmt();
 
@@ -187,50 +187,50 @@ ckx_parser_impl<CkxTokenStream>::parse_stmt()
 {
     switch ( current_token()->token_type )
     {
-    case ckx_token::type::token_int8:
-    case ckx_token::type::token_int16:
-    case ckx_token::type::token_int32:
-    case ckx_token::type::token_int64:
-    case ckx_token::type::token_uint8:
-    case ckx_token::type::token_uint16:
-    case ckx_token::type::token_uint32:
-    case ckx_token::type::token_uint64:
-    case ckx_token::type::token_char:
-    case ckx_token::type::token_real32:
-    case ckx_token::type::token_real64:
+    case ckx_token::type::tk_vi8:
+    case ckx_token::type::tk_vi16:
+    case ckx_token::type::tk_vi32:
+    case ckx_token::type::tk_vi64:
+    case ckx_token::type::tk_vu8:
+    case ckx_token::type::tk_vu16:
+    case ckx_token::type::tk_vu32:
+    case ckx_token::type::tk_vu64:
+    case ckx_token::type::tk_vch:
+    case ckx_token::type::tk_vr32:
+    case ckx_token::type::tk_vr64:
         return parse_decl_stmt();
 
     /// @todo We met some trouble with enum type.
-    case ckx_token::type::token_identifier:
+    case ckx_token::type::tk_id:
         if ( current_env->lookup_type(*(current_token()->v.p_str))
              != nullptr )
             return parse_decl_stmt();
         else
             return parse_expr_stmt();
 
-    case ckx_token::type::token_add:
-    case ckx_token::type::token_sub:
-    case ckx_token::type::token_mul:
-    case ckx_token::type::token_bit_and:
-    case ckx_token::type::token_bit_not:
-    case ckx_token::type::token_logic_not:
+    case ckx_token::type::tk_add:
+    case ckx_token::type::tk_sub:
+    case ckx_token::type::tk_mul:
+    case ckx_token::type::tk_bit_and:
+    case ckx_token::type::tk_bit_not:
+    case ckx_token::type::tk_logic_not:
 
-    case ckx_token::type::token_static_cast:
-    case ckx_token::type::token_reinterpret_cast:
-    case ckx_token::type::token_const_cast:
-    case ckx_token::type::token_ckx_cast:
+    case ckx_token::type::tk_static_cast:
+    case ckx_token::type::tk_reinterpret_cast:
+    case ckx_token::type::tk_const_cast:
+    case ckx_token::type::tk_ckx_cast:
         return parse_expr_stmt();
 
-    case ckx_token::type::token_if:        return parse_if_stmt();
-    case ckx_token::type::token_while:     return parse_while_stmt();
-    case ckx_token::type::token_do:        return parse_do_while_stmt();
-    case ckx_token::type::token_for:       return parse_for_stmt();
-    case ckx_token::type::token_break:     return parse_break_stmt();
-    case ckx_token::type::token_continue:  return parse_continue_stmt();
-    case ckx_token::type::token_return:    return parse_return_stmt();
-    case ckx_token::type::token_lbrace:    return parse_compound_stmt();
+    case ckx_token::type::tk_if:        return parse_if_stmt();
+    case ckx_token::type::tk_while:     return parse_while_stmt();
+    case ckx_token::type::tk_do:        return parse_do_while_stmt();
+    case ckx_token::type::tk_for:       return parse_for_stmt();
+    case ckx_token::type::tk_break:     return parse_break_stmt();
+    case ckx_token::type::tk_continue:  return parse_continue_stmt();
+    case ckx_token::type::tk_return:    return parse_return_stmt();
+    case ckx_token::type::tk_lbrace:    return parse_compound_stmt();
 
-    case ckx_token::type::token_semicolon:
+    case ckx_token::type::tk_semicolon:
         Q_ON_HOLD("warning : empty declaration not permitted")
 
     default:
@@ -247,12 +247,12 @@ ckx_parser_impl<CkxTokenStream>::parse_decl_stmt()
     saber_ptr<ckx_type> type = parse_type();
     while (1)
     {
-        if ( !expect(ckx_token::type::token_identifier) )
+        if ( !expect(ckx_token::type::tk_id) )
             Q_ON_HOLD("Error recover");
 
         saber_ptr<ckx_token> token = current_token();
         ckx_ast_expr *init = nullptr;
-        if ( expect_n_eat(ckx_token::type::token_assign) )
+        if ( expect_n_eat(ckx_token::type::tk_assign) )
             init = parse_expr();
 
         auto status = env()->add_new_var(*(token->v.p_str), type);
@@ -260,10 +260,10 @@ ckx_parser_impl<CkxTokenStream>::parse_decl_stmt()
             Q_ON_HOLD("Error recover");
         ret->add_decl(new ckx_ast_init_decl(token, status.second, init));
 
-        if ( !expect_n_eat(ckx_token::type::token_comma) ) break;
+        if ( !expect_n_eat(ckx_token::type::tk_comma) ) break;
     }
 
-    if ( !expect_n_eat(ckx_token::type::token_semicolon) )
+    if ( !expect_n_eat(ckx_token::type::tk_semicolon) )
         Q_ON_HOLD("Error recover");
     return ret;
 }
@@ -272,16 +272,16 @@ template <typename CkxTokenStream>
 ckx_ast_struct_stmt*
 ckx_parser_impl<CkxTokenStream>::parse_struct_stmt()
 {
-    assert(current_token()->token_type == ckx_token::type::token_struct);
+    assert(current_token()->token_type == ckx_token::type::tk_struct);
     saber_ptr<ckx_token> at_token = current_token();
     move2_next_token();
 
-    if ( !expect(ckx_token::type::token_identifier) )
+    if ( !expect(ckx_token::type::tk_id) )
         return nullptr;
     saber::string struct_typename = *(current_token()->v.p_str);
     move2_next_token();
 
-    if ( !expect_n_eat(ckx_token::type::token_lbrace) )
+    if ( !expect_n_eat(ckx_token::type::tk_lbrace) )
         return nullptr;
 
     ckx_struct_type *type = new ckx_struct_type;
@@ -297,7 +297,7 @@ ckx_parser_impl<CkxTokenStream>::parse_struct_stmt()
     if (!parse_record_type_fields(*type))
         return nullptr;
 
-    if ( !expect(ckx_token::type::token_rbrace) )
+    if ( !expect(ckx_token::type::tk_rbrace) )
         return nullptr;
 
     return new ckx_ast_struct_stmt(at_token, add_result.second);
@@ -317,7 +317,7 @@ saber_ptr<ckx_type>
 ckx_parser_impl<CkxTokenStream>::parse_type()
 {
     saber_ptr<ckx_type> type;
-    if (current_token()->token_type == ckx_token::type::token_identifier)
+    if (current_token()->token_type == ckx_token::type::tk_id)
     {
         type = env()->lookup_var( *(current_token()->v.p_str) );
     }
@@ -331,10 +331,10 @@ ckx_parser_impl<CkxTokenStream>::parse_type()
     {
         switch ( current_token() )
         {
-        case ckx_token::type::token_const:
+        case ckx_token::type::tk_const:
             type = ckx_type_helper::qual_const(type); break;
 
-        case ckx_token::type::token_mul:
+        case ckx_token::type::tk_mul:
             type = ckx_type_helper::pointer_to(type); break;
 
         default:
@@ -456,7 +456,7 @@ void
 ckx_parser_impl<CkxTokenStream>::skip2_token(const ckx_token_set& _token_set)
 {
     while ( (!_token_set.find(current_token()->token_type))
-            && (current_token()->token_type != ckx_token::type::token_eoi) )
+            && (current_token()->token_type != ckx_token::type::tk_eoi) )
         move2_next_token();
 }
 
