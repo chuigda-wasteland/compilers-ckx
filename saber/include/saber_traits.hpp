@@ -29,6 +29,20 @@ struct int2type<true>
     using value_type = true_type;
 };
 
+template <typename T1, typename T2>
+struct type_equivalent
+{
+    using value_type = false_type;
+    static constexpr bool value = false;
+};
+
+template <typename T>
+struct type_equivalent<T, T>
+{
+    using value_type = true_type;
+    static constexpr bool value = true;
+};
+
 } // namespace traits
 } // namespace saber
 

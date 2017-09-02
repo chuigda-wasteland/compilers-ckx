@@ -28,7 +28,7 @@ namespace ckx
 
 open_class ckx_token
 {
-    enum class type : unsigned char
+    enum class type : qchar
     {
         token_assign,             // =
 
@@ -163,6 +163,14 @@ private:
     // This constructor reserved for internal use.
     // All other public constructors invokes this constructor
     explicit ckx_token(const qcoord& _coord);
+};
+
+struct ckx_token_type_hash
+{
+    size_t operator() (ckx_token::type _type) const
+    {
+        return std::hash<qchar>()(static_cast<qchar>(_type));
+    }
 };
 
 }

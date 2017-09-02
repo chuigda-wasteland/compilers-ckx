@@ -20,6 +20,7 @@
 
 #include "ckx_ast_node.hpp"
 #include "ckx_type.hpp"
+#include "ckx_token_set.hpp"
 #include "ckx_error.hpp"
 
 namespace ckx
@@ -61,12 +62,17 @@ private:
     ckx_ast_return_stmt* parse_return_stmt();
     ckx_ast_compound_stmt* parse_compound_stmt();
 
+private:
     /// @brief individual functions for expressions
     /// @todo finish this part after we have a fully-designed expr-tree system
     ckx_ast_expr* parse_expr();
 
     /// @fn we need this function to ease the type resolving.
     saber_ptr<ckx_type> parse_type();
+
+    /// @fn this function (these two functions) resolves struct/variant fields
+    template <typename RecordType>
+    bool parse_record_type_fields(RecordType& _type);
 
     /// @brief utility functions
     bool is_typename(saber_ptr<ckx_token> _token) const;
@@ -90,9 +96,9 @@ private:
 
     /// @brief and here are functions for recovering from a syntax error.
     /// @todo  implement these functions
+    void skip2_token(const ckx_token_set& _token_set);
 
 private:
-
     saber_ptr<CkxTokenStream> token_stream;
     ckx_env_table *current_env;
 };
@@ -266,7 +272,35 @@ template <typename CkxTokenStream>
 ckx_ast_struct_stmt*
 ckx_parser_impl<CkxTokenStream>::parse_struct_stmt()
 {
-    /// @todo rework!
+    assert(current_token()->token_type == ckx_token::type::token_struct);
+    saber_ptr<ckx_token> at_token = current_token();
+    move2_next_token();
+
+    if ( !expect(ckx_token::type::token_identifier) )
+        return nullptr;
+    saber::string struct_typename = *(current_token()->v.p_str);
+    move2_next_token();
+
+    if ( !expect_n_eat(ckx_token::type::token_lbrace) )
+        return nullptr;
+
+    ckx_struct_type *type = new ckx_struct_type;
+    saber_ptr<ckx_type> saber_type(type);
+    auto add_result = env()->add_new_type(struct_typename, saber_type);
+
+    if (add_result.first != ckx_env_table::add_status::success)
+    {
+        syntax_error("Duplicate name for this struct", at_token->position);
+        return nullptr;
+    }
+
+    if (!parse_record_type_fields(*type))
+        return nullptr;
+
+    if ( !expect(ckx_token::type::token_rbrace) )
+        return nullptr;
+
+    return new ckx_ast_struct_stmt(at_token, add_result.second);
 }
 
 template <typename CkxTokenStream>
@@ -275,6 +309,8 @@ ckx_parser_impl<CkxTokenStream>::parse_variant_stmt()
 {
     /// @todo rework!
 }
+
+
 
 template <typename CkxTokenStream>
 saber_ptr<ckx_type>
@@ -307,6 +343,19 @@ ckx_parser_impl<CkxTokenStream>::parse_type()
     }
 }
 
+template <typename CkxTokenStream>
+template <typename RecordType>
+bool
+ckx_parser_impl<CkxTokenStream>::parse_record_type_fields(RecordType& _type)
+{
+    static_assert(
+        saber::traits::type_equivalent<ckx_struct_type, RecordType>::value
+        || saber::traits::type_equivalent<ckx_variant_type, RecordType>::value,
+        "I don't know what the hell, just go and fuck yourself.");
+
+    return true;
+}
+
 
 
 template <typename CkxTokenStream>
@@ -334,15 +383,25 @@ template <typename CkxTokenStream>
 inline bool
 ckx_parser_impl<CkxTokenStream>::expect_n_eat(ckx_token::type _token_type)
 {
-    return current_token()->token_type == _token_type ?
-                (move2_next_token(), true) : false;
+    if (current_token()->token_type == _token_type)
+    {
+        move2_next_token();
+        return true;
+    }
+
+    syntax_error("Unexpected token", current_token()->position);
+    return false;
 }
 
 template <typename CkxTokenStream>
 inline bool
 ckx_parser_impl<CkxTokenStream>::expect(ckx_token::type _token_type)
 {
-    return (current_token()->token_type == _token_type);
+    if (current_token()->token_type == _token_type)
+        return true;
+
+    syntax_error("Unexpected token", current_token()->position);
+    return false;
 }
 
 template <typename CkxTokenStream>
@@ -391,6 +450,15 @@ ckx_parser_impl<CkxTokenStream>::syntax_warn(saber::string&& _reason,
     /// @todo finalize this error processing system.
 }
 
+
+template <typename CkxTokenStream>
+void
+ckx_parser_impl<CkxTokenStream>::skip2_token(const ckx_token_set& _token_set)
+{
+    while ( (!_token_set.find(current_token()->token_type))
+            && (current_token()->token_type != ckx_token::type::token_eoi) )
+        move2_next_token();
+}
 
 
 } // namespace detail

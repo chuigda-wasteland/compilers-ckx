@@ -61,7 +61,7 @@ public:
     void add_new_stmt(ckx_ast_stmt *_stmt);
 
 private:
-    explicit saber::vector<ckx_ast_stmt*> stmts;
+    saber::vector<ckx_ast_stmt*> stmts;
     ckx_env_table *global_table;
 };
 

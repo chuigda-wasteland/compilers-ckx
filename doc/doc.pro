@@ -1,2 +1,0 @@
-DISTFILES += \
-    ../README.md

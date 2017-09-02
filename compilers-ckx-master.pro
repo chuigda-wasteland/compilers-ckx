@@ -2,7 +2,5 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     compiler \
-    test/default_tokenstream \
-    doc
-
+    test/default_tokenstream
 

@@ -11,7 +11,8 @@ SOURCES += main.cpp \
     ckx_parser.cpp \
     ckx_ast_node.cpp \
     ckx_type.cpp \
-    ckx_env_table.cpp
+    ckx_env_table.cpp \
+    ckx_token_set.cpp
 
 HEADERS += \
     ckx_file_reader.hpp \
@@ -43,10 +44,13 @@ HEADERS += \
     ckx_type.hpp \
     ckx_env_table.hpp \
     gg.h \
-    ckx_ast_node_fwd.hpp
+    ckx_ast_node_fwd.hpp \
+    ../saber/include/unordered_set.hpp \
+    ckx_token_set.hpp
 
 INCLUDEPATH += ../saber/include/
 
 DISTFILES += \
     LICENSE \
-    production.txt
+    production.txt \
+    ../README.md
