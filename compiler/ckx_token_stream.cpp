@@ -107,8 +107,8 @@ ckx_default_token_stream::~ckx_default_token_stream()
     delete impl;
 }
 
-saber_ptr<ckx_token> ckx_default_token_stream::operator [](
-        int _offset)
+saber_ptr<ckx_token>
+ckx_default_token_stream::operator [](int _offset)
 {
     return impl->operator_index_impl(_offset);
 }
@@ -123,24 +123,10 @@ void ckx_default_token_stream::operator ++ ()
     impl->operator_incr_impl();
 }
 
+
+
 namespace detail
 {
-
-static const saber::string __id_string_data[] =
-{
-#define GGLEX(X, Y) X,
-#include "gg.h"
-#undef GGLEX
-""
-};
-
-static const ckx_token::type __id_tokentype_data[] =
-{
-#define GGLEX(X, Y) ckx_token::type::tk_##Y,
-#include "gg.h"
-#undef GGLEX
-ckx_token::type::tk_eoi
-};
 
 qpair<ckx_token::type, bool>
 ckx_identifier_table::lookup(const saber::string &_name)
@@ -159,12 +145,11 @@ ckx_identifier_table::lookup(const saber::string &_name)
 
 void ckx_identifier_table::initialize()
 {
-    for (qsizet i = 0; i < countof(__id_string_data); i++)
-    {
-        map.insert(
-            qpair<saber::string, ckx_token::type>(
-                        __id_string_data[i], __id_tokentype_data[i]));
-    }
+#define GGLEX(X, Y)\
+    map.insert(\
+        qpair<saber::string, ckx_token::type>(X, ckx_token::type::tk_##Y));
+#include "gg.h"
+#undef GGLEX
 }
 
 
@@ -192,8 +177,8 @@ ckx_default_token_stream_impl::ckx_default_token_stream_impl(
 ckx_default_token_stream_impl::~ckx_default_token_stream_impl()
 {}
 
-saber_ptr<ckx_token> ckx_default_token_stream_impl::operator_index_impl(
-        int _offset)
+saber_ptr<ckx_token>
+ckx_default_token_stream_impl::operator_index_impl(int _offset)
 {
     if ( _offset + current_pos < token_buffer.size() )
     {
@@ -241,8 +226,9 @@ void ckx_default_token_stream_impl::do_split_tokens()
 
         case '+': case '-': case '*': case '/': case '%':
         case '!': case '<': case '>': case '=':
-            // the processing of >=, <=, != and == is similar to op=,
-            // so we combine them in one function solve_op_or_opassign().
+            /// @details
+            /// the processing of >=, <=, != and == is similar to op=,
+            /// so we combine them in one function solve_op_or_opassign().
             solve_op_or_opassign(); break;
 
         case ':':
@@ -281,7 +267,73 @@ void ckx_default_token_stream_impl::do_split_tokens()
                 new ckx_token(char_coord(), ckx_token::type::tk_eoi));
 }
 
+/**
+    @brief function ckx_default_token_stream_impl::solve_$xxxxx();
 
+    These functions would start at the first character of a lexeme
+    with the assertion that there must be a targeted lexeme. And they
+    stops at the first character that does not belong to the
+    targeted lexeme. For example
+
+    @example
+        Char stream
+
+        vr64     pi = 3.1415926;
+        ^~~~
+        scan_full_id_string & solve_keyword
+
+        vr64     pi = 3.1415926;
+            ^~~~~
+            next_char
+
+        vr64     pi = 3.1415926;
+                 ^~
+                 scan_full_id_string & solve_identifier
+
+        vr64     pi = 3.1415926;
+                   ^
+                   next_char
+
+        vr64     pi = 3.1415926;
+                    ^
+                    solve_op_or_assign
+
+        vr64     pi = 3.1415926;
+                     ^
+                     next_char
+
+        vr64     pi = 3.1415926;
+                      ^~~~~~~~~
+                      solve_number
+
+        vr64     pi = 3.1415926;
+                               ^
+                               solve_ordinary_op
+
+        vr64     pi = 3.1415926;
+                                ^next_line
+*/
+
+
+/**
+    @brief ckx_default_token_stream_impl::solve_numbers
+    This function solves numbers nomatter what kind it is. And the add the
+    newly built number token into the token stream.
+
+    @example
+        520.1314
+        ^~~
+        scan_integer
+
+        520.1314
+           ^
+           next_char
+
+        52.1314
+           ^~~~
+           scan_floating_part
+
+ */
 
 void ckx_default_token_stream_impl::solve_numbers()
 {
@@ -337,7 +389,7 @@ void ckx_default_token_stream_impl::solve_numbers()
 void ckx_default_token_stream_impl::solve_char_literal()
 {
     next_char();
-    qchar result = ch()!='\\' ? ch() : make_conversion();
+    qchar result = (ch()!='\\') ? ch() : make_conversion();
 
     if (ch() != '\'')
     {
@@ -388,7 +440,7 @@ void ckx_default_token_stream_impl::solve_op_or_opassign()
 
     qchar op = ch();
     next_char();
-    bool is_opassign = ch() == '=';
+    bool is_opassign = (ch() == '=');
 
     switch (op)
     {
@@ -484,6 +536,13 @@ void ckx_default_token_stream_impl::solve_ordinary_op()
     next_char();
 }
 
+/**
+    @brief ckx_default_token_stream_impl::scan_full_id_string
+
+    @details This function will store the scanned string into str().
+    And other functions will have to retrieve the lexical value from str().
+    Not elegant at all.
+ */
 void ckx_default_token_stream_impl::scan_full_id_string()
 {
     str().clear();

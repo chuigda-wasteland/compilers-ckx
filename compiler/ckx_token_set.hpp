@@ -30,7 +30,10 @@ namespace detail
 
 using ckx_token_set = saber::unordered_set<ckx_token::type,
                                            ckx_token_type_hash>;
-
+/**
+    @brief The ckx_token_sets class
+    static helper class that allows parser to obtain pre-built token_sets
+ */
 class ckx_token_sets
 {
 public:

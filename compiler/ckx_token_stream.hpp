@@ -34,7 +34,18 @@ namespace ckx
 
 using saber::saber_ptr;
 
+/**
+    @brief The ckx_token_stream class
 
+    @fn saber_ptr<ckx_token> operator[] (int offset)
+    This function returns the n-th token with respect to the current token
+
+    @fn saber::vector<ckx_error>& get_error()
+    This function returns all lexical errors occurred in the scanning stage
+
+    @fn void operator++()
+    This function moves the "current token"
+ */
 interface ckx_token_stream
 {
 public:
