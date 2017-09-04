@@ -44,12 +44,11 @@ open_class ckx_var_entry
 
 open_class ckx_func_entry
 {
-    explicit ckx_func_entry(saber_ptr<ckx_function_type> _func_type);
+    explicit ckx_func_entry(saber_ptr<ckx_func_type> _func_type);
     ~ckx_func_entry() = default;
 
-    saber_ptr<ckx_function_type> func_type;
+    saber_ptr<ckx_func_type> func_type;
     ckx_ast_func_stmt *the_function;
-
 };
 
 open_class ckx_type_entry
@@ -75,7 +74,7 @@ public:
     qpair<add_status, ckx_type_entry*> add_new_type(
             saber::string&& _name, saber_ptr<ckx_type> _type);
     qpair<add_status, ckx_func_entry*> add_new_func(
-            saber::string&& _name, saber_ptr<ckx_function_type> _type);
+            saber::string&& _name, saber_ptr<ckx_func_type> _type);
     qpair<add_status, ckx_var_entry*> add_new_var(
             saber::string&& _name, saber_ptr<ckx_type> _type);
 

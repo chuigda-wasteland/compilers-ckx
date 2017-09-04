@@ -25,7 +25,7 @@ ckx_var_entry::ckx_var_entry(saber_ptr<ckx_type> _var_type) :
     var_type(_var_type)
 {}
 
-ckx_func_entry::ckx_func_entry(saber_ptr<ckx_function_type> _func_type) :
+ckx_func_entry::ckx_func_entry(saber_ptr<ckx_func_type> _func_type) :
     func_type(_func_type)
 {}
 
@@ -81,7 +81,7 @@ ckx_env_table::add_new_type(saber::string &&_name, saber_ptr<ckx_type> _type)
 
 qpair<ckx_env_table::add_status, ckx_func_entry*>
 ckx_env_table::add_new_func(saber::string &&_name,
-                            saber_ptr<ckx_function_type> _type)
+                            saber_ptr<ckx_func_type> _type)
 {
     saber::vector<ckx_func_entry*> query_result = lookup_func(_name);
 

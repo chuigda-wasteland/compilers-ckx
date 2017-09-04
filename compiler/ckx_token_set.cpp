@@ -162,6 +162,33 @@ ckx_token_sets::close_declarator_set()
     return ret;
 }
 
+const ckx_token_set&
+ckx_token_sets::close_struct_decl_set()
+{
+    static ckx_token_set ret =
+    {
+        ckx_token::type::tk_rbrace,
+        ckx_token::type::tk_semicolon,
+
+        /// @brief elements may appear at the commence of a declaration
+        /// @details identifier as typename
+        ckx_token::type::tk_id,
+        ckx_token::type::tk_vi8,
+        ckx_token::type::tk_vi16,
+        ckx_token::type::tk_vi32,
+        ckx_token::type::tk_vi64,
+        ckx_token::type::tk_vu8,
+        ckx_token::type::tk_vu16,
+        ckx_token::type::tk_vu32,
+        ckx_token::type::tk_vu64,
+        ckx_token::type::tk_vch,
+        ckx_token::type::tk_vr32,
+        ckx_token::type::tk_vr64,
+    };
+
+    return ret;
+}
+
 } // namespace detail
 
 } // namespace detail

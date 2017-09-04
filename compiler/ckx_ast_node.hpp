@@ -83,7 +83,7 @@ class ckx_ast_compound_stmt final implements ckx_ast_stmt
 {
 public:
     ckx_ast_compound_stmt(saber_ptr<ckx_token> _at_token,
-                          ckx_env_table *_parent_scope_table);
+                          ckx_env_table *_table);
     ~ckx_ast_compound_stmt() override final;
 
     void add_new_stmt(ckx_ast_stmt *_stmt);

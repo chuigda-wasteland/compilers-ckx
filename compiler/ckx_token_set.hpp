@@ -42,9 +42,9 @@ public:
 
     static const ckx_token_set& first_stmt_set();
     static const ckx_token_set& first_global_set();
-    static const ckx_token_set& first_decl_set();
     static const ckx_token_set& close_scope_set();
     static const ckx_token_set& close_declarator_set();
+    static const ckx_token_set& close_struct_decl_set();
 };
 
 } // namespace detail

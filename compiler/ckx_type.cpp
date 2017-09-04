@@ -143,7 +143,7 @@ ckx_enum_type::add_enumerator(std::string &&_name, qint64 _value)
 
 
 
-ckx_function_type::ckx_function_type(
+ckx_func_type::ckx_func_type(
         saber_ptr<ckx_type> _return_type,
         saber::vector<saber_ptr<ckx_type>> &&_param_type_list) :
     ckx_type(ckx_type::category::type_function),
@@ -151,7 +151,7 @@ ckx_function_type::ckx_function_type(
     param_type_list(saber::move(_param_type_list))
 {}
 
-qsizet ckx_function_type::size() const
+qsizet ckx_func_type::size() const
 {
     return 8;
 }

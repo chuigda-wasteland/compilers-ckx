@@ -174,12 +174,12 @@ private:
     saber::vector<enumerator> enumerators;
 };
 
-class ckx_function_type final implements ckx_type
+class ckx_func_type final implements ckx_type
 {
 public:
-    ckx_function_type(saber_ptr<ckx_type> _return_type,
-                      saber::vector<saber_ptr<ckx_type>>&& _param_type_list);
-    ~ckx_function_type() override final = default;
+    ckx_func_type(saber_ptr<ckx_type> _return_type,
+                  saber::vector<saber_ptr<ckx_type>>&& _param_type_list);
+    ~ckx_func_type() override final = default;
 
     qsizet size() const override final;
 

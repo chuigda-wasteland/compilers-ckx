@@ -60,18 +60,15 @@ ckx_ast_stmt::~ckx_ast_stmt() {}
 
 ckx_ast_compound_stmt::ckx_ast_compound_stmt(
         saber_ptr<ckx_token> _at_token,
-        ckx_env_table *_parent_scope_table) :
+        ckx_env_table *_table) :
     ckx_ast_stmt(_at_token),
-    local_table(new ckx_env_table(_parent_scope_table))
+    local_table(_table)
 {}
 
 ckx_ast_compound_stmt::~ckx_ast_compound_stmt()
 {
-    for (auto it = stmts.begin(); it != stmts.end(); ++it)
-    {
-        delete *it;
-    }
-
+    for (ckx_ast_stmt* x : stmts)
+        delete x;
     delete local_table;
 }
 

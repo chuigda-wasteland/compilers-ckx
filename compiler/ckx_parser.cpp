@@ -72,7 +72,7 @@ private:
 
     /// @fn this function (these two functions) resolves struct/variant fields
     template <typename RecordType>
-    bool parse_record_type_fields(RecordType& _type);
+    void parse_record_type_fields(RecordType& _type);
 
     /// @brief utility functions
     bool is_typename(saber_ptr<ckx_token> _token) const;
@@ -82,8 +82,8 @@ private:
     inline saber_ptr<ckx_token> current_token();
     inline saber_ptr<ckx_token> peek_next_token();
     inline void move2_next_token();
-    inline bool expect_n_eat(ckx_token::type _token_type);
-    inline bool expect(ckx_token::type _token_type);
+    inline void expect_n_eat(ckx_token::type _token_type);
+    inline void expect(ckx_token::type _token_type);
 
     /// @brief interact with environment/symbol-table.
     inline ckx_env_table* env();
@@ -163,9 +163,9 @@ ckx_parser_impl<CkxTokenStream>::parse_global_stmt()
     case ckx_token::type::tk_ckx:
         return parse_ckx_block();
 
-    // Module manage system still designing.
-    // We will have C-like preprocessors before creating a powerful
-    // module manage system.
+    /// @todo Module manage system still designing.
+    /// We will have C-like preprocessors before creating a powerful
+    /// module manage system.
     Q_ON_HOLD(case ckx_token::type::tk_import:)
     Q_ON_HOLD(case ckx_token::type::tk_export:)
 
@@ -202,8 +202,7 @@ ckx_parser_impl<CkxTokenStream>::parse_stmt()
 
     /// @todo We met some trouble with enum type.
     case ckx_token::type::tk_id:
-        if ( current_env->lookup_type(*(current_token()->v.p_str))
-             != nullptr )
+        if ( env()->lookup_type(*(current_token()->v.p_str)) != nullptr )
             return parse_decl_stmt();
         else
             return parse_expr_stmt();
@@ -231,7 +230,9 @@ ckx_parser_impl<CkxTokenStream>::parse_stmt()
     case ckx_token::type::tk_lbrace:    return parse_compound_stmt();
 
     case ckx_token::type::tk_semicolon:
-        Q_ON_HOLD("warning : empty declaration not permitted")
+        syntax_warn("Empty declaration", current_token()->position);
+        move2_next_token();
+        break;
 
     default:
         Q_ON_HOLD( issue_error(current_token(), "...") )
@@ -245,27 +246,80 @@ ckx_parser_impl<CkxTokenStream>::parse_decl_stmt()
 {
     ckx_ast_decl_stmt* ret = new ckx_ast_decl_stmt(current_token());
     saber_ptr<ckx_type> type = parse_type();
+
     while (1)
     {
-        if ( !expect(ckx_token::type::tk_id) )
-            Q_ON_HOLD("Error recover");
-
         saber_ptr<ckx_token> token = current_token();
         ckx_ast_expr *init = nullptr;
-        if ( expect_n_eat(ckx_token::type::tk_assign) )
+        if ( peek_next_token()->token_type == ckx_token::type::tk_assign )
+        {
+            move2_next_token();
+            move2_next_token();
             init = parse_expr();
+        }
 
         auto status = env()->add_new_var(*(token->v.p_str), type);
-        if(!status.first)
-            Q_ON_HOLD("Error recover");
         ret->add_decl(new ckx_ast_init_decl(token, status.second, init));
 
-        if ( !expect_n_eat(ckx_token::type::tk_comma) ) break;
+        if ( peek_next_token()->token_type == ckx_token::type::tk_semicolon )
+        {
+            move2_next_token();
+            break;
+        }
     }
 
-    if ( !expect_n_eat(ckx_token::type::tk_semicolon) )
-        Q_ON_HOLD("Error recover");
+    expect_n_eat(ckx_token::type::tk_semicolon);
     return ret;
+}
+
+template <typename CkxTokenStream>
+ckx_ast_func_stmt*
+ckx_parser_impl<CkxTokenStream>::parse_func_stmt()
+{
+    assert(current_token()->token_type == ckx_token::type::tk_function);
+
+    saber_ptr<ckx_token> at_token = current_token();
+    move2_next_token();
+
+    saber::string func_name = *(current_token()->v.p_str);
+
+    expect_n_eat(ckx_token::type::tk_lparth);
+    ckx_env_table *param_env = new ckx_env_table(env());
+    saber::vector<saber_ptr<ckx_type>> param_type_list;
+    enter_scope(param_env);
+    while (1)
+    {
+        saber_ptr<ckx_type> arg_type = parse_type();
+        saber::string arg_name = *(current_token()->v.p_str);
+        env()->add_new_var(arg_name, arg_type);
+        param_type_list.push_back(arg_type);
+
+        if (current_token()->token_type == ckx_token::type::tk_comma)
+            continue;
+        if (current_token()->token_type == ckx_token::type::tk_rparth)
+            break;
+    }
+    leave_scope();
+    expect_n_eat(ckx_token::type::tk_rparth);
+    expect_n_eat(ckx_token::type::tk_colon);
+    saber_ptr<ckx_type> ret_type = parse_type();
+
+    ckx_func_type *func_type =
+            new ckx_func_type(ret_type, saber::move(param_type_list));
+    auto add_result = env()->add_new_func(func_name, func_type);
+
+    if (current_token()->token_type == ckx_token::type::tk_lbrace)
+    {
+        enter_scope(param_env);
+        add_result.second.the_function->define(parse_compound_stmt());
+        leave_scope();
+    }
+    else if (current_token()->token_type == ckx_token::type::tk_semicolon)
+    {
+        move2_next_token();
+    }
+
+    return new ckx_ast_func_stmt(at_token, add_result.second, param_env);
 }
 
 template <typename CkxTokenStream>
@@ -273,33 +327,21 @@ ckx_ast_struct_stmt*
 ckx_parser_impl<CkxTokenStream>::parse_struct_stmt()
 {
     assert(current_token()->token_type == ckx_token::type::tk_struct);
+
     saber_ptr<ckx_token> at_token = current_token();
     move2_next_token();
 
-    if ( !expect(ckx_token::type::tk_id) )
-        return nullptr;
     saber::string struct_typename = *(current_token()->v.p_str);
     move2_next_token();
-
-    if ( !expect_n_eat(ckx_token::type::tk_lbrace) )
-        return nullptr;
+    expect_n_eat(ckx_token::type::tk_lbrace);
 
     ckx_struct_type *type = new ckx_struct_type;
     saber_ptr<ckx_type> saber_type(type);
     auto add_result = env()->add_new_type(struct_typename, saber_type);
 
-    if (add_result.first != ckx_env_table::add_status::success)
-    {
-        syntax_error("Duplicate name for this struct", at_token->position);
-        return nullptr;
-    }
+    parse_record_type_fields(*type);
 
-    if (!parse_record_type_fields(*type))
-        return nullptr;
-
-    if ( !expect(ckx_token::type::tk_rbrace) )
-        return nullptr;
-
+    expect_n_eat(ckx_token::type::tk_rbrace);
     return new ckx_ast_struct_stmt(at_token, add_result.second);
 }
 
@@ -307,10 +349,86 @@ template <typename CkxTokenStream>
 ckx_ast_variant_stmt*
 ckx_parser_impl<CkxTokenStream>::parse_variant_stmt()
 {
-    /// @todo rework!
+    assert(current_token()->token_type == ckx_token::type::tk_variant);
+
+    saber_ptr<ckx_token> at_token = current_token();
+    move2_next_token();
+
+    saber::string variant_typename = *(current_token()->v.p_str);
+    move2_next_token();
+    expect_n_eat(ckx_token::type::tk_lbrace);
+
+    ckx_variant_type *type = new ckx_variant_type;
+    auto add_result =
+            env()->add_new_type(variant_typename, saber_ptr<ckx_type>(type));
+
+    parse_record_type_fields(*type);
+
+    expect_n_eat(ckx_token::type::tk_rbrace);
+    return new ckx_ast_variant_stmt(at_token, add_result.second);
 }
 
+template <typename CkxTokenStream>
+ckx_ast_enum_stmt*
+ckx_parser_impl<CkxTokenStream>::parse_enum_stmt()
+{
+    assert(current_token()->token_type == ckx_token::type::tk_enum);
+    saber_ptr<ckx_token> at_token = current_token();
+    move2_next_token();
 
+    saber::string enum_typename = *(current_token()->v.p_str);
+    move2_next_token();
+    expect_n_eat(ckx_token::type::tk_lbrace);
+
+    ckx_enum_type *type = new ckx_enum_type;
+    auto add_result =
+            env()->add_new_type(enum_typename, saber_ptr<ckx_type>(type));
+
+    while (current_token()->token_type != ckx_token::type::tk_rbrace)
+    {
+        saber::string enumerator_name = *(current_token()->v.p_str);
+        expect_n_eat(ckx_token::type::tk_assign);
+        qint64 enumerator_value = current_token()->v.i64;
+
+        type->add_enumerator(saber::move(enumerator_name), enumerator_value);
+    }
+
+    expect_n_eat(ckx_token::type::tk_rbrace);
+    return new ckx_ast_enum_stmt(at_token, add_result.second);
+}
+
+template <typename CkxTokenStream>
+ckx_ast_compound_stmt*
+ckx_parser_impl<CkxTokenStream>::parse_ckx_block()
+{
+    assert(current_token()->token_type == ckx_token::type::tk_ckx);
+    saber_ptr<ckx_token> at_token = current_token();
+    move2_next_token();
+
+    expect(ckx_token::type::tk_lbrace);
+    return parse_compound_stmt();
+}
+
+template <typename CkxTokenStream>
+ckx_ast_compound_stmt*
+ckx_parser_impl<CkxTokenStream>::parse_compound_stmt()
+{
+    saber_ptr<ckx_token> at_token = current_token();
+    expect_n_eat(ckx_token::type::tk_lbrace);
+
+    ckx_env_table *new_env = new ckx_env_table(env());
+
+    ckx_ast_compound_stmt *ret = new ckx_ast_compound_stmt(at_token, new_env);
+
+    enter_scope(new_env);
+    while (current_token() != ckx_token::type::tk_rbrace)
+    {
+        ret->add_new_stmt(parse_stmt());
+    }
+
+    expect_n_eat(ckx_token::type::tk_rbrace);
+    leave_scope();
+}
 
 template <typename CkxTokenStream>
 saber_ptr<ckx_type>
@@ -345,7 +463,7 @@ ckx_parser_impl<CkxTokenStream>::parse_type()
 
 template <typename CkxTokenStream>
 template <typename RecordType>
-bool
+void
 ckx_parser_impl<CkxTokenStream>::parse_record_type_fields(RecordType& _type)
 {
     static_assert(
@@ -353,7 +471,25 @@ ckx_parser_impl<CkxTokenStream>::parse_record_type_fields(RecordType& _type)
         || saber::traits::type_equivalent<ckx_variant_type, RecordType>::value,
         "I don't know what the hell, just go and fuck yourself.");
 
-    return true;
+    while (1)
+    {
+        saber_ptr<ckx_type> type = parse_type();
+
+        while (1)
+        {
+            saber::string dclr_name = *(current_token()->v.p_str);
+            _type.add_field(saber::move(dclr_name), type);
+
+            if (current_token()->token_type == ckx_token::type::tk_comma)
+                { move2_next_token(); continue; }
+
+            if (current_token()->token_type == ckx_token::type::tk_semicolon)
+                { move2_next_token(); break; }
+        }
+
+        if ( current_token()->token_type == ckx_token::type::tk_rbrace )
+            return;
+    }
 }
 
 
@@ -380,19 +516,16 @@ ckx_parser_impl<CkxTokenStream>::move2_next_token()
 }
 
 template <typename CkxTokenStream>
-inline bool
+inline void
 ckx_parser_impl<CkxTokenStream>::expect_n_eat(ckx_token::type _token_type)
 {
     if (current_token()->token_type == _token_type)
-    {
         move2_next_token();
-        return true;
-    }
 
     syntax_error("Unexpected token", current_token()->position);
-    return false;
 }
 
+/*
 template <typename CkxTokenStream>
 inline bool
 ckx_parser_impl<CkxTokenStream>::expect(ckx_token::type _token_type)
@@ -403,6 +536,7 @@ ckx_parser_impl<CkxTokenStream>::expect(ckx_token::type _token_type)
     syntax_error("Unexpected token", current_token()->position);
     return false;
 }
+*/
 
 template <typename CkxTokenStream>
 inline ckx_env_table*
