@@ -410,6 +410,111 @@ ckx_parser_impl<CkxTokenStream>::parse_ckx_block()
 }
 
 template <typename CkxTokenStream>
+ckx_ast_expr_stmt*
+ckx_parser_impl<CkxTokenStream>::parse_expr_stmt()
+{
+    /// @todo add code here after designing full expression ast
+    return nullptr;
+}
+
+template <typename CkxTokenStream>
+ckx_ast_if_stmt*
+ckx_parser_impl<CkxTokenStream>::parse_if_stmt()
+{
+    assert(current_token()->token_type == ckx_token::type::tk_if);
+    saber_ptr<ckx_token> at_token = current_token();
+    move2_next_token();
+
+    expect_n_eat(ckx_token::type::tk_lparth);
+    ckx_ast_expr *condition = parse_expr();
+    expect_n_eat(ckx_token::type::tk_rparth);
+
+    ckx_ast_stmt *then_clause = parse_stmt();
+    ckx_ast_stmt *else_clause = nullptr;
+
+    if (current_token()->token_type == ckx_token::type::tk_else)
+    {
+        move2_next_token();
+        else_clause = parse_stmt();
+    }
+
+    return new ckx_ast_if_stmt(at_token, condition, then_clause, else_clause);
+}
+
+template <typename CkxTokenStream>
+ckx_ast_while_stmt*
+ckx_parser_impl<CkxTokenStream>::parse_while_stmt()
+{
+    assert(current_token()->token_type == ckx_token::type::tk_while);
+    saber_ptr<ckx_token> at_token = current_token();
+    move2_next_token();
+
+    expect_n_eat(ckx_token::type::tk_lparth);
+    ckx_ast_expr *condition = parse_expr();
+    expect_n_eat(ckx_token::type::tk_rparth);
+    ckx_ast_stmt *clause = parse_stmt();
+
+    return new ckx_ast_while_stmt(at_token, condition, clause);
+}
+
+template <typename CkxTokenStream>
+ckx_ast_do_while_stmt*
+ckx_parser_impl<CkxTokenStream>::parse_do_while_stmt()
+{
+    assert(current_token()->token_type == ckx_token::type::tk_do);
+    saber_ptr<ckx_token> at_token = current_token();
+    move2_next_token();
+
+    ckx_ast_stmt *clause = parse_stmt();
+    expect_n_eat(ckx_token::type::tk_while);
+    expect_n_eat(ckx_token::type::tk_lparth);
+    ckx_ast_expr *condition = parse_expr();
+    expect_n_eat(ckx_token::type::tk_rparth);
+
+    return new ckx_ast_do_while_stmt(at_token, condition, clause);
+}
+
+template <typename CkxTokenStream>
+ckx_ast_break_stmt*
+ckx_parser_impl<CkxTokenStream>::parse_break_stmt()
+{
+    assert(current_token()->token_type == ckx_token::type::tk_break);
+    saber_ptr<ckx_token> at_token = current_token();
+    move2_next_token();
+    expect_n_eat(ckx_token::type::tk_semicolon);
+
+    return new ckx_ast_break_stmt(at_token);
+}
+
+template <typename CkxTokenStream>
+ckx_ast_continue_stmt*
+ckx_parser_impl<CkxTokenStream>::parse_continue_stmt()
+{
+    assert(current_token()->token_type == ckx_token::type::tk_continue);
+    saber_ptr<ckx_token> at_token = current_token();
+    move2_next_token();
+    expect_n_eat(ckx_token::type::tk_semicolon);
+
+    return new ckx_ast_continue_stmt(at_token);
+}
+
+template <typename CkxTokenStream>
+ckx_ast_return_stmt*
+ckx_parser_impl<ckx_token_stream>::parse_return_stmt()
+{
+    assert(current_token()->token_type == ckx_token::type::tk_return);
+    saber_ptr<ckx_token> at_token = current_token();
+    move2_next_token();
+
+    ckx_ast_expr *expr = nullptr;
+    if (current_token() != ckx_token::type::tk_semicolon)
+        expr = parse_expr();
+    expect_n_eat(ckx_token::type::tk_semicolon);
+
+    return new ckx_ast_return_stmt(at_token, expr);
+}
+
+template <typename CkxTokenStream>
 ckx_ast_compound_stmt*
 ckx_parser_impl<CkxTokenStream>::parse_compound_stmt()
 {
@@ -429,6 +534,7 @@ ckx_parser_impl<CkxTokenStream>::parse_compound_stmt()
     expect_n_eat(ckx_token::type::tk_rbrace);
     leave_scope();
 }
+
 
 template <typename CkxTokenStream>
 saber_ptr<ckx_type>
