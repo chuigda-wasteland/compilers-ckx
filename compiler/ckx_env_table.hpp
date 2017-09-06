@@ -59,7 +59,7 @@ open_class ckx_type_entry
     saber_ptr<ckx_type> type;
 };
 
-class ckx_env_table
+class ckx_env
 {
 public:
     enum add_status : qchar
@@ -68,8 +68,8 @@ public:
         duplicate
     };
 
-    explicit ckx_env_table(ckx_env_table *_parent);
-    ~ckx_env_table();
+    explicit ckx_env(ckx_env *_parent);
+    ~ckx_env();
 
     qpair<add_status, ckx_type_entry*> add_new_type(
             saber::string&& _name, saber_ptr<ckx_type> _type);
@@ -89,14 +89,14 @@ public:
 
     ckx_var_entry* lookup_var_local(const saber::string& _name);
 
-    inline ckx_env_table* get_parent() { return parent; }
+    inline ckx_env* get_parent() { return parent; }
 
 private:
     saber::unordered_map<saber::string, ckx_var_entry*> var_entry_table;
     saber::unordered_map<saber::string, ckx_type_entry*> type_entry_table;
     saber::unordered_multimap<saber::string, ckx_func_entry*> func_entry_table;
 
-    ckx_env_table *parent;
+    ckx_env *parent;
 };
 
 } // namespace ckx

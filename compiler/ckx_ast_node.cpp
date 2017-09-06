@@ -32,7 +32,7 @@ saber_ptr<ckx_token> ckx_ast_node::get_at_token()
 ckx_ast_translation_unit::ckx_ast_translation_unit(
         saber_ptr<ckx_token> _at_token) :
     ckx_ast_node(_at_token),
-    global_table(new ckx_env_table(nullptr))
+    global_table(new ckx_env(nullptr))
 {}
 
 ckx_ast_translation_unit::~ckx_ast_translation_unit()
@@ -60,7 +60,7 @@ ckx_ast_stmt::~ckx_ast_stmt() {}
 
 ckx_ast_compound_stmt::ckx_ast_compound_stmt(
         saber_ptr<ckx_token> _at_token,
-        ckx_env_table *_table) :
+        ckx_env *_table) :
     ckx_ast_stmt(_at_token),
     local_table(_table)
 {}
@@ -167,7 +167,7 @@ ckx_ast_expr_stmt::~ckx_ast_expr_stmt()
 
 ckx_ast_func_stmt::ckx_ast_func_stmt(saber_ptr<ckx_token> _at_token,
                                      ckx_func_entry *_entry,
-                                     ckx_env_table *_param_env_table) :
+                                     ckx_env *_param_env_table) :
     ckx_ast_node(_at_token),
     entry(_entry),
     param_env_table(_param_env_table)

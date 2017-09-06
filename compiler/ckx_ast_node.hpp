@@ -62,7 +62,7 @@ public:
 
 private:
     saber::vector<ckx_ast_stmt*> stmts;
-    ckx_env_table *global_table;
+    ckx_env *global_table;
 };
 
 
@@ -83,14 +83,14 @@ class ckx_ast_compound_stmt final implements ckx_ast_stmt
 {
 public:
     ckx_ast_compound_stmt(saber_ptr<ckx_token> _at_token,
-                          ckx_env_table *_table);
+                          ckx_env *_table);
     ~ckx_ast_compound_stmt() override final;
 
     void add_new_stmt(ckx_ast_stmt *_stmt);
 
 private:
     saber::vector<ckx_ast_stmt*> stmts;
-    ckx_env_table *local_table;
+    ckx_env *local_table;
 };
 
 class ckx_ast_if_stmt final implements ckx_ast_stmt
@@ -192,17 +192,17 @@ class ckx_ast_func_stmt make_use_of ckx_ast_node
 public:
     ckx_ast_func_stmt(saber_ptr<ckx_token> _at_token,
                       ckx_func_entry *_entry,
-                      ckx_env_table *_param_env_table);
+                      ckx_env *_param_env_table);
     ~ckx_ast_func_stmt();
 
     bool is_defined() const;
 
-    ckx_env_table* get_param_env_table();
+    ckx_env* get_param_env_table();
     void define(ckx_ast_compound_stmt* _fnbody) const;
 
 private:
     ckx_func_entry *entry;
-    ckx_env_table *param_env_table;
+    ckx_env *param_env_table;
 };
 
 class ckx_ast_init_decl make_use_of ckx_ast_node
