@@ -175,6 +175,11 @@ ckx_ast_func_stmt::ckx_ast_func_stmt(saber_ptr<ckx_token> _at_token,
 
 ckx_ast_func_stmt::~ckx_ast_func_stmt() {}
 
+void ckx_ast_func_stmt::define(ckx_ast_compound_stmt *_fnbody)
+{
+    fnbody = _fnbody;
+}
+
 ckx_ast_init_decl::ckx_ast_init_decl(saber_ptr<ckx_token> _at_token,
                                      ckx_var_entry* _entry,
                                      ckx_ast_expr *_init) :

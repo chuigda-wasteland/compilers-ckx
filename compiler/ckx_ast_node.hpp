@@ -45,7 +45,7 @@ public:
     ~ckx_ast_node() = default;
 
     saber_ptr<ckx_token> get_at_token();
-    /// virtual void dump_ast() = 0;
+    virtual void ast_dump(FILE *_fp, qint8 _level) = 0;
 
 private:
     saber_ptr<ckx_token> at_token;
@@ -60,6 +60,7 @@ public:
     ~ckx_ast_translation_unit();
 
     void add_new_stmt(ckx_ast_stmt *_stmt);
+    void ast_dump(FILE *_fp, qint8 _level) override final;
 
 private:
     saber::vector<ckx_ast_stmt*> stmts;
@@ -74,9 +75,13 @@ public:
     explicit ckx_ast_stmt(saber_ptr<ckx_token> _at_token);
     virtual ~ckx_ast_stmt() = 0;
 
-    // SKTT1Faker
-    // This function will be finished after we get a proper intermediate
-    // representation and start to write syntax-directed translation
+    virtual void ast_dump(FILE *_fp, qint8 _level) = 0;
+
+    /// @attention all AST-Nodes can be dumped
+    /// But only Statements can be translated into intermediate codes.
+    /// Expression system will have another translating system.
+    /// This function will be finished after we get a proper intermediate
+    /// representation and start to write syntax-directed translation
     Q_ON_HOLD(virtual void translate(saber::list<ckx_ir_instance>& ret) = 0;)
 };
 
@@ -88,6 +93,8 @@ public:
     ~ckx_ast_compound_stmt() override final;
 
     void add_new_stmt(ckx_ast_stmt *_stmt);
+
+    void ast_dump(FILE *_fp, qint8 _level) override final;
 
 private:
     saber::vector<ckx_ast_stmt*> stmts;
@@ -103,6 +110,8 @@ public:
                     ckx_ast_stmt* _else_clause);
     ~ckx_ast_if_stmt() override final;
 
+    void ast_dump(FILE *_fp, qint8 _level) override final;
+
 private:
     ckx_ast_expr *condition;
     ckx_ast_stmt *then_clause;
@@ -117,6 +126,8 @@ public:
                        ckx_ast_stmt *_clause);
     ~ckx_ast_while_stmt() override final;
 
+    void ast_dump(FILE *_fp, qint8 _level) override final;
+
 private:
     ckx_ast_expr *condition;
     ckx_ast_stmt *clause;
@@ -130,6 +141,8 @@ public:
                           ckx_ast_stmt *_clause);
     ~ckx_ast_do_while_stmt() override final;
 
+    void ast_dump(FILE *_fp, qint8 _level) override final;
+
 private:
     ckx_ast_expr *condition;
     ckx_ast_stmt *clause;
@@ -140,6 +153,8 @@ class ckx_ast_break_stmt final implements ckx_ast_stmt
 public:
     explicit ckx_ast_break_stmt(saber_ptr<ckx_token> _at_token);
     ~ckx_ast_break_stmt() override final = default;
+
+    void ast_dump(FILE *_fp, qint8 _level) override final;
 };
 
 class ckx_ast_continue_stmt final implements ckx_ast_stmt
@@ -147,6 +162,8 @@ class ckx_ast_continue_stmt final implements ckx_ast_stmt
 public:
     explicit ckx_ast_continue_stmt(saber_ptr<ckx_token> _at_token);
     ~ckx_ast_continue_stmt() override final = default;
+
+    void ast_dump(FILE *_fp, qint8 _level) override final;
 };
 
 class ckx_ast_return_stmt final implements ckx_ast_stmt
@@ -155,6 +172,8 @@ public:
     ckx_ast_return_stmt(saber_ptr<ckx_token> _at_token,
                         ckx_ast_expr* _return_expr);
     ~ckx_ast_return_stmt() override final = default;
+
+    void ast_dump(FILE *_fp, qint8 _level) override final;
 
 private:
     ckx_ast_expr *return_expr;
@@ -168,6 +187,8 @@ public:
 
     void add_decl(ckx_ast_init_decl* _decl);
 
+    void ast_dump(FILE *_fp, qint8 _level) override final;
+
 private:
     saber::vector<ckx_ast_init_decl*> decls;
 };
@@ -178,6 +199,8 @@ public:
     ckx_ast_expr_stmt(saber_ptr<ckx_token> _at_token, ckx_ast_expr* _expr);
     ~ckx_ast_expr_stmt() override final;
 
+    void ast_dump(FILE *_fp, qint8 _level) override final;
+
 private:
     ckx_ast_expr *expr;
 };
@@ -185,6 +208,16 @@ private:
 
 class ckx_ast_expr implements ckx_ast_node
 {
+public:
+    virtual ~ckx_ast_expr() = default;
+
+    /// @attention temporary
+    void ast_dump(FILE *_fp, qint8 _level) override final
+    {
+        Q_UNUSED(_fp);
+        Q_UNUSED(_level);
+    }
+
     Q_ON_HOLD(...)
 };
 
@@ -199,11 +232,14 @@ public:
     bool is_defined() const;
 
     ckx_env* get_param_env_table();
-    void define(ckx_ast_compound_stmt* _fnbody) const;
+    void define(ckx_ast_compound_stmt* _fnbody);
+
+    void ast_dump(FILE *_fp, qint8 _level) override final;
 
 private:
     ckx_func_entry *entry;
     ckx_env *param_env_table;
+    ckx_ast_compound_stmt *fnbody = nullptr;
 };
 
 class ckx_ast_init_decl implements ckx_ast_node
@@ -212,7 +248,9 @@ public:
     ckx_ast_init_decl(saber_ptr<ckx_token> _at_token,
                       ckx_var_entry* _entry,
                       ckx_ast_expr* _init);
-    ~ckx_ast_init_decl();
+    virtual ~ckx_ast_init_decl() final;
+
+    void ast_dump(FILE *_fp, qint8 _level) override final;
 
 private:
     ckx_var_entry *entry;
@@ -226,6 +264,8 @@ public:
                        ckx_var_entry* _entry);
     ~ckx_ast_param_decl() = default;
 
+    void ast_dump(FILE *_fp, qint8 _level) override final;
+
 private:
     ckx_var_entry *entry;
 };
@@ -236,6 +276,8 @@ public:
     ckx_ast_struct_stmt(saber_ptr<ckx_token> _at_token,
                    ckx_type_entry* _entry);
     ~ckx_ast_struct_stmt();
+
+    void ast_dump(FILE *_fp, qint8 _level) override final;
 
 private:
     ckx_type_entry *entry;
@@ -248,6 +290,8 @@ public:
                     ckx_type_entry* _entry);
     ~ckx_ast_variant_stmt();
 
+    void ast_dump(FILE *_fp, qint8 _level) override final;
+
 private:
     ckx_type_entry *entry;
 };
@@ -258,6 +302,8 @@ public:
     ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token,
                       ckx_type_entry* _entry);
     ~ckx_ast_enum_stmt();
+
+    void ast_dump(FILE *_fp, qint8 _level) override final;
 
 private:
     ckx_type_entry *entry;

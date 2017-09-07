@@ -648,6 +648,8 @@ ckx_parser_impl<CkxTokenStream>::syntax_error(saber::string &&_reason,
                                               const qcoord &_pos)
 {
     /// @todo finalize this error processing system.
+    Q_UNUSED(_reason);
+    Q_UNUSED(_pos);
 }
 
 template <typename CkxTokenStream>
@@ -656,6 +658,8 @@ ckx_parser_impl<CkxTokenStream>::syntax_warn(saber::string&& _reason,
                                              const qcoord& _pos)
 {
     /// @todo finalize this error processing system.
+    Q_UNUSED(_reason);
+    Q_UNUSED(_pos);
 }
 
 

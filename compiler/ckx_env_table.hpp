@@ -92,8 +92,8 @@ public:
     inline ckx_env* get_parent() { return parent; }
 
 private:
-    saber::unordered_map<saber::string, ckx_var_entry*> var_entry_table;
-    saber::unordered_map<saber::string, ckx_type_entry*> type_entry_table;
+    saber::unordered_map<saber::string, ckx_var_entry*>       var_entry_table;
+    saber::unordered_map<saber::string, ckx_type_entry*>      type_entry_table;
     saber::unordered_multimap<saber::string, ckx_func_entry*> func_entry_table;
 
     ckx_env *parent;
