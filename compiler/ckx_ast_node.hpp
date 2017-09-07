@@ -38,13 +38,14 @@ namespace ckx
 
 using saber::saber_ptr;
 
-class ckx_ast_node
+interface ckx_ast_node
 {
 public:
     explicit ckx_ast_node(saber_ptr<ckx_token> _at_token);
     ~ckx_ast_node() = default;
 
     saber_ptr<ckx_token> get_at_token();
+    /// virtual void dump_ast() = 0;
 
 private:
     saber_ptr<ckx_token> at_token;
@@ -52,7 +53,7 @@ private:
 
 
 
-class ckx_ast_translation_unit make_use_of ckx_ast_node
+class ckx_ast_translation_unit implements ckx_ast_node
 {
 public:
     explicit ckx_ast_translation_unit(saber_ptr<ckx_token> _at_token);
@@ -67,7 +68,7 @@ private:
 
 
 
-interface ckx_ast_stmt make_use_of ckx_ast_node
+interface ckx_ast_stmt implements ckx_ast_node
 {
 public:
     explicit ckx_ast_stmt(saber_ptr<ckx_token> _at_token);
@@ -182,12 +183,12 @@ private:
 };
 
 
-class ckx_ast_expr make_use_of ckx_ast_node
+class ckx_ast_expr implements ckx_ast_node
 {
     Q_ON_HOLD(...)
 };
 
-class ckx_ast_func_stmt make_use_of ckx_ast_node
+class ckx_ast_func_stmt implements ckx_ast_stmt
 {
 public:
     ckx_ast_func_stmt(saber_ptr<ckx_token> _at_token,
@@ -205,7 +206,7 @@ private:
     ckx_env *param_env_table;
 };
 
-class ckx_ast_init_decl make_use_of ckx_ast_node
+class ckx_ast_init_decl implements ckx_ast_node
 {
 public:
     ckx_ast_init_decl(saber_ptr<ckx_token> _at_token,
@@ -218,7 +219,7 @@ private:
     ckx_ast_expr *init;
 };
 
-class ckx_ast_param_decl make_use_of ckx_ast_node
+class ckx_ast_param_decl implements ckx_ast_node
 {
 public:
     ckx_ast_param_decl(saber_ptr<ckx_token> _at_token,
@@ -229,7 +230,7 @@ private:
     ckx_var_entry *entry;
 };
 
-class ckx_ast_struct_stmt make_use_of ckx_ast_node
+class ckx_ast_struct_stmt final implements ckx_ast_stmt
 {
 public:
     ckx_ast_struct_stmt(saber_ptr<ckx_token> _at_token,
@@ -240,7 +241,7 @@ private:
     ckx_type_entry *entry;
 };
 
-class ckx_ast_variant_stmt make_use_of ckx_ast_node
+class ckx_ast_variant_stmt final implements ckx_ast_stmt
 {
 public:
     ckx_ast_variant_stmt(saber_ptr<ckx_token> _at_token,
@@ -251,7 +252,7 @@ private:
     ckx_type_entry *entry;
 };
 
-class ckx_ast_enum_stmt make_use_of ckx_ast_node
+class ckx_ast_enum_stmt final implements ckx_ast_stmt
 {
 public:
     ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token,

@@ -526,6 +526,8 @@ ckx_parser_impl<CkxTokenStream>::parse_compound_stmt()
 
     ckx_env *new_env = new ckx_env(env());
     enter_scope(new_env);
+
+    ckx_ast_compound_stmt *ret = new ckx_ast_compound_stmt(at_token, new_env);
     while (current_token() != ckx_token::type::tk_rbrace)
     {
         ret->add_new_stmt(parse_stmt());
@@ -533,7 +535,7 @@ ckx_parser_impl<CkxTokenStream>::parse_compound_stmt()
     expect_n_eat(ckx_token::type::tk_rbrace);
     leave_scope();
 
-    return new ckx_ast_compound_stmt(at_token, new_env);
+    return ret;
 }
 
 

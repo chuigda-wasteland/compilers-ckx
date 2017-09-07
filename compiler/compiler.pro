@@ -12,7 +12,8 @@ SOURCES += main.cpp \
     ckx_ast_node.cpp \
     ckx_type.cpp \
     ckx_env_table.cpp \
-    ckx_token_set.cpp
+    ckx_token_set.cpp \
+    ckx_ast_dump.cpp
 
 HEADERS += \
     ckx_file_reader.hpp \

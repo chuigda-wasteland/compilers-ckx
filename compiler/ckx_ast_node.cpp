@@ -168,7 +168,7 @@ ckx_ast_expr_stmt::~ckx_ast_expr_stmt()
 ckx_ast_func_stmt::ckx_ast_func_stmt(saber_ptr<ckx_token> _at_token,
                                      ckx_func_entry *_entry,
                                      ckx_env *_param_env_table) :
-    ckx_ast_node(_at_token),
+    ckx_ast_stmt(_at_token),
     entry(_entry),
     param_env_table(_param_env_table)
 {}
@@ -196,7 +196,7 @@ ckx_ast_param_decl::ckx_ast_param_decl(saber_ptr<ckx_token> _at_token,
 
 ckx_ast_struct_stmt::ckx_ast_struct_stmt(saber_ptr<ckx_token> _at_token,
                                ckx_type_entry *_entry) :
-    ckx_ast_node(_at_token),
+    ckx_ast_stmt(_at_token),
     entry(_entry)
 {}
 
@@ -204,7 +204,7 @@ ckx_ast_struct_stmt::~ckx_ast_struct_stmt() {}
 
 ckx_ast_variant_stmt::ckx_ast_variant_stmt(saber_ptr<ckx_token> _at_token,
                                  ckx_type_entry *_entry) :
-    ckx_ast_node(_at_token),
+    ckx_ast_stmt(_at_token),
     entry(_entry)
 {}
 
@@ -212,7 +212,7 @@ ckx_ast_variant_stmt::~ckx_ast_variant_stmt() {}
 
 ckx_ast_enum_stmt::ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token,
                            ckx_type_entry *_entry) :
-    ckx_ast_node(_at_token),
+    ckx_ast_stmt(_at_token),
     entry(_entry)
 {}
 
