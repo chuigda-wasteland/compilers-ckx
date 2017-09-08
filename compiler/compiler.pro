@@ -47,7 +47,8 @@ HEADERS += \
     gg.h \
     ckx_ast_node_fwd.hpp \
     ../saber/include/unordered_set.hpp \
-    ckx_token_set.hpp
+    ckx_token_set.hpp \
+    ../saber/include/string_pool.hpp
 
 INCLUDEPATH += ../saber/include/
 
