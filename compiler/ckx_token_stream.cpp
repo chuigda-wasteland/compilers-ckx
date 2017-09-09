@@ -32,17 +32,17 @@ namespace detail
 class ckx_identifier_table
 {
 public:
-    static qpair<ckx_token::type, bool> lookup(const saber::string& _name);
+    static qpair<ckx_token::type, bool> lookup(const saber_string& _name);
 
 private:
     static void initialize();
 
-    static saber::unordered_map<saber::string, ckx_token::type> map;
+    static saber::unordered_map<saber_string, ckx_token::type> map;
     static bool initialized;
 };
 
 bool ckx_identifier_table::initialized = false;
-saber::unordered_map<saber::string, ckx_token::type> ckx_identifier_table::map;
+saber::unordered_map<saber_string, ckx_token::type> ckx_identifier_table::map;
 
 
 
@@ -60,7 +60,7 @@ private:
     qsizet current_pos;
     saber::vector<saber_ptr<ckx_token>> token_buffer;
     saber::vector<ckx_error> errors;
-    saber::string src;
+    saber_string src;
 
     void do_split_tokens();
 
@@ -80,7 +80,7 @@ private:
 
     inline bool is_part_of_id(qchar _ch);
     inline qchar ch();
-    inline saber::string& str();
+    inline saber_string& str();
     inline qcoord& char_coord();
     inline void next_char();
     inline void next_line();
@@ -91,7 +91,7 @@ private:
     qcoord char_coord_temp;
     qsizet char_index_temp;
 
-    saber::string string_temp;
+    saber_string string_temp;
 };
 
 }
@@ -129,7 +129,7 @@ namespace detail
 {
 
 qpair<ckx_token::type, bool>
-ckx_identifier_table::lookup(const saber::string &_name)
+ckx_identifier_table::lookup(const saber_string &_name)
 {
     if (!initialized) initialize();
     if (map.find(_name) != map.end())
@@ -147,7 +147,7 @@ void ckx_identifier_table::initialize()
 {
 #define GGLEX(X, Y)\
     map.insert(\
-        qpair<saber::string, ckx_token::type>(X, ckx_token::type::tk_##Y));
+        qpair<saber_string, ckx_token::type>(X, ckx_token::type::tk_##Y));
 #include "gg.h"
 #undef GGLEX
 }
@@ -576,7 +576,7 @@ bool ckx_default_token_stream_impl::solve_keyword()
 void ckx_default_token_stream_impl::solve_identifier()
 {
     token_buffer.emplace_back(
-        new ckx_token(char_coord(), saber::move(str())) );
+        new ckx_token(char_coord(), saber::move(str()) ) );
 }
 
 
@@ -597,6 +597,7 @@ qint64 ckx_default_token_stream_impl::scan_integer()
         ret += ch() - '0';
         next_char();
     }
+    if (is_negative) ret *= -1;
     return ret;
 }
 
@@ -655,7 +656,7 @@ inline qchar ckx_default_token_stream_impl::ch()
     return src[char_index_temp];
 }
 
-inline saber::string& ckx_default_token_stream_impl::str()
+inline saber_string& ckx_default_token_stream_impl::str()
 {
     return string_temp;
 }
@@ -682,12 +683,12 @@ inline void ckx_default_token_stream_impl::next_line()
 
 inline void ckx_default_token_stream_impl::lex_error(const char *_desc)
 {
-    errors.emplace_back(char_coord(), saber::string(_desc), true);
+    errors.emplace_back(char_coord(), saber_string(_desc), true);
 }
 
 inline void ckx_default_token_stream_impl::lex_warn(const char *_desc)
 {
-    errors.emplace_back(char_coord(), saber::string(_desc), false);
+    errors.emplace_back(char_coord(), saber_string(_desc), false);
 }
 
 } // namespace detail

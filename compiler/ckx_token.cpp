@@ -57,24 +57,20 @@ ckx_token::ckx_token(const qcoord &_pos, qchar _char_literal) :
     this->v.ch = _char_literal;
 }
 
-ckx_token::ckx_token(const qcoord &_pos, std::string &&_id) :
+ckx_token::ckx_token(const qcoord &_pos, saber_string &&_id) :
     ckx_token(_pos)
 {
-    this->token_type = type::tk_id;
-    this->v.p_str = new saber::string(saber::move(_id));
+    token_type = type::tk_id;
+    str = saber_string_pool::get().create_view(_id);
 }
 
 ckx_token::~ckx_token()
 {
-    if (this->token_type == type::tk_id)
-    {
-        delete this->v.p_str;
-    }
 }
 
-
 ckx_token::ckx_token(const qcoord &_coord) :
-    position(_coord)
+    position(_coord),
+    str(saber_string_pool::get().create_view(""))
 {}
 
 } // namespace ckx;

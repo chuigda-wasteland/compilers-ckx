@@ -21,7 +21,7 @@
 #define CKX_TOKEN_HPP
 
 #include "defs.hpp"
-#include "string.hpp"
+#include "string_pool.hpp"
 
 namespace ckx
 {
@@ -137,7 +137,7 @@ open_class ckx_token
     ckx_token(const qcoord& _pos, quint64 _unsigned_literal);
     ckx_token(const qcoord& _pos, qreal _real_literal);
     ckx_token(const qcoord& _pos, qchar _char_literal);
-    ckx_token(const qcoord& _pos, saber::string&& _id);
+    ckx_token(const qcoord& _pos, saber_string&& _id);
 
     ckx_token() = delete;
     ckx_token(const ckx_token&) = delete;
@@ -153,11 +153,10 @@ open_class ckx_token
         qint64 i64;
         quint64 u64;
         qreal r;
-        saber::string *p_str;
-    }
-    v;
+    } v;
 
     qcoord position;
+    saber_string_view str;
 
 private:
     // This constructor reserved for internal use.

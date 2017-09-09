@@ -21,7 +21,7 @@
 
 #include "ckx_type.hpp"
 
-#include "string.hpp"
+#include "string_pool.hpp"
 #include "vector.hpp"
 #include "unordered_map.hpp"
 
@@ -36,27 +36,34 @@ using saber::saber_ptr;
 
 open_class ckx_var_entry
 {
-    explicit ckx_var_entry(saber_ptr<ckx_type> _var_type);
+    explicit ckx_var_entry(saber_ptr<ckx_type> _var_type,
+                           saber_string_view _var_name);
     ~ckx_var_entry() = default;
 
     saber_ptr<ckx_type> var_type;
+    saber_string_view var_name;
 };
 
 open_class ckx_func_entry
 {
-    explicit ckx_func_entry(saber_ptr<ckx_func_type> _func_type);
+    explicit ckx_func_entry(saber_ptr<ckx_func_type> _func_type,
+                            saber_string_view _func_name);
     ~ckx_func_entry() = default;
 
     saber_ptr<ckx_func_type> func_type;
+    saber_string_view func_name;
     ckx_ast_func_stmt *the_function;
 };
 
 open_class ckx_type_entry
 {
-    explicit ckx_type_entry(saber_ptr<ckx_type> type);
+    explicit ckx_type_entry(saber_ptr<ckx_type> type,
+                            saber_string_view _type_name);
     ~ckx_type_entry() = default;
 
     saber_ptr<ckx_type> type;
+    saber_string_view type_name;
+
 };
 
 class ckx_env
@@ -72,29 +79,33 @@ public:
     ~ckx_env();
 
     qpair<add_status, ckx_type_entry*> add_new_type(
-            saber::string&& _name, saber_ptr<ckx_type> _type);
+            saber_string_view _name, saber_ptr<ckx_type> _type);
     qpair<add_status, ckx_func_entry*> add_new_func(
-            saber::string&& _name, saber_ptr<ckx_func_type> _type);
+            saber_string_view, saber_ptr<ckx_func_type> _type);
     qpair<add_status, ckx_var_entry*> add_new_var(
-            saber::string&& _name, saber_ptr<ckx_type> _type);
+            saber_string_view, saber_ptr<ckx_type> _type);
 
-    bool lookup_name(const saber::string& _name);
+    bool lookup_name(saber_string_view _name);
 
-    ckx_var_entry* lookup_var(const saber::string& _name);
-    ckx_type_entry* lookup_type(const saber::string& _name);
+    ckx_var_entry* lookup_var(saber_string_view _name);
+    ckx_type_entry* lookup_type(saber_string_view _name);
 
     /// @note We have independent representation for function table
     /// since we need to solve function overloading in the future.
-    saber::vector<ckx_func_entry*> lookup_func(const saber::string& _name);
+    saber::vector<ckx_func_entry*> lookup_func(saber_string_view _name);
 
-    ckx_var_entry* lookup_var_local(const saber::string& _name);
+    ckx_var_entry* lookup_var_local(saber_string_view _name);
 
     inline ckx_env* get_parent() { return parent; }
 
 private:
-    saber::unordered_map<saber::string, ckx_var_entry*>       var_entry_table;
-    saber::unordered_map<saber::string, ckx_type_entry*>      type_entry_table;
-    saber::unordered_multimap<saber::string, ckx_func_entry*> func_entry_table;
+    saber::unordered_map<saber_string_view, ckx_var_entry*, string_view_hash>
+    var_entry_table;
+    saber::unordered_map<saber_string_view, ckx_type_entry*, string_view_hash>
+    type_entry_table;
+
+    saber::unordered_multimap<saber_string_view, ckx_func_entry*, string_view_hash>
+    func_entry_table;
 
     ckx_env *parent;
 };

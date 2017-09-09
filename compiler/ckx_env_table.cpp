@@ -21,16 +21,22 @@
 namespace ckx
 {
 
-ckx_var_entry::ckx_var_entry(saber_ptr<ckx_type> _var_type) :
-    var_type(_var_type)
+ckx_var_entry::ckx_var_entry(saber_ptr<ckx_type> _var_type,
+                             saber_string_view _var_name) :
+    var_type(_var_type),
+    var_name(_var_name)
 {}
 
-ckx_func_entry::ckx_func_entry(saber_ptr<ckx_func_type> _func_type) :
-    func_type(_func_type)
+ckx_func_entry::ckx_func_entry(saber_ptr<ckx_func_type> _func_type,
+                               saber_string_view _func_name) :
+    func_type(_func_type),
+    func_name(_func_name)
 {}
 
-ckx_type_entry::ckx_type_entry(saber_ptr<ckx_type> _type) :
-    type(_type)
+ckx_type_entry::ckx_type_entry(saber_ptr<ckx_type> _type,
+                               saber_string_view _type_name) :
+    type(_type),
+    type_name(_type_name)
 {}
 
 
@@ -48,40 +54,37 @@ ckx_env::~ckx_env()
 
 
 qpair<ckx_env::add_status, ckx_var_entry*>
-ckx_env::add_new_var(saber::string &&_name, saber_ptr<ckx_type> _type)
+ckx_env::add_new_var(saber_string_view _name, saber_ptr<ckx_type> _type)
 {
     if ( var_entry_table.find(_name) != var_entry_table.end() )
     {
         return make_pair(add_status::duplicate, nullptr);
     }
 
-    ckx_var_entry *entry = new ckx_var_entry(_type);
+    ckx_var_entry *entry = new ckx_var_entry(_type, _name);
     var_entry_table.insert(
-                qpair<const saber::string, ckx_var_entry*>(
-                    saber::move(_name), entry) );
+        qpair<saber_string_view, ckx_var_entry*>(_name, entry) );
 
     return make_pair(add_status::success, entry);
 }
 
 qpair<ckx_env::add_status, ckx_type_entry*>
-ckx_env::add_new_type(saber::string &&_name, saber_ptr<ckx_type> _type)
+ckx_env::add_new_type(saber_string_view _name, saber_ptr<ckx_type> _type)
 {
     if ( lookup_type(_name) != nullptr )
     {
          return make_pair(add_status::duplicate, nullptr);
     }
 
-    ckx_type_entry *entry = new ckx_type_entry(_type);
+    ckx_type_entry *entry = new ckx_type_entry(_type, _name);
     type_entry_table.insert(
-                qpair<const saber::string, ckx_type_entry*>(
-                    saber::move(_name), entry ) );
+        qpair<saber_string_view, ckx_type_entry*>(_name, entry ) );
 
     return make_pair(add_status::success, entry);
 }
 
 qpair<ckx_env::add_status, ckx_func_entry*>
-ckx_env::add_new_func(saber::string &&_name,
-                            saber_ptr<ckx_func_type> _type)
+ckx_env::add_new_func(saber_string_view _name, saber_ptr<ckx_func_type> _type)
 {
     saber::vector<ckx_func_entry*> query_result = lookup_func(_name);
 
@@ -91,16 +94,15 @@ ckx_env::add_new_func(saber::string &&_name,
         return make_pair(add_status::duplicate, nullptr);
     }
 
-    ckx_func_entry *entry = new ckx_func_entry(_type);
+    ckx_func_entry *entry = new ckx_func_entry(_type, _name);
     func_entry_table.insert(
-                qpair<const saber::string, ckx_func_entry*>(
-                    saber::move(_name), entry ) );
+        qpair<saber_string_view, ckx_func_entry*>(_name, entry ) );
 
     return make_pair(add_status::success, entry);
 }
 
 bool
-ckx_env::lookup_name(const std::string &_name)
+ckx_env::lookup_name(saber_string_view _name)
 {
     return lookup_var(_name)
            || lookup_type(_name)
@@ -108,7 +110,7 @@ ckx_env::lookup_name(const std::string &_name)
 }
 
 ckx_var_entry*
-ckx_env::lookup_var(const saber::string& _name)
+ckx_env::lookup_var(saber_string_view _name)
 {
     ckx_env *this_iter = this;
 
@@ -118,7 +120,7 @@ ckx_env::lookup_var(const saber::string& _name)
 
         if (it != var_entry_table.end())
         {
-            qpair<const saber::string, ckx_var_entry*> &tref = *it;
+            qpair<const saber_string_view, ckx_var_entry*> &tref = *it;
             return tref.second;
         }
 
@@ -129,7 +131,7 @@ ckx_env::lookup_var(const saber::string& _name)
 }
 
 ckx_type_entry*
-ckx_env::lookup_type(const saber::string& _name)
+ckx_env::lookup_type(saber_string_view _name)
 {
     ckx_env *this_iter = this;
 
@@ -139,7 +141,7 @@ ckx_env::lookup_type(const saber::string& _name)
 
         if (it != type_entry_table.end())
         {
-            qpair<const saber::string, ckx_type_entry*> &tref = *it;
+            qpair<const saber_string_view, ckx_type_entry*> &tref = *it;
             return tref.second;
         }
 
@@ -150,15 +152,16 @@ ckx_env::lookup_type(const saber::string& _name)
 }
 
 saber::vector<ckx_func_entry*>
-ckx_env::lookup_func(const saber::string &_name)
+ckx_env::lookup_func(saber_string_view _name)
 {
     /// @todo fully rework this function.
     saber::vector<ckx_func_entry*> ret;
+    Q_UNUSED(_name)
     return ret;
 }
 
 ckx_var_entry*
-ckx_env::lookup_var_local(const saber::string &_name)
+ckx_env::lookup_var_local(saber_string_view _name)
 {
     auto it = var_entry_table.find(_name);
 

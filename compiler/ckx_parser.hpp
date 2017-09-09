@@ -46,8 +46,10 @@ private:
     detail::ckx_parser_impl<CkxTokenStream>* p_impl;
 };
 
-extern template class ckx_parser<ckx_default_token_stream>;
-
 } // namespace ckx
+
+
+
+
 
 #endif // CKX_PARSER_HPP

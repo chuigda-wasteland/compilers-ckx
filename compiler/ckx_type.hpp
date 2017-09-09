@@ -98,11 +98,13 @@ public:
 
     open_class field
     {
-        saber::string name;
+        saber_string_view name;
         saber_ptr<ckx_type> type;
         qsizet offset;
 
-        field(saber::string&& _name, saber_ptr<ckx_type> _type, qsizet _offset)
+        field(saber_string_view _name,
+              saber_ptr<ckx_type> _type,
+              qsizet _offset)
             : name(_name), type(_type), offset(_offset) {}
     };
 
@@ -110,7 +112,7 @@ public:
     ~ckx_struct_type() override final = default;
 
     qsizet size() const override final;
-    add_status add_field(saber::string&& _name, saber_ptr<ckx_type> _type);
+    add_status add_field(saber_string_view _name, saber_ptr<ckx_type> _type);
 
 private:
     saber::vector<field> fields;
@@ -127,11 +129,13 @@ public:
 
     open_class field
     {
-        saber::string name;
+        saber_string_view name;
         saber_ptr<ckx_type> type;
         qsizet offset;
 
-        field(saber::string&& _name, saber_ptr<ckx_type> _type, qsizet _offset)
+        field(saber_string_view _name,
+              saber_ptr<ckx_type> _type,
+              qsizet _offset)
             : name(saber::move(_name)), type(_type), offset(_offset) {}
     };
 
@@ -139,7 +143,7 @@ public:
     ~ckx_variant_type() override final = default;
 
     qsizet size() const override final;
-    add_status add_field(saber::string&& _name, saber_ptr<ckx_type> _type);
+    add_status add_field(saber_string_view _name, saber_ptr<ckx_type> _type);
 
 private:
     saber::vector<field> fields;
@@ -157,18 +161,18 @@ public:
 
     open_class enumerator
     {
-        saber::string name;
+        saber_string_view name;
         qint64 value;
 
-        enumerator(saber::string&& _name, qint64 _value)
-            : name(saber::move(_name)), value(_value) {}
+        enumerator(saber_string_view _name, qint64 _value)
+            : name(_name), value(_value) {}
     };
 
     ckx_enum_type();
     ~ckx_enum_type() override final = default;
 
     qsizet size() const override final;
-    add_status add_enumerator(saber::string&& _name, qint64 _value);
+    add_status add_enumerator(saber_string_view _name, qint64 _value);
 
 private:
     saber::vector<enumerator> enumerators;

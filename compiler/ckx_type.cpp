@@ -85,7 +85,7 @@ qsizet ckx_struct_type::size() const
 }
 
 ckx_struct_type::add_status
-ckx_struct_type::add_field(saber::string &&_name, saber_ptr<ckx_type> _type)
+ckx_struct_type::add_field(saber_string_view _name, saber_ptr<ckx_type> _type)
 {
     for (field& x : fields)
         if (x.name == _name)
@@ -107,7 +107,7 @@ qsizet ckx_variant_type::size() const
 }
 
 ckx_variant_type::add_status
-ckx_variant_type::add_field(saber::string &&_name, saber_ptr<ckx_type> _type)
+ckx_variant_type::add_field(saber_string_view _name, saber_ptr<ckx_type> _type)
 {
     for (field& x : fields)
         if (x.name == _name)
@@ -131,13 +131,13 @@ qsizet ckx_enum_type::size() const
 }
 
 ckx_enum_type::add_status
-ckx_enum_type::add_enumerator(std::string &&_name, qint64 _value)
+ckx_enum_type::add_enumerator(saber_string_view _name, qint64 _value)
 {
     for (enumerator& x : enumerators)
         if (x.name == _name)
             return add_status::add_duplicate;
 
-    enumerators.emplace_back(saber::move(_name), _value);
+    enumerators.emplace_back(_name, _value);
     return add_status::add_success;
 }
 

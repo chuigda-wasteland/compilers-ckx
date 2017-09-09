@@ -11,7 +11,7 @@ namespace ckx
 class ckx_test_filereader implements ckx_file_reader
 {
 public:
-    ckx_test_filereader(saber::string&& _str) : str(saber::move(_str)) {}
+    ckx_test_filereader(saber_string&& _str) : str(saber::move(_str)) {}
     ~ckx_test_filereader() = default;
     qchar get_next_char(void) override final
     {
@@ -22,12 +22,12 @@ public:
 
 private:
     qsizet pos = 0;
-    saber::string str;
+    saber_string str;
 };
 
 static bool do_test_ckx_token_stream_1(void)
 {
-    saber::string str =
+    saber_string str =
 #define GGLEX(X, Y) X" "
 #include "gg.h"
 #undef GGLEX
@@ -59,7 +59,7 @@ static bool do_test_ckx_token_stream_1(void)
 
 static bool do_test_ckx_token_stream_2(void)
 {
-    saber::string str =
+    saber_string str =
 #define VYLEX(X) X" "
 #include "vy.h"
 #undef VYLEX
@@ -68,9 +68,9 @@ static bool do_test_ckx_token_stream_2(void)
     ckx_test_filereader reader = ckx_test_filereader(saber::move(str));
     ckx_default_token_stream stream = ckx_default_token_stream(reader);
 
-    saber::vector<saber::string> comparsion =
+    saber::vector<saber_string> comparsion =
     {
-#define VYLEX(X) saber::string(X),
+#define VYLEX(X) saber_string(X),
 #include "vy.h"
 #undef VYLEX
         ""
@@ -81,7 +81,7 @@ static bool do_test_ckx_token_stream_2(void)
          ++i, ++stream)
     {
         if (stream[0].get()->token_type != ckx_token::type::tk_id
-            || *(stream[0].get()->v.p_str) != comparsion[i])
+            || stream[0].get()->str.get() != comparsion[i])
         {
             qDebug() << "Failed at token" << i << '\n';
             return false;
@@ -98,7 +98,7 @@ static bool float_equal(qreal r1, qreal r2)
 
 static bool do_test_ckx_token_stream_3()
 {
-    saber::string str =
+    saber_string str =
 #define VY2LEX(X, Y) X" "
 #include "vy2.h"
 #undef VY2LEX
@@ -133,7 +133,7 @@ static bool do_test_ckx_token_stream_3()
 
 static bool do_test_ckx_token_stream_4()
 {
-    saber::string str =
+    saber_string str =
 #define VY3LEX(X, Y) X" "
 #include "vy3.h"
 #undef VY3LEX
@@ -168,7 +168,7 @@ static bool do_test_ckx_token_stream_4()
 
 static bool do_test_ckx_token_stream_5()
 {
-    saber::string str =
+    saber_string str =
 #define VY4LEX(X, Y) X" "
 #include "vy4.h"
 #undef VY4LEX
