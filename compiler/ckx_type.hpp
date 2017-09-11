@@ -108,7 +108,7 @@ public:
             : name(_name), type(_type), offset(_offset) {}
     };
 
-    ckx_struct_type();
+    ckx_struct_type(saber_string_view _struct_name);
     ~ckx_struct_type() override final = default;
 
     qsizet size() const override final;
@@ -116,6 +116,7 @@ public:
 
 private:
     saber::vector<field> fields;
+    saber_string_view struct_name;
 };
 
 class ckx_variant_type final implements ckx_type
@@ -139,7 +140,7 @@ public:
             : name(saber::move(_name)), type(_type), offset(_offset) {}
     };
 
-    ckx_variant_type();
+    ckx_variant_type(saber_string_view _variant_name);
     ~ckx_variant_type() override final = default;
 
     qsizet size() const override final;
@@ -148,6 +149,7 @@ public:
 private:
     saber::vector<field> fields;
     qsizet field_size_max = 0;
+    saber_string_view variant_name;
 };
 
 class ckx_enum_type final implements ckx_type
@@ -168,7 +170,7 @@ public:
             : name(_name), value(_value) {}
     };
 
-    ckx_enum_type();
+    ckx_enum_type(saber_string_view _enum_name);
     ~ckx_enum_type() override final = default;
 
     qsizet size() const override final;
@@ -176,6 +178,7 @@ public:
 
 private:
     saber::vector<enumerator> enumerators;
+    saber_string_view enum_name;
 };
 
 class ckx_func_type final implements ckx_type

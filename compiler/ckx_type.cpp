@@ -72,8 +72,9 @@ qsizet ckx_basic_type::size() const
 
 
 
-ckx_struct_type::ckx_struct_type() :
-    ckx_type(ckx_type::category::type_struct)
+ckx_struct_type::ckx_struct_type(saber_string_view _struct_name) :
+    ckx_type(ckx_type::category::type_struct),
+    struct_name(_struct_name)
 {}
 
 qsizet ckx_struct_type::size() const
@@ -97,8 +98,9 @@ ckx_struct_type::add_field(saber_string_view _name, saber_ptr<ckx_type> _type)
 
 
 
-ckx_variant_type::ckx_variant_type() :
-    ckx_type(ckx_type::category::type_variant)
+ckx_variant_type::ckx_variant_type(saber_string_view _variant_name) :
+    ckx_type(ckx_type::category::type_variant),
+    variant_name(_variant_name)
 {}
 
 qsizet ckx_variant_type::size() const
@@ -121,8 +123,9 @@ ckx_variant_type::add_field(saber_string_view _name, saber_ptr<ckx_type> _type)
 
 
 
-ckx_enum_type::ckx_enum_type() :
-    ckx_type(ckx_type::category::type_enum)
+ckx_enum_type::ckx_enum_type(saber_string_view _enum_name) :
+    ckx_type(ckx_type::category::type_enum),
+    enum_name(_enum_name)
 {}
 
 qsizet ckx_enum_type::size() const

@@ -279,8 +279,8 @@ template <typename CkxTokenStream>
 ckx_ast_expr_stmt*
 ckx_parser_impl<CkxTokenStream>::parse_expr_stmt()
 {
-    /// @todo add code here after designing full expression ast
-    return nullptr;
+    saber_ptr<ckx_token> at_token = current_token();
+    return new ckx_ast_expr_stmt(at_token, parse_expr());
 }
 
 template <typename CkxTokenStream>
@@ -377,7 +377,7 @@ ckx_parser_impl<CkxTokenStream>::parse_record_stmt()
     next_token();
     expect_n_eat(ckx_token::type::tk_lbrace);
 
-    CkxRecordType *record_type = new CkxRecordType();
+    CkxRecordType *record_type = new CkxRecordType(record_name);
     saber_ptr<ckx_type> saber_type(record_type);
     auto add_result = env()->add_new_type(record_name, saber_type);
 
@@ -412,13 +412,13 @@ ckx_parser_impl<CkxTokenStream>::parse_enum_stmt()
     saber_ptr<ckx_token> at_token = current_token();
     next_token();
 
-    saber_string_view enum_typename = current_token()->str;
+    saber_string_view enum_name = current_token()->str;
     next_token();
     expect_n_eat(ckx_token::type::tk_lbrace);
 
-    ckx_enum_type *type = new ckx_enum_type;
+    ckx_enum_type *type = new ckx_enum_type(enum_name);
     auto add_result =
-        env()->add_new_type(enum_typename, saber_ptr<ckx_type>(type));
+        env()->add_new_type(enum_name, saber_ptr<ckx_type>(type));
 
     while (current_token()->token_type != ckx_token::type::tk_rbrace)
     {
