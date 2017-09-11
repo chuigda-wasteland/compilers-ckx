@@ -17,7 +17,9 @@ class string_view
 {
     friend class string_pool<StringType>;
     using pool_type = string_pool<StringType>;
+
 public:
+    string_view(const string_view& _another);
     ~string_view();
 
     const StringType& get() const noexcept;
@@ -25,8 +27,9 @@ public:
     bool operator!= (const string_view& _another) const noexcept;
 
 private:
-    string_view(typename pool_type::set_type::iterator _iter);
-    typename pool_type::set_type::iterator iter;
+    string_view(const StringType* _str = nullptr, size_t* _refcount = nullptr);
+    const StringType* str;
+    size_t* refcount;
 };
 
 template <typename StringType>
@@ -45,31 +48,45 @@ private:
     set_type string_set;
 };
 
+
+
+template<typename StringType>
+string_view<StringType>::string_view(const StringType *_str,
+                                     size_t *_refcount) :
+    str(_str),
+    refcount(_refcount)
+{
+}
+
 template <typename StringType>
-string_view<StringType>::string_view(
-        typename pool_type::set_type::iterator _iter) :
-    iter(_iter)
-{}
+string_view<StringType>::string_view(const string_view& _another) :
+    str(_another.str),
+    refcount(_another.refcount)
+{
+    ++(*refcount);
+}
 
 template <typename StringType>
 string_view<StringType>::~string_view()
 {
-    iter->second--;
-    if (!iter->second) pool_type::get().string_set.erase(iter);
+    --(*refcount);
+    if (*refcount == 0)
+        string_pool<StringType>::get().string_set.erase(*str);
 }
 
 template <typename StringType>
 const StringType&
 string_view<StringType>::get() const noexcept
 {
-    return iter->first;
+    return *str;
 }
 
 template <typename StringType>
 bool
 string_view<StringType>::operator== (const string_view& _another) const noexcept
 {
-    return iter == _another.iter;
+    return string_pool<StringType>::get().string_set.find(*str)
+           == string_pool<StringType>::get().string_set.find(*(_another.str));
 }
 
 template <typename StringType>
@@ -78,7 +95,6 @@ string_view<StringType>::operator!= (const string_view& _another) const noexcept
 {
     return ! this->operator==(_another);
 }
-
 
 
 template <typename StringType>
@@ -96,7 +112,7 @@ string_pool<StringType>::create_view(const StringType &_string)
     auto it = string_set.find(_string);
     if ( it == string_set.end() )
         it = string_set.insert(std::make_pair(_string, 1)).first;
-    return string_view<StringType>(it);
+    return string_view<StringType>(&(it->first), &(it->second));
 }
 
 template <typename StringType>
@@ -106,7 +122,7 @@ string_pool<StringType>::create_view(StringType &&_string)
     auto it = string_set.find(_string);
     if ( it == string_set.end() )
         it = string_set.insert(std::make_pair(saber::move(_string), 1)).first;
-    return string_view<StringType>(it);
+    return string_view<StringType>(&(it->first), &(it->second));
 }
 
 } // namespace saber

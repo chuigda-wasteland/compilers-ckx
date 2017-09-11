@@ -1,5 +1,5 @@
 TEMPLATE = app
-CONFIG += console c++17
+CONFIG += console c++14
 CONFIG -= app_bundle
 CONFIG -= qt
 
@@ -31,7 +31,7 @@ HEADERS += \
     ../saber/include/saber_traits.hpp \
     ../saber/include/safe_stl_general.hpp \
     ../saber/include/set.hpp \
-    ../saberinclude/strings.defs.h \
+    ../saber/include/strings.defs.h \
     ../saber/include/type_traits.hpp \
     ../saber/include/utility.hpp \
     ../saber/include/vector.hpp \
