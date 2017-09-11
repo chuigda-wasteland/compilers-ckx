@@ -10,13 +10,10 @@ namespace saber
 
 template <typename StringType> class string_pool;
 
-
-
 template <typename StringType>
 class string_view
 {
     friend class string_pool<StringType>;
-    using pool_type = string_pool<StringType>;
 
 public:
     string_view(const string_view& _another);
@@ -55,8 +52,7 @@ string_view<StringType>::string_view(const StringType *_str,
                                      size_t *_refcount) :
     str(_str),
     refcount(_refcount)
-{
-}
+{}
 
 template <typename StringType>
 string_view<StringType>::string_view(const string_view& _another) :
@@ -122,6 +118,8 @@ string_pool<StringType>::create_view(StringType &&_string)
     auto it = string_set.find(_string);
     if ( it == string_set.end() )
         it = string_set.insert(std::make_pair(saber::move(_string), 1)).first;
+    else
+        ++(it->second);
     return string_view<StringType>(&(it->first), &(it->second));
 }
 
