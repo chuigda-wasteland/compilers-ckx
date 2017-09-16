@@ -132,13 +132,6 @@ void ckx_ast_init_decl::ast_dump(FILE *_fp, qint8 _level)
     Q_UNUSED(_level);
 }
 
-void ckx_ast_param_decl::ast_dump(FILE *_fp, qint8 _level)
-{
-    /// @todo the same as init_decl
-    Q_UNUSED(_fp);
-    Q_UNUSED(_level);
-}
-
 void ckx_ast_struct_stmt::ast_dump(FILE *_fp, qint8 _level)
 {
     Q_UNUSED(_fp);

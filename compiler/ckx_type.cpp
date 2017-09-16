@@ -17,6 +17,7 @@
   */
 
 #include "ckx_type.hpp"
+#include "unordered_map.hpp"
 
 namespace ckx
 {
@@ -70,6 +71,37 @@ qsizet ckx_basic_type::size() const
     }
 }
 
+saber_string
+ckx_basic_type::to_string() const
+{
+    struct category_hash
+    {
+        bool operator() (category _ctg) const
+        {
+            return std::hash<qchar>()(static_cast<qchar>(_ctg));
+        }
+    };
+
+    static saber::unordered_map<category, saber_string, category_hash>
+            typename_string_list
+    {
+        {category::type_vi8,  "vi8"},
+        {category::type_vi16, "vi16"},
+        {category::type_vi32, "vi32"},
+        {category::type_vi64, "vi64"},
+        {category::type_vu8,  "vu8"},
+        {category::type_vu16, "vu16"},
+        {category::type_vu32, "vu32"},
+        {category::type_vu64, "vu64"},
+        {category::type_vr32, "vr32"},
+        {category::type_vr64, "vr64"},
+        {category::type_vch,  "vch"},
+        {category::type_void, "void"}
+    };
+
+    return typename_string_list.find(this_category)->second;
+}
+
 
 
 ckx_struct_type::ckx_struct_type(saber_string_view _struct_name) :
@@ -83,6 +115,12 @@ qsizet ckx_struct_type::size() const
 
     return (*fields.rbegin()).offset
            + (*fields.rbegin()).type->size();
+}
+
+saber_string
+ckx_struct_type::to_string() const
+{
+    return struct_name.get();
 }
 
 ckx_struct_type::add_status
@@ -108,6 +146,12 @@ qsizet ckx_variant_type::size() const
     return field_size_max;
 }
 
+saber_string
+ckx_variant_type::to_string() const
+{
+    return variant_name.get();
+}
+
 ckx_variant_type::add_status
 ckx_variant_type::add_field(saber_string_view _name, saber_ptr<ckx_type> _type)
 {
@@ -131,6 +175,12 @@ ckx_enum_type::ckx_enum_type(saber_string_view _enum_name) :
 qsizet ckx_enum_type::size() const
 {
     return 8;
+}
+
+saber_string
+ckx_enum_type::to_string() const
+{
+    return enum_name.get();
 }
 
 ckx_enum_type::add_status
@@ -159,6 +209,19 @@ qsizet ckx_func_type::size() const
     return 8;
 }
 
+saber_string
+ckx_func_type::to_string() const
+{
+    saber_string ret = "fn (";
+    for (saber_ptr<ckx_type>& type : param_type_list)
+        ret += type->to_string() + saber_string(",");
+    ret += saber_string(") -> ");
+    ret += return_type->to_string();
+    return ret;
+}
+
+
+
 ckx_qualification::ckx_qualification(saber_ptr<ckx_type> _qualified) :
     ckx_type(ckx_type::category::type_qualifier),
     qualified(_qualified)
@@ -169,6 +232,14 @@ qsizet ckx_qualification::size() const
     return qualified->size();
 }
 
+saber_string
+ckx_qualification::to_string() const
+{
+    return qualified->to_string() + saber_string(" const");
+}
+
+
+
 ckx_pointer_type::ckx_pointer_type(saber_ptr<ckx_type> _target) :
     ckx_type(ckx_type::category::type_pointer),
     target(_target)
@@ -178,6 +249,14 @@ qsizet ckx_pointer_type::size() const
 {
     return target->size();
 }
+
+saber_string
+ckx_pointer_type::to_string() const
+{
+    return target->to_string() + saber_string(" *");
+}
+
+
 
 saber_ptr<ckx_type>
 ckx_type_helper::get_type(ckx_token::type _basic_type_token)

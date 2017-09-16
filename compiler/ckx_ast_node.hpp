@@ -257,19 +257,6 @@ private:
     ckx_ast_expr *init;
 };
 
-class ckx_ast_param_decl implements ckx_ast_node
-{
-public:
-    ckx_ast_param_decl(saber_ptr<ckx_token> _at_token,
-                       ckx_var_entry* _entry);
-    ~ckx_ast_param_decl() = default;
-
-    void ast_dump(FILE *_fp, qint8 _level) override final;
-
-private:
-    ckx_var_entry *entry;
-};
-
 class ckx_ast_struct_stmt final implements ckx_ast_stmt
 {
 public:

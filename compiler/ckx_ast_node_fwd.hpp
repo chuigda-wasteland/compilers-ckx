@@ -23,9 +23,7 @@ namespace ckx
 {
 
 class ckx_ast_node;
-
 class ckx_ast_translation_unit;
-
 class ckx_ast_stmt;
 
     class ckx_ast_compound_stmt;
@@ -46,7 +44,6 @@ class ckx_ast_stmt;
 
 class ckx_ast_expr;
 class ckx_ast_init_decl;
-class ckx_ast_param_decl;
 
 } // namespace ckx
 

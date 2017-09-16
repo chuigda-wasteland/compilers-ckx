@@ -25,9 +25,7 @@
 #include "vector.hpp"
 
 #include "ckx_token.hpp"
-
 #include "defs.hpp"
-
 
 namespace ckx
 {
@@ -72,6 +70,7 @@ public:
 
     const category& get_category() const;
     virtual qsizet size() const = 0;
+    virtual saber_string to_string() const = 0;
 
 protected:
     category this_category;
@@ -85,6 +84,7 @@ public:
     ~ckx_basic_type() override final = default;
 
     qsizet size() const override final;
+    saber_string to_string() const override final;
 };
 
 class ckx_struct_type final implements ckx_type
@@ -112,6 +112,8 @@ public:
     ~ckx_struct_type() override final = default;
 
     qsizet size() const override final;
+    saber_string to_string() const override final;
+
     add_status add_field(saber_string_view _name, saber_ptr<ckx_type> _type);
 
 private:
@@ -144,6 +146,8 @@ public:
     ~ckx_variant_type() override final = default;
 
     qsizet size() const override final;
+    saber_string to_string() const override final;
+
     add_status add_field(saber_string_view _name, saber_ptr<ckx_type> _type);
 
 private:
@@ -174,6 +178,8 @@ public:
     ~ckx_enum_type() override final = default;
 
     qsizet size() const override final;
+    saber_string to_string() const override final;
+
     add_status add_enumerator(saber_string_view _name, qint64 _value);
 
 private:
@@ -189,6 +195,7 @@ public:
     ~ckx_func_type() override final = default;
 
     qsizet size() const override final;
+    saber_string to_string() const override final;
 
 private:
     saber_ptr<ckx_type> return_type;
@@ -202,6 +209,7 @@ public:
     ~ckx_qualification() override final = default;
 
     qsizet size() const override final;
+    saber_string to_string() const override final;
 
 private:
     saber_ptr<ckx_type> qualified;
@@ -214,6 +222,7 @@ public:
     ~ckx_pointer_type() override final = default;
 
     qsizet size() const override final;
+    saber_string to_string() const override final;
 
 private:
     saber_ptr<ckx_type> target;
@@ -226,6 +235,7 @@ public:
     ~ckx_type_alias() override final = default;
 
     qsizet size() const override final;
+    saber_string to_string() const override final;
 
 private:
     saber_ptr<ckx_type> origin;
