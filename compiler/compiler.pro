@@ -13,7 +13,8 @@ SOURCES += main.cpp \
     ckx_type.cpp \
     ckx_env_table.cpp \
     ckx_token_set.cpp \
-    ckx_ast_dump.cpp
+    ckx_ast_dump.cpp \
+    ckx_file_writer.cpp
 
 HEADERS += \
     ckx_file_reader.hpp \
@@ -49,7 +50,8 @@ HEADERS += \
     ../saber/include/unordered_set.hpp \
     ckx_token_set.hpp \
     ../saber/include/string_pool.hpp \
-    ../saber/include/string_pool.hpp
+    ../saber/include/string_pool.hpp \
+    ckx_file_writer.hpp
 
 INCLUDEPATH += ../saber/include/
 

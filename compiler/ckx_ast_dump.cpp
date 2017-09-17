@@ -83,6 +83,12 @@ void ckx_ast_do_while_stmt::ast_dump(FILE *_fp, qint8 _level)
     clause->ast_dump(_fp, _level+2);
 }
 
+void ckx_ast_for_stmt::ast_dump(FILE *_fp, qint8 _level)
+{
+    print_space_indent(_fp, _level);
+    std::fprintf(_fp, "for-statement");
+}
+
 void ckx_ast_break_stmt::ast_dump(FILE *_fp, qint8 _level)
 {
     print_space_indent(_fp, _level);

@@ -21,9 +21,9 @@
 #define CKX_FILE_READER_HPP
 
 #include <iosfwd>
-#include <string>
 #include <cstdio>
 
+#include "string.hpp"
 #include "defs.hpp"
 
 namespace ckx
@@ -40,16 +40,15 @@ interface ckx_file_reader
 public:
     ckx_file_reader() = default;
     virtual ~ckx_file_reader() = 0;
-
     virtual qchar get_next_char(void) = 0;
 };
 
 
-class ckx_fp_reader implements ckx_file_reader
+class ckx_fp_reader final implements ckx_file_reader
 {
 public:
     explicit ckx_fp_reader(std::FILE* _fp);
-    ~ckx_fp_reader() override;
+    ~ckx_fp_reader() override final;
     qchar get_next_char() override final;
 
 private:
@@ -57,15 +56,15 @@ private:
 };
 
 
-class ckx_istream_reader implements ckx_file_reader
+class ckx_istream_reader final implements ckx_file_reader
 {
 public:
     explicit ckx_istream_reader(std::istream& _stream);
-    ~ckx_istream_reader() override;
+    ~ckx_istream_reader() override final;
     qchar get_next_char() override final;
 
 private:
-    detail::ckx_istream_reader_impl* impl;
+    detail::ckx_istream_reader_impl *impl;
 };
 
 } // namespace ckx

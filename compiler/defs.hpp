@@ -37,7 +37,7 @@ using quint32 = std::uint32_t;
 using quint16 = std::uint16_t;
 using quint8  = std::uint8_t;
 
-using qchar = unsigned char;
+using qchar = signed char;
 
 using qsizet = size_t;
 using qptrdiff = std::ptrdiff_t;

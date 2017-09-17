@@ -36,7 +36,7 @@ public:
     explicit ckx_fp_reader_impl(std::FILE* _fp);
     ~ckx_fp_reader_impl() = default;
 
-    qchar get_next_char_impl();
+    inline qchar get_next_char_impl();
 
 private:
     std::FILE *fp;
@@ -49,7 +49,7 @@ public:
     explicit ckx_istream_reader_impl(std::istream& _stream);
     ~ckx_istream_reader_impl() = default;
 
-    qchar get_next_char_impl();
+    inline qchar get_next_char_impl();
 
 private:
     std::istream& stream;
@@ -92,7 +92,8 @@ namespace detail
 {
 
 ckx_fp_reader_impl::ckx_fp_reader_impl(FILE *_fp) : fp(_fp) {}
-qchar ckx_fp_reader_impl::get_next_char_impl()
+
+inline qchar ckx_fp_reader_impl::get_next_char_impl()
 {
     qchar ret;
     std::fscanf(this->fp, "%c", &ret);
@@ -104,7 +105,7 @@ ckx_istream_reader_impl::ckx_istream_reader_impl(std::istream &_stream) :
     stream(_stream)
 {}
 
-qchar ckx_istream_reader_impl::get_next_char_impl()
+inline qchar ckx_istream_reader_impl::get_next_char_impl()
 {
     qchar ch;
     return stream >> ch ? ch :
