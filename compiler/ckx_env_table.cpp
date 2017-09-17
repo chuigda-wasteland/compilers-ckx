@@ -84,21 +84,22 @@ ckx_env::add_new_type(saber_string_view _name, saber_ptr<ckx_type> _type)
 }
 
 qpair<ckx_env::add_status, ckx_func_entry*>
-ckx_env::add_new_func(saber_string_view _name, saber_ptr<ckx_func_type> _type)
+ckx_env::add_new_func(saber_string_view _name,
+                      saber_ptr<ckx_func_type> _type)
 {
-    saber::vector<ckx_func_entry*> query_result = lookup_func(_name);
-
-    if (query_result.size() != 0)
+    if (lookup_func(_name) == nullptr)
     {
-        Q_ON_HOLD("Function overloading")
-        return make_pair(add_status::duplicate, nullptr);
+        auto it = func_entry_table.emplace(
+                      _name, new saber::vector<ckx_func_entry*>());
+        ckx_func_entry *ret = new ckx_func_entry(_type, _name);
+        it.first->second->emplace_back(ret);
+        return qpair<add_status, ckx_func_entry*>(add_status::success, ret);
     }
-
-    ckx_func_entry *entry = new ckx_func_entry(_type, _name);
-    func_entry_table.insert(
-        qpair<saber_string_view, ckx_func_entry*>(_name, entry ) );
-
-    return make_pair(add_status::success, entry);
+    else
+    {
+        return qpair<add_status, ckx_func_entry*>(add_status::duplicate,
+                                                  nullptr);
+    }
 }
 
 bool
@@ -106,7 +107,7 @@ ckx_env::lookup_name(saber_string_view _name)
 {
     return lookup_var(_name)
            || lookup_type(_name)
-           || !( lookup_func(_name).empty() );
+           || (!lookup_func(_name));
 }
 
 ckx_var_entry*
@@ -138,33 +139,25 @@ ckx_env::lookup_type(saber_string_view _name)
     while (this_iter != nullptr)
     {
         auto it = type_entry_table.find(_name);
-
         if (it != type_entry_table.end())
-        {
-            qpair<const saber_string_view, ckx_type_entry*> &tref = *it;
-            return tref.second;
-        }
-
+            return it->second;
         this_iter = this_iter->parent;
     }
-
     return nullptr;
 }
 
-saber::vector<ckx_func_entry*>
-ckx_env::lookup_func(saber_string_view _name)
+saber::vector<ckx_func_entry*>* ckx_env::lookup_func(saber_string_view _name)
 {
-    /// @todo fully rework this function.
-    saber::vector<ckx_func_entry*> ret;
-    Q_UNUSED(_name)
-    return ret;
+    auto it = func_entry_table.find(_name);
+    if (it != func_entry_table.end())
+        return it->second;
+    return nullptr;
 }
 
 ckx_var_entry*
 ckx_env::lookup_var_local(saber_string_view _name)
 {
     auto it = var_entry_table.find(_name);
-
     return (it == var_entry_table.end()) ? (*it).second : nullptr;
 }
 

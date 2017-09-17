@@ -92,7 +92,7 @@ public:
 
     /// @note We have independent representation for function table
     /// since we need to solve function overloading in the future.
-    saber::vector<ckx_func_entry*> lookup_func(saber_string_view _name);
+    saber::vector<ckx_func_entry *> *lookup_func(saber_string_view _name);
 
     ckx_var_entry* lookup_var_local(saber_string_view _name);
 
@@ -100,12 +100,13 @@ public:
 
 private:
     saber::unordered_map<saber_string_view, ckx_var_entry*, string_view_hash>
-    var_entry_table;
+        var_entry_table;
     saber::unordered_map<saber_string_view, ckx_type_entry*, string_view_hash>
-    type_entry_table;
-
-    saber::unordered_multimap<saber_string_view, ckx_func_entry*, string_view_hash>
-    func_entry_table;
+        type_entry_table;
+    saber::unordered_map<saber_string_view,
+                         saber::vector<ckx_func_entry*>*,
+                         string_view_hash>
+        func_entry_table;
 
     ckx_env *parent;
 };

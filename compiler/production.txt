@@ -98,11 +98,7 @@ do-while-statement
     do statement while ( expression )
 
 for-statement
-    for ( [for-init]opt ; [expression]opt ; [expression]opt ) statement
-
-for-init
-    declaration
-    expression
+    for ( [expression]opt ; [expression]opt ; [expression]opt ) statement
 
 break-statement
     break ;
