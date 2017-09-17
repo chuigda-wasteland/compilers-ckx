@@ -51,7 +51,6 @@ ckx_ast_translation_unit::add_new_stmt(ckx_ast_stmt *_stmt)
     stmts.push_back(_stmt);
 }
 
-
 ckx_ast_stmt::ckx_ast_stmt(saber_ptr<ckx_token> _at_token) :
     ckx_ast_node(_at_token)
 {}
@@ -120,6 +119,26 @@ ckx_ast_do_while_stmt::ckx_ast_do_while_stmt(saber_ptr<ckx_token> _at_token,
 ckx_ast_do_while_stmt::~ckx_ast_do_while_stmt()
 {
     delete condition;
+    delete clause;
+}
+
+ckx_ast_for_stmt::ckx_ast_for_stmt(saber_ptr<ckx_token> _at_token,
+                                   ckx_ast_expr *_init,
+                                   ckx_ast_expr *_condition,
+                                   ckx_ast_expr *_incr,
+                                   ckx_ast_stmt *_clause) :
+    ckx_ast_stmt(_at_token),
+    init(_init),
+    condition(_condition),
+    incr(_incr),
+    clause(_clause)
+{}
+
+ckx_ast_for_stmt::~ckx_ast_for_stmt()
+{
+    delete init;
+    delete condition;
+    delete incr;
     delete clause;
 }
 

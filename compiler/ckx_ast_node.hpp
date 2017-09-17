@@ -148,6 +148,25 @@ private:
     ckx_ast_stmt *clause;
 };
 
+class ckx_ast_for_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_for_stmt(saber_ptr<ckx_token> _at_token,
+                     ckx_ast_expr *_init,
+                     ckx_ast_expr *_condition,
+                     ckx_ast_expr *_incr,
+                     ckx_ast_stmt *_clause);
+    ~ckx_ast_for_stmt();
+
+    void ast_dump(FILE *_fp, qint8 _level) override final;
+
+private:
+    ckx_ast_expr *init;
+    ckx_ast_expr *condition;
+    ckx_ast_expr *incr;
+    ckx_ast_stmt *clause;
+};
+
 class ckx_ast_break_stmt final implements ckx_ast_stmt
 {
 public:

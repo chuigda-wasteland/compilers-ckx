@@ -213,7 +213,7 @@ saber_string
 ckx_func_type::to_string() const
 {
     saber_string ret = "fn (";
-    for (saber_ptr<ckx_type>& type : param_type_list)
+    for (const saber_ptr<ckx_type>& type : param_type_list)
         ret += type->to_string() + saber_string(",");
     ret += saber_string(") -> ");
     ret += return_type->to_string();

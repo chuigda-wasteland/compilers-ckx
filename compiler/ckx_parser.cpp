@@ -82,13 +82,13 @@ private:
     inline  void                  expect(ckx_token::type _token_type);
 
     /// @brief interact with environment/symbol-table.
-    inline  ckx_env*  env();
+    inline  ckx_env*        env();
     inline  void            enter_scope(ckx_env* _new_scope_env);
     inline  void            leave_scope();
 
     /// @brief functions for reporting problem.
-    void  syntax_error(saber_string&& _reason, const qcoord& _pos);
-    void  syntax_warn(saber_string&& _reason, const qcoord& _pos);
+    void syntax_error(saber_string&& _reason, const qcoord& _pos);
+    void syntax_warn(saber_string&& _reason, const qcoord& _pos);
 
     /// @brief and here are functions for recovering from a syntax error.
     /// @todo  implement these functions
@@ -501,6 +501,33 @@ ckx_parser_impl<CkxTokenStream>::parse_do_while_stmt()
     expect_n_eat(ckx_token::type::tk_semicolon);
 
     return new ckx_ast_do_while_stmt(at_token, condition, clause);
+}
+
+template<typename CkxTokenStream>
+ckx_ast_for_stmt*
+ckx_parser_impl<CkxTokenStream>::parse_for_stmt()
+{
+    assert(current_token()->token_type == ckx_token::type::tk_for);
+    saber_ptr<ckx_token> at_token = current_token();
+    next_token();
+
+    expect_n_eat(ckx_token::type::tk_lparth);
+    ckx_ast_expr *init = nullptr;
+    ckx_ast_expr *cond = nullptr;
+    ckx_ast_expr *incr = nullptr;
+    if (current_token() != ckx_token::type::tk_semicolon)
+        init = parse_expr();
+    expect_n_eat(ckx_token::type::tk_semicolon);
+    if (current_token() != ckx_token::type::tk_semicolon)
+        cond = parse_expr();
+    expect_n_eat(ckx_token::type::tk_semicolon);
+    if (current_token() != ckx_token::type::tk_semicolon)
+        incr = parse_expr();
+    expect_n_eat(ckx_token::type::tk_semicolon);
+    expect_n_eat(ckx_token::type::tk_rparth);
+
+    ckx_ast_stmt *clause = parse_stmt();
+    return new ckx_ast_for_stmt(at_token, init, cond, incr, clause);
 }
 
 template <typename CkxTokenStream>
