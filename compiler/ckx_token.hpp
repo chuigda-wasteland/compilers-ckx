@@ -128,6 +128,8 @@ open_class ckx_token
         tk_const_cast,         // const_cast
         tk_ckx_cast,           // ckx_cast
 
+        tk_sizeof,             // sizeof
+
         tk_ckx,                // ckx
         tk_eoi                 // EOI
     };

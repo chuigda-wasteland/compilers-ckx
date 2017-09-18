@@ -22,6 +22,7 @@ public:
     const StringType& get() const noexcept;
     bool operator== (const string_view& _another) const noexcept;
     bool operator!= (const string_view& _another) const noexcept;
+    string_view& operator= (const string_view& _another) noexcept;
 
 private:
     string_view(const StringType* _str = nullptr, size_t* _refcount = nullptr);
@@ -90,6 +91,21 @@ bool
 string_view<StringType>::operator!= (const string_view& _another) const noexcept
 {
     return ! this->operator==(_another);
+}
+
+template <typename StringType>
+string_view<StringType>&
+string_view<StringType>::operator =(const string_view& _another) noexcept
+{
+    --(*refcount);
+    if (*refcount == 0)
+        string_pool<StringType>::get().string_set.erase(*str);
+
+    refcount = _another.refcount;
+    str = _another.str;
+    ++(*refcount);
+
+    return *this;
 }
 
 
