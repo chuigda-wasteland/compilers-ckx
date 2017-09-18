@@ -23,10 +23,58 @@ declaration
     declarator init-declaration-list;
 
 function
-    "function" id ( param-type-list ) -> declarator SKTT1Faker
+    "fn" id ( param-type-list ) -> declarator SKTT1Faker
 
 expression
-    Q_ON_HOLD(...)
+    assignment-expression
+
+assignment-expression
+    conditional-expression
+    conditional-expression assignment-operator assignment-expression
+
+conditional-expression
+    binary-expression
+    binary-expression ? expression : assignment-expression
+
+binary-expression
+    unary-expression
+    unary-expression binary-operator binary-expression
+
+unary-expression
+    usual-unary-expression
+    cast-expression
+
+usual-unary-expression
+    usual-unary-operator unary-expression
+    postfix-expression
+
+postfix-expression
+    array-subscript-expression
+    function-invoke-expression
+
+array-subscript-expression
+    basic-expression "[" expression "]"
+
+function-invoke-expression
+    basic-expression "(" expression-paramaters-list ")"
+
+cast-expression
+    static_cast < type > ( expression )
+    const_cast < type > ( expression )
+    reinterpret_cast < type > ( expression )
+    ckx_cast < type > ( expression )
+
+basic-expression
+    id-expression
+    constant-expression
+    parthed-expression
+    sizeof-expression
+
+parthed-expression
+    ( expression )
+
+sizeof-expression
+    sizeof ( expression )
 
 ckx-block
     ckx compound-statement

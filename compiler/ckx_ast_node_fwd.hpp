@@ -43,6 +43,21 @@ class ckx_ast_stmt;
     class ckx_ast_expr_stmt;
 
 class ckx_ast_expr;
+    class ckx_ast_binary_expr;
+    class ckx_ast_unary_expr;
+        class ckx_ast_unary_usual_expr;
+        class ckx_ast_cast_expr;
+    class ckx_ast_postfix_expr;
+        class ckx_ast_subscript_expr;
+        class ckx_ast_invoke_expr;
+    class ckx_ast_assign_expr;
+    class ckx_ast_cond_expr;
+    class ckx_ast_basic_expr;
+        class ckx_ast_id_expr;
+        class ckx_ast_parthed_expr;
+        class ckx_ast_const_expr;
+        class ckx_ast_sizeof_expr;
+
 class ckx_ast_init_decl;
 
 } // namespace ckx
