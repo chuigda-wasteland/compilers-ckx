@@ -6,6 +6,7 @@ A general purposed programming language -- for my honey -- chenkx
 <hr/>
 
 ## Original idea
+
 Originally I decided to write a C compiler as a practice in my university. And it may also become a good compiler for freshmens to learn how to build compilers.
 
 But unfortunately, I don't like the `array` in C
@@ -45,6 +46,7 @@ The first line `import std.io` uses ckx keyword `import` to import `io` utility 
 the `ckx block` is equivalent to the `main` function in C or C++. it returns an integer of type `vi16`.
 
 ### Basic data types
+
 Instead of using type names like `int` and `long`, ckx explicitly label the size/capacity in type names.
 
 * `vi8` `vi16` `vi32` and `vi64` represents signed integers of size 8/16/32/64 bits. 
@@ -53,13 +55,14 @@ Instead of using type names like `int` and `long`, ckx explicitly label the size
 * `vch` is the char type for ckx. however, still I don't know what to use for this type. the default C/C++ `char` of size 8 may be a temporary solution.
 
 ### Functions
+
 You can `declare` a function like this:
 
-	1) function add (vi16 a, vi16 b) -> vi16
+	1) fn add (vi16 a, vi16 b) : vi16
 
 And you can define a function like this:
 
-    1)  function add (vi16 a, vi16 b) -> vi16
+    1)  fn add (vi16 a, vi16 b) : vi16
     2)  {
     3)  	return a + b;
     4)  }
@@ -106,14 +109,17 @@ Pointers in ckx is the same as pointers in C. The powerful low-level operator.
 ### Other special features
 
 ##### Type casts
+
 * Only integers could be implicitly promoted. for example, promoting from `vi8` to `vi16`, or from `vu8` to `vu64`.
 * Signed integers will not be implicitly converted to unsigned ints. Vice versa.
 * Integers will not be implicitly converted to floats. And floats will also not be implicitly converted to ints.
 * Enumerators are actually integer constants. However, they have their individual type so will not be implicitly converted to integers. Integers also could not be implicitly converted to enums.
 
 ##### Function overloading
+
 * Function overloading is one targeted feature of ckx.
 * Currently I ~~The programmer~~ am not familiar with function overloading, name mangling... So I need some help.
 
 ##### Closures
+
 > Still under work. If you have a good idea about it, contact me and I'll be appreciated.
