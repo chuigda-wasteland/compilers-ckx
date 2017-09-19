@@ -156,4 +156,40 @@ void ckx_ast_enum_stmt::ast_dump(FILE *_fp, qint8 _level)
     Q_UNUSED(_level);
 }
 
+void ckx_ast_binary_expr::ast_dump(FILE *_fp, qint8 _level)
+{
+    Q_UNUSED(_fp);
+    Q_UNUSED(_level);
+}
+
+void ckx_ast_unary_expr::ast_dump(FILE *_fp, qint8 _level)
+{
+    Q_UNUSED(_fp);
+    Q_UNUSED(_level);
+}
+
+void ckx_ast_subscript_expr::ast_dump(FILE *_fp, qint8 _level)
+{
+    Q_UNUSED(_fp);
+    Q_UNUSED(_level);
+}
+
+void ckx_ast_invoke_expr::ast_dump(FILE *_fp, qint8 _level)
+{
+    Q_UNUSED(_fp);
+    Q_UNUSED(_level);
+}
+
+void ckx_ast_cond_expr::ast_dump(FILE *_fp, qint8 _level)
+{
+    Q_UNUSED(_fp);
+    Q_UNUSED(_level);
+}
+
+void ckx_ast_id_expr::ast_dump(FILE *_fp, qint8 _level)
+{
+    Q_UNUSED(_fp);
+    Q_UNUSED(_level);
+}
+
 } // namespace ckx

@@ -236,4 +236,97 @@ ckx_ast_enum_stmt::ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token,
 
 ckx_ast_enum_stmt::~ckx_ast_enum_stmt() {}
 
+
+
+ckx_ast_expr::ckx_ast_expr(saber_ptr<ckx_token> _at_token) :
+    ckx_ast_node(_at_token)
+{}
+
+ckx_ast_expr::~ckx_ast_expr() {}
+
+ckx_ast_binary_expr::ckx_ast_binary_expr(saber_ptr<ckx_token> _at_token,
+                                         ckx_token::type _opercode,
+                                         ckx_ast_expr *_loperand,
+                                         ckx_ast_expr *_roperand) :
+    ckx_ast_expr(_at_token),
+    opercode(_opercode),
+    loperand(_loperand),
+    roperand(_roperand)
+{}
+
+ckx_ast_binary_expr::~ckx_ast_binary_expr()
+{
+    delete loperand;
+    delete roperand;
+}
+
+ckx_ast_unary_expr::ckx_ast_unary_expr(saber_ptr<ckx_token> _at_token,
+                                       ckx_token::type _opercode,
+                                       ckx_ast_expr *_operand) :
+    ckx_ast_expr(_at_token),
+    opercode(_opercode),
+    operand(_operand)
+{}
+
+ckx_ast_unary_expr::~ckx_ast_unary_expr()
+{
+    delete operand;
+}
+
+ckx_ast_subscript_expr::ckx_ast_subscript_expr(saber_ptr<ckx_token> _at_token,
+                                               ckx_ast_expr *_base,
+                                               ckx_ast_expr *_subscript) :
+    ckx_ast_expr(_at_token),
+    base(_base),
+    subscript(_subscript)
+{}
+
+ckx_ast_subscript_expr::~ckx_ast_subscript_expr()
+{
+    delete base;
+    delete subscript;
+}
+
+ckx_ast_invoke_expr::ckx_ast_invoke_expr(
+        saber_ptr<ckx_token> _at_token,
+        ckx_ast_expr *_invokable,
+        saber::vector<ckx_ast_expr *> &&_args) :
+    ckx_ast_expr(_at_token),
+    invokable(_invokable),
+    args(saber::move(_args))
+{
+}
+
+ckx_ast_invoke_expr::~ckx_ast_invoke_expr()
+{
+    delete invokable;
+    for (auto& arg : args) delete arg;
+}
+
+ckx_ast_cond_expr::ckx_ast_cond_expr(saber_ptr<ckx_token> _at_token,
+                                     ckx_ast_expr *_cond_expr,
+                                     ckx_ast_expr *_then_expr,
+                                     ckx_ast_expr *_else_expr) :
+    ckx_ast_expr(_at_token),
+    cond_expr(_cond_expr),
+    then_expr(_then_expr),
+    else_expr(_else_expr)
+{}
+
+ckx_ast_cond_expr::~ckx_ast_cond_expr()
+{
+    delete cond_expr;
+    delete then_expr;
+    delete else_expr;
+}
+
+ckx_ast_id_expr::ckx_ast_id_expr(saber_ptr<ckx_token> _at_token,
+                                 ckx_var_entry *_entry) :
+    ckx_ast_expr(_at_token),
+    entry(_entry)
+{}
+
+ckx_ast_id_expr::~ckx_ast_id_expr()
+{}
+
 } // namespace ckx

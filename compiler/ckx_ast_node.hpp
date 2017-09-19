@@ -22,7 +22,7 @@
 #include "defs.hpp"
 
 #include "memory.hpp"
-#include "string.hpp"
+#include "string_pool.hpp"
 #include "vector.hpp"
 #include "list.hpp"
 
@@ -224,22 +224,6 @@ private:
     ckx_ast_expr *expr;
 };
 
-
-class ckx_ast_expr implements ckx_ast_node
-{
-public:
-    virtual ~ckx_ast_expr() = default;
-
-    /// @attention temporary
-    void ast_dump(FILE *_fp, qint8 _level) override final
-    {
-        Q_UNUSED(_fp);
-        Q_UNUSED(_level);
-    }
-
-    Q_ON_HOLD(...)
-};
-
 class ckx_ast_func_stmt implements ckx_ast_stmt
 {
 public:
@@ -314,6 +298,122 @@ public:
 private:
     ckx_type_entry *entry;
 };
+
+
+
+interface ckx_ast_expr implements ckx_ast_node
+{
+public:
+    ckx_ast_expr(saber_ptr<ckx_token> _at_token);
+    virtual ~ckx_ast_expr() = 0;
+
+    virtual void ast_dump(FILE *_fp, qint8 _level) = 0;
+};
+
+class ckx_ast_binary_expr final implements ckx_ast_expr
+{
+public:
+    ckx_ast_binary_expr(saber_ptr<ckx_token> _at_token,
+                        ckx_token::type _opercode,
+                        ckx_ast_expr *_loperand,
+                        ckx_ast_expr *_roperand);
+    ~ckx_ast_binary_expr() override final;
+
+    void ast_dump(FILE* _fp, qint8 _level) override final;
+
+private:
+    ckx_token::type opercode;
+    ckx_ast_expr *loperand;
+    ckx_ast_expr *roperand;
+};
+
+class ckx_ast_unary_expr final implements ckx_ast_expr
+{
+public:
+    ckx_ast_unary_expr(saber_ptr<ckx_token> _at_token,
+                       ckx_token::type _opercode,
+                       ckx_ast_expr *_operand);
+    ~ckx_ast_unary_expr() override final;
+
+    void ast_dump(FILE* _fp, qint8 _level) override final;
+
+private:
+    ckx_token::type opercode;
+    ckx_ast_expr *operand;
+};
+
+class ckx_ast_subscript_expr final implements ckx_ast_expr
+{
+public:
+    ckx_ast_subscript_expr(saber_ptr<ckx_token> _at_token,
+                           ckx_ast_expr *_base,
+                           ckx_ast_expr *_subscript);
+    ~ckx_ast_subscript_expr() override final;
+
+    void ast_dump(FILE *_fp, qint8 _level) override final;
+
+private:
+    ckx_ast_expr *base;
+    ckx_ast_expr *subscript;
+};
+
+class ckx_ast_invoke_expr final implements ckx_ast_expr
+{
+public:
+    ckx_ast_invoke_expr(saber_ptr<ckx_token> _at_token,
+                        ckx_ast_expr *_invokable,
+                        saber::vector<ckx_ast_expr*> &&_args);
+    ~ckx_ast_invoke_expr() override final;
+
+    void ast_dump(FILE* _fp, qint8 _level) override final;
+
+private:
+    ckx_ast_expr *invokable;
+    saber::vector<ckx_ast_expr*> args;
+};
+
+class ckx_ast_cond_expr final implements ckx_ast_expr
+{
+public:
+    ckx_ast_cond_expr(saber_ptr<ckx_token> _at_token,
+                      ckx_ast_expr* _cond_expr,
+                      ckx_ast_expr* _then_expr,
+                      ckx_ast_expr* _else_expr);
+    ~ckx_ast_cond_expr() override final;
+
+    void ast_dump(FILE* _fp, qint8 _level) override final;
+
+private:
+    ckx_ast_expr* cond_expr;
+    ckx_ast_expr* then_expr;
+    ckx_ast_expr* else_expr;
+};
+
+class ckx_ast_id_expr final implements ckx_ast_expr
+{
+public:
+    ckx_ast_id_expr(saber_ptr<ckx_token> _at_token, ckx_var_entry* _entry);
+    ~ckx_ast_id_expr() override final;
+
+    void ast_dump(FILE* _fp, qint8 _level) override final;
+
+private:
+    ckx_var_entry *entry;
+};
+
+/**
+    @note maybe we can use constant-expression in place of sizeof-expression
+class ckx_ast_sizeof_expr final implements ckx_ast_expr
+{
+public:
+    ckx_ast_sizeof_expr(saber_ptr<ckx_token> _at_token,
+                        saber_ptr<ckx_type> _type);
+    ~ckx_ast_sizeof_expr() override final;
+
+private:
+    saber_ptr<ckx_type> type;
+};
+*/
 
 } // namespace ckx
 
