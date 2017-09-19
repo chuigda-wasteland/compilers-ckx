@@ -41,6 +41,9 @@ public:
     ckx_file_reader() = default;
     virtual ~ckx_file_reader() = 0;
     virtual qchar get_next_char(void) = 0;
+
+    ckx_file_reader(const ckx_file_reader& _another) = delete;
+    ckx_file_reader* operator= (const ckx_file_reader& _another) = delete;
 };
 
 
@@ -50,6 +53,9 @@ public:
     explicit ckx_fp_reader(std::FILE* _fp);
     ~ckx_fp_reader() override final;
     qchar get_next_char() override final;
+
+    ckx_fp_reader(const ckx_fp_reader& _another) = delete;
+    ckx_fp_reader& operator= (const ckx_fp_reader& _another) = delete;
 
 private:
     detail::ckx_fp_reader_impl *impl;
@@ -62,6 +68,9 @@ public:
     explicit ckx_istream_reader(std::istream& _stream);
     ~ckx_istream_reader() override final;
     qchar get_next_char() override final;
+
+    ckx_istream_reader(const ckx_istream_reader& _another) = delete;
+    ckx_istream_reader& operator= (const ckx_istream_reader& _another) = delete;
 
 private:
     detail::ckx_istream_reader_impl *impl;

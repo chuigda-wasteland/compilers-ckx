@@ -46,6 +46,9 @@ public:
     virtual void write(qreal _value) = 0;
     virtual void write(const qchar* _str) = 0;
     virtual void write_whitespace(qsizet _count) = 0;
+
+    ckx_file_writer(const ckx_file_writer& _another) = delete;
+    ckx_file_writer& operator= (const ckx_file_writer& _another) = delete;
 };
 
 class ckx_fp_writer final implements ckx_file_writer
@@ -59,6 +62,9 @@ public:
     void write(qreal _value) override final;
     void write(const qchar* _str) override final;
     void write_whitespace(qsizet _count) override final;
+
+    ckx_fp_writer(const ckx_fp_writer& _another) = delete;
+    ckx_fp_writer& operator= (const ckx_fp_writer& _another) = delete;
 
 private:
     detail::ckx_fp_writer_impl *impl;
@@ -75,6 +81,9 @@ public:
     void write(qreal _value) override final;
     void write(const qchar* _str) override final;
     void write_whitespace(qsizet _count) override final;
+
+    ckx_ostream_writer(const ckx_ostream_writer& _another) = delete;
+    ckx_ostream_writer& operator= (const ckx_ostream_writer& _another) = delete;
 
 private:
     detail::ckx_ostream_writer_impl *impl;

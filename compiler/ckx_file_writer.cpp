@@ -12,7 +12,7 @@ namespace detail
 class ckx_fp_writer_impl
 {
 public:
-    ckx_fp_writer_impl(std::FILE* _fp);
+    explicit ckx_fp_writer_impl(std::FILE* _fp);
     ~ckx_fp_writer_impl() = default;
 
     inline void write_impl(qint64 _value);
@@ -28,7 +28,7 @@ private:
 class ckx_ostream_writer_impl
 {
 public:
-    ckx_ostream_writer_impl(std::ostream &_stream);
+    explicit ckx_ostream_writer_impl(std::ostream &_stream);
     ~ckx_ostream_writer_impl() = default;
 
     template <typename AnyType> inline void write_impl(AnyType&& _any_v);

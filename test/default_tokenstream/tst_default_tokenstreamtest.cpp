@@ -40,7 +40,7 @@ static bool do_test_ckx_token_stream_1(void)
 #undef GGLEX
     };
 
-    ckx_test_filereader reader = ckx_test_filereader(saber::move(str));
+    ckx_test_filereader reader(saber::move(str));
     ckx_default_token_stream stream = ckx_default_token_stream(reader);
 
     for (qsizet i = 0;
@@ -65,7 +65,7 @@ static bool do_test_ckx_token_stream_2(void)
 #undef VYLEX
     ;
 
-    ckx_test_filereader reader = ckx_test_filereader(saber::move(str));
+    ckx_test_filereader reader(saber::move(str));
     ckx_default_token_stream stream = ckx_default_token_stream(reader);
 
     saber::vector<saber_string> comparsion =
@@ -111,7 +111,7 @@ static bool do_test_ckx_token_stream_3()
 #undef VY2LEX
     };
 
-    ckx_test_filereader reader = ckx_test_filereader(saber::move(str));
+    ckx_test_filereader reader(saber::move(str));
     ckx_default_token_stream stream = ckx_default_token_stream(reader);
 
     for (qsizet i = 0;
@@ -146,7 +146,7 @@ static bool do_test_ckx_token_stream_4()
 #undef VY3LEX
     };
 
-    ckx_test_filereader reader = ckx_test_filereader(saber::move(str));
+    ckx_test_filereader reader(saber::move(str));
     ckx_default_token_stream stream = ckx_default_token_stream(reader);
 
     for (qsizet i = 0;
@@ -181,7 +181,7 @@ static bool do_test_ckx_token_stream_5()
 #undef VY4LEX
     };
 
-    ckx_test_filereader reader = ckx_test_filereader(saber::move(str));
+    ckx_test_filereader reader(saber::move(str));
     ckx_default_token_stream stream = ckx_default_token_stream(reader);
 
     for (qsizet i = 0;
