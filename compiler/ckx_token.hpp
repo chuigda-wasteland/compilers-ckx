@@ -113,7 +113,7 @@ open_class ckx_token
 
         tk_operator,           // operator
 
-        tk_id        ,         // identifier
+        tk_id,                 // identifier
 
         tk_vi_literal,         // int literal
         // reserved
