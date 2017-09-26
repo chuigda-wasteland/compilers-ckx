@@ -113,5 +113,7 @@ void ckx_ast_cond_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 void ckx_ast_id_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 { Q_UNUSED(_writer); Q_UNUSED(_level); }
 
+void ckx_ast_sizeof_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
+{ Q_UNUSED(_writer); Q_UNUSED(_level); }
 
 } // namespace ckx
