@@ -85,8 +85,8 @@ private:
     inline void next_char();
     inline void next_line();
 
-    inline void lex_error(const char* _desc);
-    inline void lex_warn(const char* _desc);
+    inline void lex_error(saber_string &&);
+    inline void lex_warn(saber_string &&);
 
     qcoord char_coord_temp;
     qsizet char_index_temp;
@@ -681,14 +681,18 @@ inline void ckx_default_token_stream_impl::next_line()
 
 
 
-inline void ckx_default_token_stream_impl::lex_error(const char *_desc)
+inline void ckx_default_token_stream_impl::lex_error(saber_string&& _desc)
 {
-    errors.emplace_back(char_coord(), saber_string(_desc), true);
+    errors.emplace_back(
+        char_coord(), saber_string_pool::get().create_view(saber::move(_desc)),
+        true);
 }
 
-inline void ckx_default_token_stream_impl::lex_warn(const char *_desc)
+inline void ckx_default_token_stream_impl::lex_warn(saber_string&& _desc)
 {
-    errors.emplace_back(char_coord(), saber_string(_desc), false);
+    errors.emplace_back(
+        char_coord(), saber_string_pool::get().create_view(saber::move(_desc)),
+        true);
 }
 
 } // namespace detail

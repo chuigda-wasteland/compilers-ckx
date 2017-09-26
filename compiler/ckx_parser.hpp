@@ -21,6 +21,7 @@
 
 #include "ckx_token_stream.hpp"
 #include "ckx_ast_node_fwd.hpp"
+#include "list.hpp"
 
 namespace ckx
 {
@@ -37,10 +38,25 @@ template <typename CkxTokenStream>
 class ckx_parser
 {
 public:
+    struct parse_result
+    {
+        parse_result(ckx_ast_translation_unit *_trans_unit,
+                     saber::list<ckx_error*> *_error_list,
+                     saber::list<ckx_error*> *_warn_list);
+        ~parse_result();
+
+        parse_result(const parse_result& _another) = delete;
+        parse_result(parse_result&& _another);
+
+        ckx_ast_translation_unit *trans_unit;
+        saber::list<ckx_error*> *error_list;
+        saber::list<ckx_error*> *warn_list;
+    };
+
     ckx_parser();
     ~ckx_parser();
 
-    ckx_ast_translation_unit* parse(saber_ptr<CkxTokenStream> _token_stream);
+    parse_result parse(saber_ptr<CkxTokenStream> _token_stream);
 
 private:
     detail::ckx_parser_impl<CkxTokenStream>* p_impl;

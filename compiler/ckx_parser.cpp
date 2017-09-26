@@ -36,8 +36,8 @@ public:
     explicit ckx_parser_impl() = default;
     ~ckx_parser_impl() = default;
 
-    ckx_ast_translation_unit* parse_impl(
-            saber_ptr<CkxTokenStream> _token_stream);
+    typename ckx_parser<CkxTokenStream>::parse_result
+    parse_impl(saber_ptr<CkxTokenStream> _token_stream);
 
 private:
     /// @brief General parsing functions
@@ -98,10 +98,44 @@ private:
 private:
     saber_ptr<CkxTokenStream> token_stream;
     ckx_env *current_env;
+
+    saber::list<ckx_error*> *error_list = nullptr;
+    saber::list<ckx_error*> *warn_list = nullptr;
 };
 
 } // namespace detail
 
+
+
+template <typename CkxTokenStream>
+ckx_parser<CkxTokenStream>::parse_result::parse_result(
+        ckx_ast_translation_unit *_trans_unit,
+        saber::list<ckx_error*> *_error_list,
+        saber::list<ckx_error*> *_warn_list) :
+    trans_unit(_trans_unit),
+    error_list(_error_list),
+    warn_list(_warn_list)
+{}
+
+template <typename CkxTokenStream>
+ckx_parser<CkxTokenStream>::parse_result::~parse_result()
+{
+    /// @todo
+    /// Note that we are still not sure that who's about to release resources.
+    /// We may add several lines of codes here.
+}
+
+template <typename CkxTokenStream>
+ckx_parser<CkxTokenStream>::parse_result::parse_result(
+        parse_result &&_another) :
+    trans_unit(_another.trans_unit),
+    error_list(_another.error_list),
+    warn_list(_another.warn_list)
+{
+    _another.trans_unit = nullptr;
+    _another.error_list = nullptr;
+    _another.warn_list = nullptr;
+}
 
 
 template <typename CkxTokenStream>
@@ -117,7 +151,7 @@ ckx_parser<CkxTokenStream>::~ckx_parser()
 }
 
 template <typename CkxTokenStream>
-ckx_ast_translation_unit*
+typename ckx_parser<CkxTokenStream>::parse_result
 ckx_parser<CkxTokenStream>::parse(saber_ptr<CkxTokenStream> _token_stream)
 {
     return p_impl->parse_impl(_token_stream);
@@ -133,21 +167,29 @@ namespace detail
 {
 
 template <typename CkxTokenStream>
-ckx_ast_translation_unit*
+typename ckx_parser<CkxTokenStream>::parse_result
 ckx_parser_impl<CkxTokenStream>::parse_impl(
         saber_ptr<CkxTokenStream> _token_stream)
 {
-    this->token_stream = _token_stream;
+    token_stream = _token_stream;
+    error_list = new saber::list<ckx_error*>;
+    warn_list = new saber::list<ckx_error*>;
 
-    ckx_ast_translation_unit *ret =
+    ckx_ast_translation_unit *trans_unit =
          new ckx_ast_translation_unit(current_token());
 
     enter_scope(new ckx_env(nullptr));
     while (current_token()->token_type != ckx_token::type::tk_eoi)
     {
-        ret->add_new_stmt(parse_global_stmt());
+        trans_unit->add_new_stmt(parse_global_stmt());
     }
     leave_scope();
+
+    typename ckx_parser<CkxTokenStream>::parse_result ret =
+         typename ckx_parser<CkxTokenStream>::parse_result(
+             trans_unit, error_list, warn_list);
+    trans_unit = nullptr;
+    warn_list = nullptr;
     return ret;
 }
 
@@ -170,6 +212,9 @@ ckx_parser_impl<CkxTokenStream>::parse_global_stmt()
     case ckx_token::type::tk_vr64:
         return parse_decl_stmt();
 
+    /// @attention
+    /// Note that currently it is impossible for enum-type :: enumerator
+    /// to appear in global statements.
     case ckx_token::type::tk_id:
         if ( is_typename(current_token()) )
             return parse_decl_stmt();
@@ -200,7 +245,7 @@ ckx_parser_impl<CkxTokenStream>::parse_global_stmt()
     default:
     parse_decl_with_id_typename_failed:
         syntax_error(
-            "Expected : typename, 'function', 'struct', 'variant' or 'enum'"
+            "Expected : typename, 'fn', 'struct', 'variant' or 'enum'"
             " as the commemce of global declaration.",
             current_token()->position);
         return nullptr;
