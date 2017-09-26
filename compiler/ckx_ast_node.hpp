@@ -52,9 +52,7 @@ private:
     saber_ptr<ckx_token> at_token;
 };
 
-
-
-class ckx_ast_translation_unit implements ckx_ast_node
+class ckx_ast_translation_unit final implements ckx_ast_node
 {
 public:
     explicit ckx_ast_translation_unit(saber_ptr<ckx_token> _at_token);
@@ -67,8 +65,6 @@ private:
     saber::vector<ckx_ast_stmt*> stmts;
     ckx_env *global_table;
 };
-
-
 
 interface ckx_ast_stmt implements ckx_ast_node
 {
@@ -246,13 +242,13 @@ private:
     ckx_ast_compound_stmt *fnbody = nullptr;
 };
 
-class ckx_ast_init_decl implements ckx_ast_node
+class ckx_ast_init_decl final implements ckx_ast_node
 {
 public:
     ckx_ast_init_decl(saber_ptr<ckx_token> _at_token,
                       ckx_var_entry* _entry,
                       ckx_ast_expr* _init);
-    virtual ~ckx_ast_init_decl() final;
+    virtual ~ckx_ast_init_decl() override final;
 
     void ast_dump(ckx_file_writer& _fp, quint16 _level) override final;
 
@@ -266,7 +262,7 @@ class ckx_ast_struct_stmt final implements ckx_ast_stmt
 public:
     ckx_ast_struct_stmt(saber_ptr<ckx_token> _at_token,
                    ckx_type_entry* _entry);
-    ~ckx_ast_struct_stmt();
+    ~ckx_ast_struct_stmt() override final;
 
     void ast_dump(ckx_file_writer& _fp, quint16 _level) override final;
 
@@ -279,7 +275,7 @@ class ckx_ast_variant_stmt final implements ckx_ast_stmt
 public:
     ckx_ast_variant_stmt(saber_ptr<ckx_token> _at_token,
                     ckx_type_entry* _entry);
-    ~ckx_ast_variant_stmt();
+    ~ckx_ast_variant_stmt() override final;
 
     void ast_dump(ckx_file_writer& _fp, quint16 _level) override final;
 
@@ -292,7 +288,7 @@ class ckx_ast_enum_stmt final implements ckx_ast_stmt
 public:
     ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token,
                       ckx_type_entry* _entry);
-    ~ckx_ast_enum_stmt();
+    ~ckx_ast_enum_stmt() override final;
 
     void ast_dump(ckx_file_writer& _fp, quint16 _level) override final;
 
