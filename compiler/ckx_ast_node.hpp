@@ -226,11 +226,11 @@ class ckx_ast_func_stmt implements ckx_ast_stmt
 public:
     ckx_ast_func_stmt(saber_ptr<ckx_token> _at_token,
                       ckx_func_entry *_entry,
-                      ckx_env *_param_env_table);
+                      ckx_env *_param_env_table,
+                      saber::vector<ckx_ast_init_decl*>&& _param_decls);
     ~ckx_ast_func_stmt();
 
     bool is_defined() const;
-
     ckx_env* get_param_env_table();
     void define(ckx_ast_compound_stmt* _fnbody);
 
@@ -240,6 +240,7 @@ private:
     ckx_func_entry *entry;
     ckx_env *param_env_table;
     ckx_ast_compound_stmt *fnbody = nullptr;
+    saber::vector<ckx_ast_init_decl*> param_decls;
 };
 
 class ckx_ast_init_decl final implements ckx_ast_node

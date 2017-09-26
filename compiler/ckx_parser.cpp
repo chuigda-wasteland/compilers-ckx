@@ -327,13 +327,17 @@ ckx_parser_impl<CkxTokenStream>::parse_func_stmt()
     expect_n_eat(ckx_token::type::tk_lparth);
     ckx_env *param_env = new ckx_env(env());
     saber::vector<saber_ptr<ckx_type>> param_type_list;
+    saber::vector<ckx_ast_init_decl*> param_decl_list;
     enter_scope(param_env);
     while (1)
     {
-        saber_ptr<ckx_type> arg_type = parse_type();
-        saber_string_view arg_name = current_token()->str;
-        env()->add_new_var(arg_name, arg_type);
-        param_type_list.push_back(arg_type);
+        saber_ptr<ckx_token> param_at_token = current_token();
+        saber_ptr<ckx_type> param_type = parse_type();
+        saber_string_view param_name = current_token()->str;
+        auto add_result = env()->add_new_var(param_name, param_type);
+        param_type_list.push_back(param_type);
+        param_decl_list.push_back(
+             new ckx_ast_init_decl(param_at_token, add_result.second, nullptr));
 
         if (current_token()->token_type == ckx_token::type::tk_comma)
             continue;
@@ -360,7 +364,8 @@ ckx_parser_impl<CkxTokenStream>::parse_func_stmt()
         next_token();
     }
 
-    return new ckx_ast_func_stmt(at_token, add_result.second, param_env);
+    return new ckx_ast_func_stmt(at_token, add_result.second, param_env,
+                                 saber::move(param_decl_list));
 }
 
 template <typename CkxTokenStream>
