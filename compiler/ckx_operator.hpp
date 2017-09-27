@@ -18,6 +18,8 @@ enum class ckx_op : qchar
     op_deref,
     op_bit_not,
     op_logic_not,
+    op_inc,
+    op_dec,
 
     /// @note binary-operators
     op_add,
@@ -42,6 +44,7 @@ enum class ckx_op : qchar
 
     /// @note assignment-operators
     /// @attention assignment may also be treated as common binary operators.
+    op_assign,
     op_add_assign,
     op_sub_assign,
     op_mul_assign,
