@@ -44,6 +44,9 @@ open_class ckx_token
         tk_div_assign,         // /=
         tk_mod_assign,         // %=
 
+        tk_inc,                // ++
+        tk_dec,                // --
+
         tk_bit_and,            // &
         tk_bit_or,             // |
         tk_bit_not,            // ~

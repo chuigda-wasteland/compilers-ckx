@@ -67,6 +67,7 @@ private:
     void solve_numbers();
     void solve_char_literal();
     void solve_bitwise_or_logic_op();
+    void solve_add_n_sub();
     void solve_op_or_opassign();
     void solve_colon_or_scope();
     void solve_ordinary_op();
@@ -224,8 +225,12 @@ void ckx_default_token_stream_impl::do_split_tokens()
         case '&': case '|': case '^':
             solve_bitwise_or_logic_op(); break;
 
-        case '+': case '-': case '*': case '/': case '%':
-        case '!': case '<': case '>': case '=':
+        case '+': case '-':
+            /// @details now + and - must be solved separately.
+            solve_add_n_sub(); break;
+
+        case '*': case '/': case '%': case '!': case '<':
+        case '>': case '=':
             /// @details
             /// the processing of >=, <=, != and == is similar to op=,
             /// so we combine them in one function solve_op_or_opassign().
@@ -434,6 +439,45 @@ void ckx_default_token_stream_impl::solve_bitwise_or_logic_op()
     if (is_logic) next_char();
 }
 
+void ckx_default_token_stream_impl::solve_add_n_sub()
+{
+    ckx_token::type new_token_type;
+    qchar op = ch();
+    next_char();
+
+    if (ch() == op)
+    {
+        switch (op)
+        {
+        case '+': new_token_type = ckx_token::type::tk_inc; break;
+        case '-': new_token_type = ckx_token::type::tk_dec; break;
+        default: assert(false); // What the fuck!
+        }
+        next_char();
+    }
+    else if (ch() == '=')
+    {
+        switch (op)
+        {
+        case '+': new_token_type = ckx_token::type::tk_add_assign; break;
+        case '-': new_token_type = ckx_token::type::tk_sub_assign; break;
+        default: assert(false); // What the fuck!
+        }
+        next_char();
+    }
+    else
+    {
+        switch (op)
+        {
+        case '+': new_token_type = ckx_token::type::tk_add; break;
+        case '-': new_token_type = ckx_token::type::tk_sub; break;
+        default: assert(false); // What the fuck!
+        }
+    }
+
+    token_buffer.emplace_back(new ckx_token(char_coord(), new_token_type));
+}
+
 void ckx_default_token_stream_impl::solve_op_or_opassign()
 {
     ckx_token::type new_token_type;
@@ -444,16 +488,6 @@ void ckx_default_token_stream_impl::solve_op_or_opassign()
 
     switch (op)
     {
-    case '+':
-        new_token_type = is_opassign ? ckx_token::type::tk_add_assign :
-                                       ckx_token::type::tk_add;
-        break;
-
-    case '-':
-        new_token_type = is_opassign ? ckx_token::type::tk_sub_assign :
-                                       ckx_token::type::tk_sub;
-        break;
-
     case '*':
         new_token_type = is_opassign ? ckx_token::type::tk_mul_assign :
                                        ckx_token::type::tk_mul;
