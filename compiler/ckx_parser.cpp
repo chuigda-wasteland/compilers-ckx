@@ -53,6 +53,7 @@ ckx_parser<CkxTokenStream>::parse_result::parse_result(
 }
 
 
+
 template <typename CkxTokenStream>
 ckx_parser<CkxTokenStream>::ckx_parser()
 {
@@ -557,7 +558,140 @@ template <typename CkxTokenStream>
 ckx_ast_expr*
 ckx_parser_impl<CkxTokenStream>::parse_expr()
 {
-    /// @todo ...
+    return parse_assign_expr();
+}
+
+template <typename CkxTokenStream>
+ckx_ast_expr*
+ckx_parser_impl<CkxTokenStream>::parse_cond_expr()
+{
+    saber_ptr<ckx_token> at_token = current_token();
+
+    ckx_ast_expr *binary_expr =
+         parse_binary_expr(
+             ckx_op_helper::precedence(ckx_op::op_unary_positive));
+
+    if (current_token()->token_type == ckx_token::type::tk_ques)
+    {
+        next_token();
+        ckx_ast_expr *then_expr = parse_expr();
+        expect_n_eat(ckx_token::type::tk_colon);
+        ckx_ast_expr *else_expr = parse_expr();
+
+        return new ckx_ast_cond_expr(
+            at_token, binary_expr, then_expr, else_expr);
+    }
+    return binary_expr;
+}
+
+template <typename CkxTokenStream>
+ckx_ast_expr*
+ckx_parser_impl<CkxTokenStream>::parse_binary_expr(quint8 _prec)
+{
+    saber_ptr<ckx_token> at_token = current_token();
+
+    ckx_ast_expr *expr = parse_unary_expr();
+    ckx_op op = ckx_op_helper::token2binary(current_token()->token_type);
+    quint8 new_prec;
+    while (ckx_op_helper::is_binary(op)
+           && (new_prec=ckx_op_helper::precedence(op)) >= _prec)
+    {
+        next_token();
+
+        ckx_ast_expr *binary_expr =
+            new ckx_ast_binary_expr(
+                 at_token, op, expr, parse_binary_expr(new_prec+1));
+        expr = binary_expr;
+        op = ckx_op_helper::token2binary(current_token()->token_type);
+    }
+    return expr;
+}
+
+template <typename CkxTokenStream>
+ckx_ast_expr*
+ckx_parser_impl<CkxTokenStream>::parse_assign_expr()
+{
+    saber_ptr<ckx_token> at_token = current_token();
+    ckx_ast_expr *expr = parse_cond_expr();
+
+    ckx_op current_op =
+        ckx_op_helper::token2binary(current_token()->token_type);
+    if (ckx_op_helper::is_assign(current_op))
+    {
+        next_token();
+        return new ckx_ast_binary_expr(
+            at_token, current_op, expr, parse_assign_expr());
+    }
+    return expr;
+}
+
+template <typename CkxTokenStream>
+ckx_ast_cast_expr*
+ckx_parser_impl<CkxTokenStream>::parse_cast_expr()
+{
+    saber_ptr<ckx_token> at_token = current_token();
+
+    ckx_ast_cast_expr::castop castop;
+    switch (current_token()->token_type)
+    {
+    case ckx_token::type::tk_static_cast:
+        castop = ckx_ast_cast_expr::castop::cst_static; break;
+    case ckx_token::type::tk_const_cast:
+        castop = ckx_ast_cast_expr::castop::cst_const; break;
+    case ckx_token::type::tk_reinterpret_cast:
+        castop = ckx_ast_cast_expr::castop::cst_reinterpret; break;
+    case ckx_token::type::tk_ckx_cast:
+        castop = ckx_ast_cast_expr::castop::cst_ckx; break;
+    default: assert(false); // What the fuck!
+    }
+    next_token();
+    expect_n_eat(ckx_token::type::tk_lt);
+    saber_ptr<ckx_type> desired_type = parse_type();
+    expect_n_eat(ckx_token::type::tk_gt);
+    expect_n_eat(ckx_token::type::tk_lparth);
+    ckx_ast_expr *expr = parse_expr();
+    expect_n_eat(ckx_token::type::tk_rparth);
+
+    return new ckx_ast_cast_expr(at_token, castop, desired_type, expr);
+}
+
+template <typename CkxTokenStream>
+ckx_ast_expr*
+ckx_parser_impl<CkxTokenStream>::parse_unary_expr()
+{
+    saber_ptr<ckx_token> at_token = current_token();
+
+    switch (current_token()->token_type)
+    {
+    case ckx_token::type::tk_static_cast:
+    case ckx_token::type::tk_const_cast:
+    case ckx_token::type::tk_reinterpret_cast:
+    case ckx_token::type::tk_ckx_cast:
+        return parse_cast_expr();
+
+    case ckx_token::type::tk_add:
+    case ckx_token::type::tk_sub:
+    case ckx_token::type::tk_bit_and:
+    case ckx_token::type::tk_mul:
+    case ckx_token::type::tk_bit_not:
+    case ckx_token::type::tk_logic_not:
+    case ckx_token::type::tk_inc:
+    case ckx_token::type::tk_dec:
+        next_token();
+        return new ckx_ast_unary_expr(
+            at_token, ckx_op_helper::token2unary(at_token->token_type),
+            parse_unary_expr());
+
+    default:
+        return parse_postfix_expr();
+    }
+}
+
+template <typename CkxTokenStream>
+ckx_ast_expr*
+ckx_parser_impl<CkxTokenStream>::parse_postfix_expr()
+{
+    saber_ptr<ckx_token> at_token = current_token();
     return nullptr;
 }
 

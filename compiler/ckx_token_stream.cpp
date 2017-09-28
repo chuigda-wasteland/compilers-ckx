@@ -241,6 +241,7 @@ void ckx_default_token_stream_impl::do_split_tokens()
 
         case '~': case ';': case ',': case '.': case '{':
         case '}': case '[': case ']': case '(': case ')':
+        case '?':
             solve_ordinary_op(); break;
 
         case 'b': case 'c': case 'd': case 'e': case 'f':
@@ -550,16 +551,17 @@ void ckx_default_token_stream_impl::solve_ordinary_op()
 
     switch (ch())
     {
-    case '~': new_token_type = ckx_token::type::tk_bit_not;   break;
-    case ';': new_token_type = ckx_token::type::tk_semicolon; break;
-    case ',': new_token_type = ckx_token::type::tk_comma;     break;
-    case '.': new_token_type = ckx_token::type::tk_dot;       break;
-    case '{': new_token_type = ckx_token::type::tk_lbrace;    break;
-    case '}': new_token_type = ckx_token::type::tk_rbrace;    break;
-    case '[': new_token_type = ckx_token::type::tk_lbracket;  break;
-    case ']': new_token_type = ckx_token::type::tk_rbracket;  break;
-    case '(': new_token_type = ckx_token::type::tk_lparth;    break;
-    case ')': new_token_type = ckx_token::type::tk_rparth;    break;
+    case '~': new_token_type = ckx_token::type::tk_bit_not;    break;
+    case ';': new_token_type = ckx_token::type::tk_semicolon;  break;
+    case ',': new_token_type = ckx_token::type::tk_comma;      break;
+    case '.': new_token_type = ckx_token::type::tk_dot;        break;
+    case '{': new_token_type = ckx_token::type::tk_lbrace;     break;
+    case '}': new_token_type = ckx_token::type::tk_rbrace;     break;
+    case '[': new_token_type = ckx_token::type::tk_lbracket;   break;
+    case ']': new_token_type = ckx_token::type::tk_rbracket;   break;
+    case '(': new_token_type = ckx_token::type::tk_lparth;     break;
+    case ')': new_token_type = ckx_token::type::tk_rparth;     break;
+    case '?': new_token_type = ckx_token::type::tk_ques;       break;
         break;
     default:
         // What the fuck!

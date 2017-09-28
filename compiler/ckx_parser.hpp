@@ -49,8 +49,8 @@ public:
         parse_result(parse_result&& _another);
 
         ckx_ast_translation_unit *trans_unit;
-        saber::list<ckx_error*> *error_list;
-        saber::list<ckx_error*> *warn_list;
+        saber::list<ckx_error*>  *error_list;
+        saber::list<ckx_error*>  *warn_list;
     };
 
     ckx_parser();

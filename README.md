@@ -1,4 +1,4 @@
-# The programming language - ckx
+﻿# The programming language - ckx
 
 A general purposed programming language -- for my honey -- chenkx
 
@@ -98,8 +98,8 @@ Pointers in ckx is the same as pointers in C. The powerful low-level operator.
     2)  vi8 *p = &i;            // Taking address
     3)  vi8 *q = heap_alloc();  // Using heap allocation
     4)  heap_free(q);           // Remember to free!
-	5)
-	6)  vi8 const* = &i;
+    5)
+    6)  vi8 const* = &i;
 
 > Note: ckx supports `T const*` but does not support `const T*`.
 

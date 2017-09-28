@@ -21,17 +21,16 @@
 
 #include "defs.hpp"
 
-#include "memory.hpp"
 #include "string_pool.hpp"
 #include "vector.hpp"
+#include "memory.hpp"
 #include "list.hpp"
 
 #include "ckx_type.hpp"
-#include "ckx_env_table.hpp"
-
 #include "ckx_token.hpp"
+#include "ckx_operator.hpp"
+#include "ckx_env_table.hpp"
 #include "ckx_file_writer.hpp"
-
 #include "ckx_ast_node_fwd.hpp"
 
 namespace ckx
@@ -312,7 +311,7 @@ class ckx_ast_binary_expr final implements ckx_ast_expr
 {
 public:
     ckx_ast_binary_expr(saber_ptr<ckx_token> _at_token,
-                        ckx_token::type _opercode,
+                        ckx_op _opercode,
                         ckx_ast_expr *_loperand,
                         ckx_ast_expr *_roperand);
     ~ckx_ast_binary_expr() override final;
@@ -320,7 +319,7 @@ public:
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
 private:
-    ckx_token::type opercode;
+    ckx_op opercode;
     ckx_ast_expr *loperand;
     ckx_ast_expr *roperand;
 };
@@ -329,14 +328,14 @@ class ckx_ast_unary_expr final implements ckx_ast_expr
 {
 public:
     ckx_ast_unary_expr(saber_ptr<ckx_token> _at_token,
-                       ckx_token::type _opercode,
+                       ckx_op _opercode,
                        ckx_ast_expr *_operand);
     ~ckx_ast_unary_expr() override final;
 
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
 private:
-    ckx_token::type opercode;
+    ckx_op opercode;
     ckx_ast_expr *operand;
 };
 
@@ -403,12 +402,7 @@ class ckx_ast_cast_expr final implements ckx_ast_expr
 {
 public:
     enum class castop : qchar
-    {
-        cst_static,
-        cst_const,
-        cst_reinterpret,
-        cst_ckx
-    };
+    { cst_static, cst_const, cst_reinterpret, cst_ckx };
 
     ckx_ast_cast_expr(saber_ptr<ckx_token> _at_token,
                       castop _op,

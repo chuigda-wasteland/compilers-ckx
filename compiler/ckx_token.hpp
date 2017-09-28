@@ -77,6 +77,7 @@ open_class ckx_token
         tk_lparth,             // (
         tk_rparth,             // )
 
+        tk_ques,               // ?
 
         tk_vi8,               // vi8
         tk_vi16,              // vi16

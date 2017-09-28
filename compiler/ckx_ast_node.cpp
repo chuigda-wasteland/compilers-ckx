@@ -253,7 +253,7 @@ ckx_ast_expr::ckx_ast_expr(saber_ptr<ckx_token> _at_token) :
 ckx_ast_expr::~ckx_ast_expr() {}
 
 ckx_ast_binary_expr::ckx_ast_binary_expr(saber_ptr<ckx_token> _at_token,
-                                         ckx_token::type _opercode,
+                                         ckx_op _opercode,
                                          ckx_ast_expr *_loperand,
                                          ckx_ast_expr *_roperand) :
     ckx_ast_expr(_at_token),
@@ -269,7 +269,7 @@ ckx_ast_binary_expr::~ckx_ast_binary_expr()
 }
 
 ckx_ast_unary_expr::ckx_ast_unary_expr(saber_ptr<ckx_token> _at_token,
-                                       ckx_token::type _opercode,
+                                       ckx_op _opercode,
                                        ckx_ast_expr *_operand) :
     ckx_ast_expr(_at_token),
     opercode(_opercode),

@@ -46,21 +46,23 @@ private:
     ckx_ast_return_stmt*    parse_return_stmt();
     ckx_ast_compound_stmt*  parse_compound_stmt();
 
-    ckx_ast_expr*            parse_conditional_expr();
-    ckx_ast_binary_expr*     parse_binary_expr();
+    ckx_ast_expr*  parse_expr();
+
+    ckx_ast_expr*  parse_cond_expr();
+    ckx_ast_expr*  parse_binary_expr(quint8 _prec);
+    ckx_ast_expr*  parse_assign_expr();
+    ckx_ast_expr*  parse_unary_expr();
+    ckx_ast_expr*  parse_postfix_expr();
+
     ckx_ast_cast_expr*       parse_cast_expr();
-    ckx_ast_unary_expr*      parse_unary_expr();
-    ckx_ast_subscript_expr*  parse_array_subscript();
-    ckx_ast_invoke_expr*     parse_func_invoke();
     ckx_ast_id_expr*         parse_id();
+    ckx_ast_invoke_expr*     parse_func_invoke();
+    ckx_ast_subscript_expr*  parse_array_subscript();
 
     template <typename CkxAstRecordStmt, typename CkxRecordType>
     CkxAstRecordStmt* parse_record_stmt();
 
 private:
-    /// @brief individual functions for expressions
-    /// @todo finish this part after we have a fully-designed expr-tree system
-    ckx_ast_expr* parse_expr();
 
     /// @fn we need this function to ease the type resolving.
     saber_ptr<ckx_type> parse_type();
