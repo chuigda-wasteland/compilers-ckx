@@ -53,7 +53,8 @@ HEADERS += \
     ../saber/include/string_pool.hpp \
     ../saber/include/string_pool.hpp \
     ckx_file_writer.hpp \
-    ckx_operator.hpp
+    ckx_operator.hpp \
+    ckx_parser_impl.hpp
 
 INCLUDEPATH += ../saber/include/
 

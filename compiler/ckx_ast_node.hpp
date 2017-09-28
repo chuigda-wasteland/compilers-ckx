@@ -399,12 +399,37 @@ private:
     ckx_var_entry *entry;
 };
 
+class ckx_ast_cast_expr final implements ckx_ast_expr
+{
+public:
+    enum class castop : qchar
+    {
+        cst_static,
+        cst_const,
+        cst_reinterpret,
+        cst_ckx
+    };
+
+    ckx_ast_cast_expr(saber_ptr<ckx_token> _at_token,
+                      castop _op,
+                      saber_ptr<ckx_type> _desired_type,
+                      ckx_ast_expr* _expr);
+    ~ckx_ast_cast_expr() override final;
+
+    void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
+
+private:
+    castop op;
+    saber_ptr<ckx_type> desired_type;
+    ckx_ast_expr *expr;
+};
+
 class ckx_ast_sizeof_expr final implements ckx_ast_expr
 {
 public:
     ckx_ast_sizeof_expr(saber_ptr<ckx_token> _at_token,
                         saber_ptr<ckx_type> _type);
-    ~ckx_ast_sizeof_expr() override final;
+    ~ckx_ast_sizeof_expr() override final = default;
 
     void ast_dump(ckx_file_writer &_writer, quint16 _level) override final;
 

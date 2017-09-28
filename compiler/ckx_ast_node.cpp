@@ -337,4 +337,25 @@ ckx_ast_id_expr::ckx_ast_id_expr(saber_ptr<ckx_token> _at_token,
 ckx_ast_id_expr::~ckx_ast_id_expr()
 {}
 
+ckx_ast_cast_expr::ckx_ast_cast_expr(saber_ptr<ckx_token> _at_token,
+                                     castop _op,
+                                     saber_ptr<ckx_type> _desired_type,
+                                     ckx_ast_expr *_expr) :
+    ckx_ast_expr(_at_token),
+    op(_op),
+    desired_type(_desired_type),
+    expr(_expr)
+{}
+
+ckx_ast_cast_expr::~ckx_ast_cast_expr()
+{
+    delete expr;
+}
+
+ckx_ast_sizeof_expr::ckx_ast_sizeof_expr(saber_ptr<ckx_token> _at_token,
+                                         saber_ptr<ckx_type> _type) :
+    ckx_ast_expr(_at_token),
+    type(_type)
+{}
+
 } // namespace ckx

@@ -51,9 +51,8 @@ class ckx_ast_expr;
     class ckx_ast_invoke_expr;
     class ckx_ast_cond_expr;
     class ckx_ast_id_expr;
-    /// @note under discussion
-    /// class ckx_ast_const_expr;
-    /// class ckx_ast_sizeof_expr;
+    class ckx_ast_cast_expr;
+    class ckx_ast_sizeof_expr;
 
 } // namespace ckx
 

@@ -61,6 +61,8 @@ public:
     static bool is_unary(ckx_op _op);
     static bool is_binary(ckx_op _op);
     static bool is_assign(ckx_op _op);
+
+    static quint8 precedence(ckx_op);
 };
 
 }
