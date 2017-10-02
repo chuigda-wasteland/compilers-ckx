@@ -25,7 +25,7 @@ public:
     typename ckx_parser<CkxTokenStream>::parse_result
     parse_impl(saber_ptr<CkxTokenStream> _token_stream);
 
-private:
+protected:
     /// @brief General parsing functions
     /// for productions, see compilers-ckx/compiler/production.txt
     ckx_ast_stmt* parse_global_stmt();
@@ -61,7 +61,7 @@ private:
     template <typename CkxAstRecordStmt, typename CkxRecordType>
     CkxAstRecordStmt* parse_record_stmt();
 
-private:
+protected:
 
     /// @fn we need this function to ease the type resolving.
     saber_ptr<ckx_type> parse_type();
@@ -90,7 +90,7 @@ private:
     /// @todo  implement these functions
     void skip2_token(const ckx_token_set& _token_set);
 
-private:
+protected:
     saber_ptr<CkxTokenStream> token_stream;
     ckx_env *current_env;
 
