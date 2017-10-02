@@ -107,7 +107,14 @@ void ckx_ast_cond_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 
 
 void ckx_ast_id_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*2);
+    _writer.write(reinterpret_cast<const qchar*>("Identifier : "));
+    _writer.write(entry->var_name);
+    _writer.write(reinterpret_cast<const qchar*>(" of type [["));
+    _writer.write(entry->var_type->to_string());
+    _writer.write(reinterpret_cast<const qchar*>("]]\n"));
+}
 
 
 void ckx_ast_cast_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
@@ -115,20 +122,30 @@ void ckx_ast_cast_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
 
 
 void ckx_ast_sizeof_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*2);
+    _writer.write(reinterpret_cast<const qchar*>("Sizeof [["));
+    _writer.write(type->to_string());
+    _writer.write(reinterpret_cast<const qchar*>("]]\n"));
+}
 
 
 void ckx_ast_vi_literal_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
 {
     _writer.write_whitespace(_level*2);
-    _writer.write(reinterpret_cast<const qchar*>("Integral literal : "));
+    _writer.write(reinterpret_cast<const qchar*>("Integral literal "));
     _writer.write(val);
     _writer.write(reinterpret_cast<const qchar*>("\n"));
 }
 
 
 void ckx_ast_vr_literal_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*2);
+    _writer.write(reinterpret_cast<const qchar*>("Real literal "));
+    _writer.write(val);
+    _writer.write(reinterpret_cast<const qchar*>("\n"));
+}
 
 
 } // namespace ckx

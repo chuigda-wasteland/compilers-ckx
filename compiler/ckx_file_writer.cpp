@@ -19,6 +19,8 @@ public:
     inline void write_impl(quint64 _value);
     inline void write_impl(qreal _value);
     inline void write_impl(const qchar* _str);
+    inline void write_impl(const saber_string& _str);
+    inline void write_impl(saber_string_view _str_view);
     inline void write_whitespace_impl(qsizet _count);
 
 private:
@@ -32,6 +34,7 @@ public:
     ~ckx_ostream_writer_impl() = default;
 
     template <typename AnyType> inline void write_impl(AnyType&& _any_v);
+    inline void write_impl(saber_string_view _str);
     inline void write_whitespace_impl(qsizet _count);
 
 private:
@@ -75,6 +78,16 @@ void ckx_fp_writer::write(const qchar *_str)
     impl->write_impl(_str);
 }
 
+void ckx_fp_writer::write(const saber_string &_str)
+{
+    impl->write_impl(_str);
+}
+
+void ckx_fp_writer::write(saber_string_view _str_view)
+{
+    impl->write_impl(_str_view);
+}
+
 void ckx_fp_writer::write_whitespace(qsizet _count)
 {
     impl->write_whitespace_impl(_count);
@@ -111,6 +124,16 @@ void ckx_ostream_writer::write(const qchar *_str)
     impl->write_impl(_str);
 }
 
+void ckx_ostream_writer::write(const saber_string &_str)
+{
+    impl->write_impl(_str);
+}
+
+void ckx_ostream_writer::write(saber_string_view _str_view)
+{
+    impl->write_impl(_str_view);
+}
+
 void ckx_ostream_writer::write_whitespace(qsizet _count)
 {
     impl->write_whitespace_impl(_count);
@@ -144,6 +167,16 @@ inline void ckx_fp_writer_impl::write_impl(const qchar *_str)
     std::fprintf(fp, "%s", _str);
 }
 
+inline void ckx_fp_writer_impl::write_impl(const saber_string &_str)
+{
+    std::fprintf(fp, "%s", _str.c_str());
+}
+
+inline void ckx_fp_writer_impl::write_impl(saber_string_view _str_view)
+{
+    std::fprintf(fp, "%s", _str_view.get().c_str());
+}
+
 inline void ckx_fp_writer_impl::write_whitespace_impl(qsizet _count)
 {
     for (qsizet i = 0; i < _count; i++) std::fputc(' ', fp);
@@ -158,6 +191,11 @@ template <typename AnyType>
 inline void ckx_ostream_writer_impl::write_impl(AnyType&& _any_v)
 {
     stream << saber::forward<AnyType>(_any_v);
+}
+
+inline void ckx_ostream_writer_impl::write_impl(saber_string_view _str_view)
+{
+    stream << _str_view.get();
 }
 
 inline void ckx_ostream_writer_impl::write_whitespace_impl(qsizet _count)

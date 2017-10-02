@@ -26,14 +26,16 @@ template <typename CkxTokenStream>
 class ckx_parser_impl_test final :
         public detail::ckx_parser_impl<CkxTokenStream>
 {
-    friend class detail::ckx_parser_impl<CkxTokenStream>;
 public:
     void test_parse_basic_expr();
+    void test_parse_unary_expr();
 
 private:
     void initialize_test();
     void cleanup_test();
 };
+
+
 
 int main()
 {
@@ -42,20 +44,25 @@ int main()
     return 0;
 }
 
+
+
 template <typename CkxTokenStream>
 void
 ckx_parser_impl_test<CkxTokenStream>::test_parse_basic_expr()
 {
-    ckx_test_filereader reader {"123"};
+    ckx_test_filereader reader {"123 literal number   39.5 array"};
     ckx_fp_writer writer { stdout };
     detail::ckx_parser_impl<CkxTokenStream>::token_stream =
                 new ckx_default_token_stream(reader);
     initialize_test();
 
-    ckx_ast_expr *expr =
+    for (int i = 0; i < 5; i++)
+    {
+        ckx_ast_expr *expr =
             detail::ckx_parser_impl<CkxTokenStream>::parse_basic_expr();
-    expr->ast_dump(writer, 0);
-    delete expr;
+        expr->ast_dump(writer, 0);
+        delete expr;
+    }
 
     cleanup_test();
 }
@@ -70,6 +77,22 @@ ckx_parser_impl_test<CkxTokenStream>::initialize_test()
             new saber::list<ckx_error*>;
     detail::ckx_parser_impl<CkxTokenStream>::warn_list =
             new saber::list<ckx_error*>;
+
+    std::array<saber_string_view, 3> names
+    {
+        saber_string_pool::get().create_view("number"),
+        saber_string_pool::get().create_view("integer"),
+        saber_string_pool::get().create_view("literal"),
+    };
+
+    for (auto& name : names)
+        detail::ckx_parser_impl<CkxTokenStream>::env()->add_new_var(
+            name, ckx_type_helper::get_type(ckx_token::type::tk_vi32));
+
+    detail::ckx_parser_impl<CkxTokenStream>::env()->add_new_var(
+        saber_string_pool::get().create_view("array"),
+        ckx_type_helper::pointer_to(
+            ckx_type_helper::get_type(ckx_token::type::tk_vi8)));
 }
 
 template <typename CkxTokenStream>

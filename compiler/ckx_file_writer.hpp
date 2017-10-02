@@ -23,7 +23,7 @@
 #include <iosfwd>
 #include <cstdio>
 
-#include "string.hpp"
+#include "string_pool.hpp"
 #include "defs.hpp"
 
 namespace ckx
@@ -45,6 +45,8 @@ public:
     virtual void write(quint64 _value) = 0;
     virtual void write(qreal _value) = 0;
     virtual void write(const qchar* _str) = 0;
+    virtual void write(const saber_string& _str) = 0;
+    virtual void write(saber_string_view _str_view) = 0;
     virtual void write_whitespace(qsizet _count) = 0;
 
     ckx_file_writer(const ckx_file_writer& _another) = delete;
@@ -61,6 +63,8 @@ public:
     void write(quint64 _value) override final;
     void write(qreal _value) override final;
     void write(const qchar* _str) override final;
+    void write(const saber_string& _str) override final;
+    void write(saber_string_view _str_view) override final;
     void write_whitespace(qsizet _count) override final;
 
     ckx_fp_writer(const ckx_fp_writer& _another) = delete;
@@ -80,6 +84,8 @@ public:
     void write(quint64 _value) override final;
     void write(qreal _value) override final;
     void write(const qchar* _str) override final;
+    void write(const saber_string& _str) override final;
+    void write(saber_string_view _str_view) override final;
     void write_whitespace(qsizet _count) override final;
 
     ckx_ostream_writer(const ckx_ostream_writer& _another) = delete;

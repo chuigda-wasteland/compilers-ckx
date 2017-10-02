@@ -649,6 +649,7 @@ qreal ckx_default_token_stream_impl::scan_floating_part()
         digit_count++;
         next_char();
     }
+    ret *= 10;
 
     for (quint8 i = 0; i < digit_count; i++) ret /= 10;
 

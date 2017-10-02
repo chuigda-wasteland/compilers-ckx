@@ -93,7 +93,7 @@ static bool do_test_ckx_token_stream_2(void)
 
 static bool float_equal(qreal r1, qreal r2)
 {
-    return (r1 - r2) < std::numeric_limits<qreal>::epsilon();
+    return (r1 - r2) < 0.000001;
 }
 
 static bool do_test_ckx_token_stream_3()

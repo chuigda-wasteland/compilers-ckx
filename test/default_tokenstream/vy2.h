@@ -2,6 +2,7 @@
 #define VY2LEX(X, Y)
 #endif
 
+VY2LEX("39.50", 39.50)
 VY2LEX("1.32", 1.32)
 VY2LEX("1.0", 1.0)
 VY2LEX("0.00394", 0.00394)
