@@ -27,6 +27,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        tst_env_testtest.cpp 
+        tst_env_testtest.cpp \ 
+    ../../saber/src/safe_stl_general.cpp \
+    ../../compiler/ckx_env_table.cpp \
+    ../../compiler/ckx_type.cpp
+
+INCLUDEPATH += \
+    ../../saber/include/ \
+    ../../compiler/
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
