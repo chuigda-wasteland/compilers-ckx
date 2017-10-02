@@ -53,6 +53,8 @@ class ckx_ast_expr;
     class ckx_ast_id_expr;
     class ckx_ast_cast_expr;
     class ckx_ast_sizeof_expr;
+    class ckx_ast_vi_literal_expr;
+    class ckx_ast_vr_literal_expr;
 
 } // namespace ckx
 

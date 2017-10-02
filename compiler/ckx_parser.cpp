@@ -692,7 +692,88 @@ ckx_ast_expr*
 ckx_parser_impl<CkxTokenStream>::parse_postfix_expr()
 {
     saber_ptr<ckx_token> at_token = current_token();
+    ckx_ast_expr *ret = nullptr;
+
+    while (1)
+    {
+        switch (current_token()->token_type)
+        {
+        case ckx_token::type::tk_id:
+        case ckx_token::type::tk_vi_literal:
+        case ckx_token::type::tk_vr_literal:
+            {
+                ret = parse_basic_expr();
+                break;
+            }
+
+        case ckx_token::type::tk_lparth:
+            {
+                next_token();
+                saber::vector<ckx_ast_expr*> args;
+                while (current_token()->token_type
+                       != ckx_token::type::tk_rparth)
+                {
+                    args.push_back(parse_expr());
+                    expect_n_eat(ckx_token::type::tk_comma);
+                }
+                expect_n_eat(ckx_token::type::tk_rparth);
+                ret = new ckx_ast_invoke_expr(at_token, ret, saber::move(args));
+                break;
+            }
+
+        case ckx_token::type::tk_lbracket:
+            {
+                next_token();
+                ret = new ckx_ast_subscript_expr(at_token, ret, parse_expr());
+                expect_n_eat(ckx_token::type::tk_rbracket);
+                break;
+            }
+
+        default:
+            return ret;
+        }
+    }
+
     return nullptr;
+}
+
+template <typename CkxTokenStream>
+ckx_ast_expr*
+ckx_parser_impl<CkxTokenStream>::parse_basic_expr()
+{
+    saber_ptr<ckx_token> at_token = current_token();
+
+    switch (current_token()->token_type)
+    {
+    case ckx_token::type::tk_vi_literal:
+        {
+            ckx_ast_expr* ret = new ckx_ast_vi_literal_expr(
+                current_token(), current_token()->v.i64);
+            next_token();
+            return ret;
+        }
+
+    case ckx_token::type::tk_vr_literal:
+        {
+            ckx_ast_expr* ret = new ckx_ast_vr_literal_expr(
+                current_token(), current_token()->v.r);
+            next_token();
+            return ret;
+        }
+
+    case ckx_token::type::tk_id:
+        {
+            ckx_var_entry* entry = env()->lookup_var(current_token()->str);
+            if (entry != nullptr)
+            {
+                next_token();
+                return new ckx_ast_id_expr(at_token, entry);
+            }
+        }
+
+    default:
+        assert(0);
+    }
 }
 
 template <typename CkxTokenStream>

@@ -55,9 +55,8 @@ private:
     ckx_ast_expr*  parse_postfix_expr();
 
     ckx_ast_cast_expr*       parse_cast_expr();
+    ckx_ast_expr*            parse_basic_expr();
     ckx_ast_id_expr*         parse_id();
-    ckx_ast_invoke_expr*     parse_func_invoke();
-    ckx_ast_subscript_expr*  parse_array_subscript();
 
     template <typename CkxAstRecordStmt, typename CkxRecordType>
     CkxAstRecordStmt* parse_record_stmt();

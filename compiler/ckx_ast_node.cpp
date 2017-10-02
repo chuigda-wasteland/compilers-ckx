@@ -358,4 +358,16 @@ ckx_ast_sizeof_expr::ckx_ast_sizeof_expr(saber_ptr<ckx_token> _at_token,
     type(_type)
 {}
 
+ckx_ast_vi_literal_expr::ckx_ast_vi_literal_expr(saber_ptr<ckx_token> _at_token,
+                                                 qint64 _val) :
+    ckx_ast_expr(_at_token),
+    val(_val)
+{}
+
+ckx_ast_vr_literal_expr::ckx_ast_vr_literal_expr(saber_ptr<ckx_token> _at_token,
+                                                 qreal _val) :
+    ckx_ast_expr(_at_token),
+    val(_val)
+{}
+
 } // namespace ckx
