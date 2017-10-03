@@ -5,6 +5,8 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
+#if false
+
 #include "iterator.hpp"
 #include "memory.hpp"
 #include "strings.defs.h"
@@ -1341,5 +1343,14 @@ swap(vector<T, Allocator> &_a, vector<T, Allocator> &_b)
 }
 
 } // namespace saber
+
+#else
+#include <vector>
+
+namespace saber
+{
+using std::vector;
+} // namespace saber
+#endif
 
 #endif // VECTOR_HPP

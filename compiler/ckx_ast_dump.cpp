@@ -109,9 +109,9 @@ void ckx_ast_cond_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 void ckx_ast_id_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*2);
-    _writer.write(reinterpret_cast<const qchar*>("Identifier : "));
+    _writer.write(reinterpret_cast<const qchar*>("Identifier \""));
     _writer.write(entry->var_name);
-    _writer.write(reinterpret_cast<const qchar*>(" of type [["));
+    _writer.write(reinterpret_cast<const qchar*>("\" of type [["));
     _writer.write(entry->var_type->to_string());
     _writer.write(reinterpret_cast<const qchar*>("]]\n"));
 }

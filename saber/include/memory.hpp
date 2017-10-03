@@ -193,6 +193,13 @@ public:
 
     saber_ptr& operator= (const saber_ptr& _another)
     {
+        (*shared_count)--;
+        if (*shared_count == 0)
+        {
+            delete shared_count;
+            delete ptr;
+        }
+
         ptr = _another.ptr;
         shared_count = _another.shared_count;
         (*shared_count)++;

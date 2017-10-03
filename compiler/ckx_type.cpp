@@ -113,8 +113,8 @@ qsizet ckx_struct_type::size() const
 {
     if ( fields.empty() ) return 0;
 
-    return (*fields.rbegin()).offset
-           + (*fields.rbegin()).type->size();
+    return (fields.rbegin()->offset
+           + fields.rbegin()->type->size());
 }
 
 saber_string

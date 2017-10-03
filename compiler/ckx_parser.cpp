@@ -796,10 +796,10 @@ ckx_parser_impl<CkxTokenStream>::parse_type()
         switch ( current_token()->token_type )
         {
         case ckx_token::type::tk_const:
-            type = ckx_type_helper::qual_const(type); break;
+            type = ckx_type_helper::qual_const(type); next_token(); break;
 
         case ckx_token::type::tk_mul:
-            type = ckx_type_helper::pointer_to(type); break;
+            type = ckx_type_helper::pointer_to(type); next_token(); break;
 
         default:
             return type;
