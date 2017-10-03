@@ -91,15 +91,55 @@ void ckx_ast_binary_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 
 
 void ckx_ast_unary_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*2);
+    switch (opercode)
+    {
+    case ckx_op::op_unary_negative:
+        _writer.write(reinterpret_cast<const qchar*>("Negative")); break;
+    case ckx_op::op_unary_positive:
+        _writer.write(reinterpret_cast<const qchar*>("Positive")); break;
+    case ckx_op::op_addr:
+        _writer.write(reinterpret_cast<const qchar*>("AddressOf")); break;
+    case ckx_op::op_deref:
+        _writer.write(reinterpret_cast<const qchar*>("Dereference")); break;
+    case ckx_op::op_bit_not:
+        _writer.write(reinterpret_cast<const qchar*>("BitwiseRevert")); break;
+    case ckx_op::op_logic_not:
+        _writer.write(reinterpret_cast<const qchar*>("LogicalNot")); break;
+    case ckx_op::op_inc:
+        _writer.write(reinterpret_cast<const qchar*>("Increment")); break;
+    case ckx_op::op_dec:
+        _writer.write(reinterpret_cast<const qchar*>("Decrement")); break;
+    default:
+        assert(false); // What the fuck!
+    }
+    _writer.write(reinterpret_cast<const qchar*>(" Towards\n"));
+    operand->ast_dump(_writer, _level+1);
+}
 
 
 void ckx_ast_subscript_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*2);
+    _writer.write(reinterpret_cast<const qchar*>("Array Subscript Operator\n"));
+    base->ast_dump(_writer, _level+1);
+    subscript->ast_dump(_writer, _level+1);
+}
 
 
 void ckx_ast_invoke_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*2);
+    _writer.write(reinterpret_cast<const qchar*>("Function Invokation\n"));
+    _writer.write_whitespace((_level+1)*2);
+    _writer.write(reinterpret_cast<const qchar*>("Invoking\n"));
+    this->invokable->ast_dump(_writer, _level+2);
+    _writer.write_whitespace((_level+1)*2);
+    _writer.write(reinterpret_cast<const qchar*>("With arguments\n"));
+    for (auto& arg : args)
+        arg->ast_dump(_writer, _level+2);
+}
 
 
 void ckx_ast_cond_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
