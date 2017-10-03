@@ -26,6 +26,8 @@ template <typename CkxTokenStream>
 class ckx_parser_impl_test final :
         public detail::ckx_parser_impl<CkxTokenStream>
 {
+    using base = detail::ckx_parser_impl<CkxTokenStream>;
+
 public:
     void test_parse_basic_expr();
     void test_parse_unary_expr();
@@ -52,14 +54,14 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_basic_expr()
 {
     ckx_test_filereader reader {"123 literal number   39.5 array"};
     ckx_fp_writer writer { stdout };
-    detail::ckx_parser_impl<CkxTokenStream>::token_stream =
+    base::token_stream =
                 new ckx_default_token_stream(reader);
     initialize_test();
 
     for (int i = 0; i < 5; i++)
     {
         ckx_ast_expr *expr =
-            detail::ckx_parser_impl<CkxTokenStream>::parse_basic_expr();
+            base::parse_basic_expr();
         expr->ast_dump(writer, 0);
         delete expr;
     }
@@ -71,12 +73,9 @@ template <typename CkxTokenStream>
 void
 ckx_parser_impl_test<CkxTokenStream>::initialize_test()
 {
-    detail::ckx_parser_impl<CkxTokenStream>::current_env =
-            new ckx_env(nullptr);
-    detail::ckx_parser_impl<CkxTokenStream>::error_list =
-            new saber::list<ckx_error*>;
-    detail::ckx_parser_impl<CkxTokenStream>::warn_list =
-            new saber::list<ckx_error*>;
+    base::current_env = new ckx_env(nullptr);
+    base::error_list = new saber::list<ckx_error*>;
+    base::warn_list = new saber::list<ckx_error*>;
 
     std::array<saber_string_view, 3> names
     {
@@ -86,10 +85,10 @@ ckx_parser_impl_test<CkxTokenStream>::initialize_test()
     };
 
     for (auto& name : names)
-        detail::ckx_parser_impl<CkxTokenStream>::env()->add_new_var(
+        base::env()->add_new_var(
             name, ckx_type_helper::get_type(ckx_token::type::tk_vi32));
 
-    detail::ckx_parser_impl<CkxTokenStream>::env()->add_new_var(
+    base::env()->add_new_var(
         saber_string_pool::get().create_view("array"),
         ckx_type_helper::pointer_to(
             ckx_type_helper::get_type(ckx_token::type::tk_vi8)));
@@ -98,7 +97,7 @@ ckx_parser_impl_test<CkxTokenStream>::initialize_test()
 template <typename CkxTokenStream>
 void ckx_parser_impl_test<CkxTokenStream>::cleanup_test()
 {
-    delete detail::ckx_parser_impl<CkxTokenStream>::current_env;
-    delete detail::ckx_parser_impl<CkxTokenStream>::error_list;
-    delete detail::ckx_parser_impl<CkxTokenStream>::warn_list;
+    delete base::current_env;
+    delete base::error_list;
+    delete base::warn_list;
 }
