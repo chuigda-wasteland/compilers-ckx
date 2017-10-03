@@ -120,7 +120,7 @@ qsizet ckx_struct_type::size() const
 saber_string
 ckx_struct_type::to_string() const
 {
-    return struct_name.get();
+    return "StructType[[" + struct_name.get() + "]]";
 }
 
 ckx_struct_type::add_status
@@ -149,7 +149,7 @@ qsizet ckx_variant_type::size() const
 saber_string
 ckx_variant_type::to_string() const
 {
-    return variant_name.get();
+    return "VariantType[[" + variant_name.get() + "]]";
 }
 
 ckx_variant_type::add_status
@@ -180,7 +180,7 @@ qsizet ckx_enum_type::size() const
 saber_string
 ckx_enum_type::to_string() const
 {
-    return enum_name.get();
+    return "EnumType[[" + enum_name.get() + "]]";
 }
 
 ckx_enum_type::add_status
