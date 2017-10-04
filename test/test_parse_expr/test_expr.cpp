@@ -1,4 +1,24 @@
-﻿#include "ckx_parser_impl.hpp"
+﻿/**
+    The Opensource Compiler CKX -- for my honey ChenKX
+    Copyright (C) 2017  CousinZe
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see http://www.gnu.org/licenses/.
+  */
+
+/// @note This file contains a MANUAL test. Debuggers should read the log
+/// themselves and manually detect bugs.
+
+#include "ckx_parser_impl.hpp"
 #include "memory.hpp"
 
 using namespace ckx;
@@ -33,6 +53,9 @@ public:
     void test_parse_type();
     void test_parse_postfix_expr();
     void test_parse_unary_expr();
+    void test_parse_cast_expr();
+    void test_parse_binary_expr();
+    void test_parse_assign_expr();
 
 private:
     void initialize_test();
@@ -48,6 +71,9 @@ int main()
     test.test_parse_type();
     test.test_parse_postfix_expr();
     test.test_parse_unary_expr();
+    test.test_parse_cast_expr();
+    test.test_parse_binary_expr();
+    test.test_parse_assign_expr();
     return 0;
 }
 
@@ -284,6 +310,109 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
 
 template <typename CkxTokenStream>
 void
+ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
+{
+    ckx_fp_writer writer { stdout };
+    {
+        ckx_test_filereader reader { "static_cast<vi8>(number)" };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+
+        ckx_ast_expr *expr = base::parse_cast_expr();
+        expr->ast_dump(writer, 0);
+
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
+
+    {
+        ckx_test_filereader reader { "reinterpret_cast<vr32*>(array)" };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+
+        ckx_ast_expr *expr = base::parse_cast_expr();
+        expr->ast_dump(writer, 0);
+
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
+
+    {
+        ckx_test_filereader reader {
+            "const_cast<vr32 const*>(reinterpret_cast<vr32*>(array))" };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+
+        ckx_ast_expr *expr = base::parse_cast_expr();
+        expr->ast_dump(writer, 0);
+
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
+}
+
+template<typename CkxTokenStream>
+void ckx_parser_impl_test<CkxTokenStream>::test_parse_binary_expr()
+{
+    ckx_fp_writer writer { stdout };
+
+    {
+        ckx_test_filereader reader { "number * integer" };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+
+        ckx_ast_expr *expr = base::parse_binary_expr(0);
+        expr->ast_dump(writer, 0);
+
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
+
+    {
+        ckx_test_filereader reader { "number * *array + integer" };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+
+        ckx_ast_expr *expr = base::parse_binary_expr(0);
+        expr->ast_dump(writer, 0);
+
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
+
+    {
+        ckx_test_filereader reader {
+            "number>integer && integer>literal || integer+literal>*array" };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+
+        ckx_ast_expr *expr = base::parse_binary_expr(0);
+        expr->ast_dump(writer, 0);
+
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
+}
+
+template<typename CkxTokenStream>
+void ckx_parser_impl_test<CkxTokenStream>::test_parse_assign_expr()
+{
+    ckx_fp_writer writer { stdout };
+    {
+        ckx_test_filereader reader { "number = literal + integer - *array" };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+
+        ckx_ast_expr *expr = base::parse_assign_expr();
+        expr->ast_dump(writer, 0);
+
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
+}
+
+template <typename CkxTokenStream>
+void
 ckx_parser_impl_test<CkxTokenStream>::initialize_test()
 {
     base::enter_scope(new ckx_env(nullptr));
@@ -292,9 +421,13 @@ ckx_parser_impl_test<CkxTokenStream>::initialize_test()
 
     std::array<saber_string_view, 3> names
     {
-        {saber_string_pool::get().create_view("number"),
-        saber_string_pool::get().create_view("integer"),
-        saber_string_pool::get().create_view("literal")}
+        /// Clang recommended me to add a pair of brace here,
+        /// but I don't know why. >_<
+        {
+            saber_string_pool::get().create_view("number"),
+            saber_string_pool::get().create_view("integer"),
+            saber_string_pool::get().create_view("literal")
+        }
     };
 
     for (auto& name : names)

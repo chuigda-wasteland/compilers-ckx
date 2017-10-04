@@ -567,9 +567,7 @@ ckx_parser_impl<CkxTokenStream>::parse_cond_expr()
 {
     saber_ptr<ckx_token> at_token = current_token();
 
-    ckx_ast_expr *binary_expr =
-         parse_binary_expr(
-             ckx_op_helper::precedence(ckx_op::op_unary_positive));
+    ckx_ast_expr *binary_expr = parse_binary_expr(0);
 
     if (current_token()->token_type == ckx_token::type::tk_ques)
     {
