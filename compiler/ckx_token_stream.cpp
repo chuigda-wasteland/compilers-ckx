@@ -32,7 +32,7 @@ namespace detail
 class ckx_identifier_table
 {
 public:
-    static qpair<ckx_token::type, bool> lookup(const saber_string& _name);
+    static qpair<ckx_token::type, bool> lookup(saber_string_view _name);
 
 private:
     static void initialize();
@@ -81,7 +81,7 @@ private:
 
     inline bool is_part_of_id(qchar _ch);
     inline qchar ch();
-    inline saber_string& str();
+    inline saber_string_view str();
     inline qcoord& char_coord();
     inline void next_char();
     inline void next_line();
@@ -92,7 +92,7 @@ private:
     qcoord char_coord_temp;
     qsizet char_index_temp;
 
-    saber_string string_temp;
+    saber_string_view string_temp;
 };
 
 }
@@ -130,12 +130,12 @@ namespace detail
 {
 
 qpair<ckx_token::type, bool>
-ckx_identifier_table::lookup(const saber_string &_name)
+ckx_identifier_table::lookup(saber_string_view _name)
 {
     if (!initialized) initialize();
-    if (map.find(_name) != map.end())
+    if (map.find(_name.get()) != map.end())
     {
-        return qpair<ckx_token::type, bool>(map[_name], true);
+        return qpair<ckx_token::type, bool>(map[_name.get()], true);
     }
     else
     {
@@ -161,7 +161,8 @@ ckx_default_token_stream_impl::ckx_default_token_stream_impl(
         ckx_file_reader &_file_reader) :
     current_pos(0),
     char_coord_temp(1, 1),
-    char_index_temp(0)
+    char_index_temp(0),
+    string_temp(saber_string_pool::get().create_view(""))
 {
     src.reserve(default_reserved_size);
 
@@ -581,15 +582,18 @@ void ckx_default_token_stream_impl::solve_ordinary_op()
  */
 void ckx_default_token_stream_impl::scan_full_id_string()
 {
-    str().clear();
-    str().push_back(ch());
+    saber_string strtemp;
+    strtemp.clear();
+    strtemp.push_back(ch());
     next_char();
 
     while (is_part_of_id(ch()))
     {
-        str().push_back(ch());
+        strtemp.push_back(ch());
         next_char();
     }
+
+    string_temp = saber_string_pool::get().create_view(saber::move(strtemp));
 }
 
 bool ckx_default_token_stream_impl::solve_keyword()
@@ -612,7 +616,7 @@ bool ckx_default_token_stream_impl::solve_keyword()
 void ckx_default_token_stream_impl::solve_identifier()
 {
     token_buffer.emplace_back(
-        new ckx_token(char_coord(), saber::move(str()) ) );
+        new ckx_token(char_coord(), str()));
 }
 
 
@@ -693,7 +697,7 @@ inline qchar ckx_default_token_stream_impl::ch()
     return src[char_index_temp];
 }
 
-inline saber_string& ckx_default_token_stream_impl::str()
+inline saber_string_view ckx_default_token_stream_impl::str()
 {
     return string_temp;
 }

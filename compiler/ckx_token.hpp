@@ -143,7 +143,7 @@ open_class ckx_token
     ckx_token(const qcoord& _pos, quint64 _unsigned_literal);
     ckx_token(const qcoord& _pos, qreal _real_literal);
     ckx_token(const qcoord& _pos, qchar _char_literal);
-    ckx_token(const qcoord& _pos, saber_string&& _id);
+    ckx_token(const qcoord& _pos, saber_string_view _id);
 
     ckx_token() = delete;
     ckx_token(const ckx_token&) = delete;

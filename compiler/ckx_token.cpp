@@ -57,11 +57,11 @@ ckx_token::ckx_token(const qcoord &_pos, qchar _char_literal) :
     this->v.ch = _char_literal;
 }
 
-ckx_token::ckx_token(const qcoord &_pos, saber_string &&_id) :
+ckx_token::ckx_token(const qcoord &_pos, saber_string_view _id) :
     ckx_token(_pos)
 {
     token_type = type::tk_id;
-    str = saber_string_pool::get().create_view(_id);
+    str = _id;
 }
 
 ckx_token::~ckx_token()

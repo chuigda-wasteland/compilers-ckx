@@ -95,7 +95,7 @@ string_view<StringType>::operator!= (const string_view& _another) const noexcept
 
 template <typename StringType>
 string_view<StringType>&
-string_view<StringType>::operator =(const string_view& _another) noexcept
+string_view<StringType>::operator= (const string_view& _another) noexcept
 {
     --(*refcount);
     if (*refcount == 0)
@@ -104,7 +104,6 @@ string_view<StringType>::operator =(const string_view& _another) noexcept
     refcount = _another.refcount;
     str = _another.str;
     ++(*refcount);
-
     return *this;
 }
 
