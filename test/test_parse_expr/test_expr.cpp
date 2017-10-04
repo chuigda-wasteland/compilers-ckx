@@ -55,6 +55,7 @@ public:
     void test_parse_unary_expr();
     void test_parse_cast_expr();
     void test_parse_binary_expr();
+    void test_parse_cond_expr();
     void test_parse_assign_expr();
 
 private:
@@ -73,6 +74,7 @@ int main()
     test.test_parse_unary_expr();
     test.test_parse_cast_expr();
     test.test_parse_binary_expr();
+    test.test_parse_cond_expr();
     test.test_parse_assign_expr();
     return 0;
 }
@@ -395,11 +397,41 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_binary_expr()
 }
 
 template<typename CkxTokenStream>
+void ckx_parser_impl_test<CkxTokenStream>::test_parse_cond_expr()
+{
+    ckx_fp_writer writer { stdout };
+    {
+        ckx_test_filereader reader { "number>integer ? number : integer" };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+
+        ckx_ast_expr *expr = base::parse_cond_expr();
+        expr->ast_dump(writer, 0);
+
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
+}
+
+template<typename CkxTokenStream>
 void ckx_parser_impl_test<CkxTokenStream>::test_parse_assign_expr()
 {
     ckx_fp_writer writer { stdout };
     {
         ckx_test_filereader reader { "number = literal + integer - *array" };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+
+        ckx_ast_expr *expr = base::parse_assign_expr();
+        expr->ast_dump(writer, 0);
+
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
+
+    {
+        ckx_test_filereader reader {
+            "(number>literal?number:literal) = *array" };
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
 

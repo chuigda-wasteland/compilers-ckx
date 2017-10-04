@@ -62,7 +62,7 @@ bool ckx_op_helper::is_unary(ckx_op _op)
 bool ckx_op_helper::is_binary(ckx_op _op)
 {
     return (_op >= ckx_op::op_add
-            && _op <= ckx_op::op_mod_assign);
+            && _op <= ckx_op::op_neq);
 }
 
 bool ckx_op_helper::is_assign(ckx_op _op)
