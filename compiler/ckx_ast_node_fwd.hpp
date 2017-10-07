@@ -49,6 +49,8 @@ class ckx_ast_expr;
     class ckx_ast_unary_expr;
     class ckx_ast_subscript_expr;
     class ckx_ast_invoke_expr;
+    class ckx_ast_extract_expr;
+    class ckx_ast_enumerator_expr;
     class ckx_ast_cond_expr;
     class ckx_ast_id_expr;
     class ckx_ast_cast_expr;

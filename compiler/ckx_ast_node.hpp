@@ -84,17 +84,14 @@ public:
 class ckx_ast_compound_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_compound_stmt(saber_ptr<ckx_token> _at_token,
-                          ckx_env *_table);
+    ckx_ast_compound_stmt(saber_ptr<ckx_token> _at_token);
     ~ckx_ast_compound_stmt() override final;
 
     void add_new_stmt(ckx_ast_stmt *_stmt);
-
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
 private:
     saber::vector<ckx_ast_stmt*> stmts;
-    ckx_env *local_table;
 };
 
 class ckx_ast_if_stmt final implements ckx_ast_stmt
@@ -201,7 +198,6 @@ public:
     ~ckx_ast_decl_stmt() override final;
 
     void add_decl(ckx_ast_init_decl* _decl);
-
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
 private:
@@ -224,76 +220,102 @@ class ckx_ast_func_stmt implements ckx_ast_stmt
 {
 public:
     ckx_ast_func_stmt(saber_ptr<ckx_token> _at_token,
-                      ckx_func_entry *_entry,
-                      ckx_env *_param_env_table,
-                      saber::vector<ckx_ast_init_decl*>&& _param_decls);
+                      saber::vector<ckx_ast_init_decl*>&& _param_decls,
+                      ckx_ast_compound_stmt *_fnbody = nullptr);
     ~ckx_ast_func_stmt();
-
-    bool is_defined() const;
-    ckx_env* get_param_env_table();
-    void define(ckx_ast_compound_stmt* _fnbody);
 
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
 private:
-    ckx_func_entry *entry;
-    ckx_env *param_env_table;
-    ckx_ast_compound_stmt *fnbody = nullptr;
     saber::vector<ckx_ast_init_decl*> param_decls;
+    ckx_ast_compound_stmt *fnbody;
 };
 
 class ckx_ast_init_decl final implements ckx_ast_node
 {
 public:
     ckx_ast_init_decl(saber_ptr<ckx_token> _at_token,
-                      ckx_var_entry* _entry,
+                      saber_ptr<ckx_type> _type,
+                      saber_string_view _name,
                       ckx_ast_expr* _init);
     virtual ~ckx_ast_init_decl() final;
 
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
 private:
-    ckx_var_entry *entry;
+    saber_ptr<ckx_type> type;
+    saber_string_view name;
     ckx_ast_expr *init;
 };
 
 class ckx_ast_struct_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_struct_stmt(saber_ptr<ckx_token> _at_token,
-                   ckx_type_entry* _entry);
+    open_class field
+    {
+        field(saber_ptr<ckx_type> _type, saber_string_view _name) :
+            type(_type), name(_name) {}
+        saber_ptr<ckx_type> type;
+        saber_string_view name;
+    };
+
+    ckx_ast_struct_stmt(saber_ptr<ckx_token> _at_token, saber_string_view _name);
     ~ckx_ast_struct_stmt() override final;
 
+    void add_field(saber_ptr<ckx_type> _type, saber_string_view _name);
+    const saber::vector<field>& get_fields() const;
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
 private:
-    ckx_type_entry *entry;
+    saber_string_view name;
+    saber::vector<field> fields;
 };
 
 class ckx_ast_variant_stmt final implements ckx_ast_stmt
 {
 public:
+    open_class field
+    {
+        field(saber_ptr<ckx_type> _type, saber_string_view _name) :
+            type(_type), name(_name) {}
+        saber_ptr<ckx_type> type;
+        saber_string_view name;
+    };
+
     ckx_ast_variant_stmt(saber_ptr<ckx_token> _at_token,
-                    ckx_type_entry* _entry);
+                         saber_string_view _name);
     ~ckx_ast_variant_stmt() override final;
 
+    void add_field(saber_ptr<ckx_type> _type, saber_string_view _name);
+    const saber::vector<field>& get_fields() const;
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
 private:
-    ckx_type_entry *entry;
+    saber_string_view name;
+    saber::vector<field> fields;
 };
 
 class ckx_ast_enum_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token,
-                      ckx_type_entry* _entry);
+    open_class enumerator
+    {
+        enumerator(saber_string_view _name, qint64 _value)
+            : name(_name), value(_value) {}
+        saber_string_view name;
+        qint64 value;
+    };
+
+    ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token, saber_string_view _name);
     ~ckx_ast_enum_stmt() override final;
 
+    void add_enumerator(saber_string_view _name, qint64 _value = 0);
+    const saber::vector<enumerator>& get_enumerators() const;
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
 private:
-    ckx_type_entry *entry;
+    saber_string_view name;
+    saber::vector<enumerator> enumerators;
 };
 
 
@@ -369,6 +391,36 @@ private:
     saber::vector<ckx_ast_expr*> args;
 };
 
+class ckx_ast_extract_expr final implements ckx_ast_expr
+{
+public:
+    ckx_ast_extract_expr(saber_ptr<ckx_token> _at_token,
+                         ckx_ast_expr *_extracted,
+                         saber_string_view _field_name);
+    ~ckx_ast_extract_expr() override final;
+
+    void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
+
+private:
+    ckx_ast_expr *extracted;
+    saber_string_view field_name;
+};
+
+class ckx_ast_enumerator_expr final implements ckx_ast_expr
+{
+public:
+    ckx_ast_enumerator_expr(saber_ptr<ckx_token> _at_token,
+                            saber_string_view _enum_name,
+                            saber_string_view _enumerator_name);
+    ~ckx_ast_enumerator_expr() override final = default;
+
+    void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
+
+private:
+    saber_string_view enum_name;
+    saber_string_view enumerator_name;
+};
+
 class ckx_ast_cond_expr final implements ckx_ast_expr
 {
 public:
@@ -389,13 +441,13 @@ private:
 class ckx_ast_id_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_id_expr(saber_ptr<ckx_token> _at_token, ckx_var_entry* _entry);
+    ckx_ast_id_expr(saber_ptr<ckx_token> _at_token, saber_string_view _name);
     ~ckx_ast_id_expr() override final;
 
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
 private:
-    ckx_var_entry *entry;
+    saber_string_view name;
 };
 
 class ckx_ast_cast_expr final implements ckx_ast_expr
