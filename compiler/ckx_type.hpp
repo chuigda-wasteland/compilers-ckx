@@ -54,10 +54,11 @@ public:
         type_void,
 
         type_function,
-        type_enum,
 
+        type_id,
         type_struct,
         type_variant,
+        type_enum,
 
         type_pointer,
         type_qualifier,
@@ -85,6 +86,21 @@ public:
 
     qsizet size() const override final;
     saber_string to_string() const override final;
+};
+
+class ckx_id_type final implements ckx_type
+{
+public:
+    ckx_id_type(saber_string_view _name);
+    ~ckx_id_type() override final = default;
+
+    qsizet size() const override final;
+    saber_string to_string() const override final;
+
+    saber_string_view get_name() const;
+
+private:
+    saber_string_view name;
 };
 
 class ckx_struct_type final implements ckx_type
@@ -248,7 +264,8 @@ public:
     static saber_ptr<ckx_type> qual_const(saber_ptr<ckx_type> _base);
     static saber_ptr<ckx_type> pointer_to(saber_ptr<ckx_type> _base);
 
-private:
+    /// @note made public may benefit testing a lot.
+
     static saber_ptr<ckx_type> get_vi8_type();
     static saber_ptr<ckx_type> get_vi16_type();
     static saber_ptr<ckx_type> get_vi32_type();

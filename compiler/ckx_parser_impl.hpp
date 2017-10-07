@@ -15,8 +15,40 @@ namespace ckx
 namespace detail
 {
 
+class ckx_typename_table final
+{
+public:
+    explicit ckx_typename_table(ckx_typename_table* _parent = nullptr) :
+        parent(_parent) {}
+    ~ckx_typename_table() = default;
+
+    void add_typename(saber_string_view _name)
+    {
+        typenames.emplace(_name);
+    }
+
+    bool query_typename(saber_string_view _name) const
+    {
+        const ckx_typename_table *iter = this;
+        while (iter != nullptr)
+        {
+            auto find_it = typenames.find(_name);
+            if (find_it != typenames.end())
+                return true;
+            iter = iter->parent;
+        }
+        return false;
+    }
+
+private:
+    saber::unordered_set<saber_string_view, string_view_hash> typenames;
+    ckx_typename_table *parent;
+};
+
+
+
 template <typename CkxTokenStream>
-class ckx_parser_impl
+class ckx_parser_impl final
 {
 public:
     explicit ckx_parser_impl() = default;
@@ -89,6 +121,9 @@ protected:
 
     saber::list<ckx_error*> *error_list = nullptr;
     saber::list<ckx_error*> *warn_list = nullptr;
+
+    /// @note still we need a table for storing types occured in parsing
+    ckx_typename_table *typename_table;
 };
 
 

@@ -86,6 +86,7 @@ ckx_parser_impl<CkxTokenStream>::parse_impl(
     token_stream = _token_stream;
     error_list = new saber::list<ckx_error*>;
     warn_list = new saber::list<ckx_error*>;
+    typename_table = new ckx_typename_table;
 
     ckx_ast_translation_unit *trans_unit =
          new ckx_ast_translation_unit(current_token());
@@ -100,6 +101,7 @@ ckx_parser_impl<CkxTokenStream>::parse_impl(
              trans_unit, error_list, warn_list);
     trans_unit = nullptr;
     warn_list = nullptr;
+    delete typename_table;
     return ret;
 }
 
@@ -184,7 +186,9 @@ ckx_parser_impl<CkxTokenStream>::parse_stmt()
     case ckx_token::type::tk_id:
         if ( is_typename(current_token()) )
         {
-            /// @todo need to rework after changing the main framework
+            if (peek_next_token()->token_type == ckx_token::type::tk_scope)
+                /// @note we just assume that type is an enum
+                return parse_expr_stmt();
             return parse_decl_stmt();
         }
         else
@@ -206,7 +210,7 @@ ckx_parser_impl<CkxTokenStream>::parse_stmt()
     case ckx_token::type::tk_if:        return parse_if_stmt();
     case ckx_token::type::tk_while:     return parse_while_stmt();
     case ckx_token::type::tk_do:        return parse_do_while_stmt();
-    /// case ckx_token::type::tk_for:       return parse_for_stmt();
+    case ckx_token::type::tk_for:       return parse_for_stmt();
     case ckx_token::type::tk_break:     return parse_break_stmt();
     case ckx_token::type::tk_continue:  return parse_continue_stmt();
     case ckx_token::type::tk_return:    return parse_return_stmt();
@@ -338,6 +342,10 @@ ckx_parser_impl<CkxTokenStream>::parse_record_stmt()
         if ( current_token()->token_type == ckx_token::type::tk_rbrace )
             break;
     }
+    expect_n_eat(ckx_token::type::tk_rbrace);
+
+    typename_table->add_typename(record_name);
+    return ret;
 }
 
 template <typename CkxTokenStream>
@@ -361,6 +369,8 @@ ckx_parser_impl<CkxTokenStream>::parse_enum_stmt()
         ret->add_enumerator(enumerator_name, enumerator_value);
     }
     expect_n_eat(ckx_token::type::tk_rbrace);
+
+    typename_table->add_typename(enum_name);
     return ret;
 }
 
@@ -446,13 +456,13 @@ ckx_parser_impl<CkxTokenStream>::parse_for_stmt()
     ckx_ast_expr *init = nullptr;
     ckx_ast_expr *cond = nullptr;
     ckx_ast_expr *incr = nullptr;
-    if (current_token() != ckx_token::type::tk_semicolon)
+    if (current_token()->token_type != ckx_token::type::tk_semicolon)
         init = parse_expr();
     expect_n_eat(ckx_token::type::tk_semicolon);
-    if (current_token() != ckx_token::type::tk_semicolon)
+    if (current_token()->token_type != ckx_token::type::tk_semicolon)
         cond = parse_expr();
     expect_n_eat(ckx_token::type::tk_semicolon);
-    if (current_token() != ckx_token::type::tk_semicolon)
+    if (current_token()->token_type != ckx_token::type::tk_semicolon)
         incr = parse_expr();
     expect_n_eat(ckx_token::type::tk_semicolon);
     expect_n_eat(ckx_token::type::tk_rparth);
@@ -758,7 +768,7 @@ ckx_parser_impl<CkxTokenStream>::parse_type()
     saber_ptr<ckx_type> type;
     if (current_token()->token_type == ckx_token::type::tk_id)
     {
-        /// @todo
+        type = new ckx_id_type(current_token()->str);
     }
     else
     {
@@ -828,7 +838,8 @@ template <typename CkxTokenStream>
 bool
 ckx_parser_impl<CkxTokenStream>::is_typename(saber_ptr<ckx_token> _token)
 {
-    /// @todo
+    assert(_token->token_type == ckx_token::type::tk_id);
+    return typename_table->query_typename(_token->str);
 }
 
 

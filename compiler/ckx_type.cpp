@@ -104,6 +104,31 @@ ckx_basic_type::to_string() const
 
 
 
+ckx_id_type::ckx_id_type(saber_string_view _name) :
+    ckx_type(category::type_id),
+    name(_name)
+{}
+
+qsizet
+ckx_id_type::size() const
+{
+    return 0;
+}
+
+saber_string
+ckx_id_type::to_string() const
+{
+    return name.get();
+}
+
+saber_string_view
+ckx_id_type::get_name() const
+{
+    return name;
+}
+
+
+
 ckx_struct_type::ckx_struct_type(saber_string_view _struct_name) :
     ckx_type(ckx_type::category::type_struct),
     struct_name(_struct_name)
@@ -267,13 +292,13 @@ ckx_type_helper::get_type(ckx_token::type _basic_type_token)
     case ckx_token::type::tk_vi16:  return get_vi16_type();
     case ckx_token::type::tk_vi32:  return get_vi32_type();
     case ckx_token::type::tk_vi64:  return get_vi64_type();
-    case ckx_token::type::tk_vu8:  return get_vu8_type();
-    case ckx_token::type::tk_vu16: return get_vu16_type();
-    case ckx_token::type::tk_vu32: return get_vu32_type();
-    case ckx_token::type::tk_vu64: return get_vu64_type();
+    case ckx_token::type::tk_vu8:   return get_vu8_type();
+    case ckx_token::type::tk_vu16:  return get_vu16_type();
+    case ckx_token::type::tk_vu32:  return get_vu32_type();
+    case ckx_token::type::tk_vu64:  return get_vu64_type();
     case ckx_token::type::tk_vch:   return get_vch_type();
-    case ckx_token::type::tk_vr32: return get_vr32_type();
-    case ckx_token::type::tk_vr64: return get_vr64_type();
+    case ckx_token::type::tk_vr32:  return get_vr32_type();
+    case ckx_token::type::tk_vr64:  return get_vr64_type();
     case ckx_token::type::tk_void:   return get_void_type();
 
     default: assert(0);
