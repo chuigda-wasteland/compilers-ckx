@@ -58,15 +58,13 @@ ckx_ast_stmt::ckx_ast_stmt(saber_ptr<ckx_token> _at_token) :
 ckx_ast_stmt::~ckx_ast_stmt() {}
 
 ckx_ast_compound_stmt::ckx_ast_compound_stmt(saber_ptr<ckx_token> _at_token) :
-    ckx_ast_stmt(_at_token),
-    local_table(_table)
+    ckx_ast_stmt(_at_token)
 {}
 
 ckx_ast_compound_stmt::~ckx_ast_compound_stmt()
 {
     for (ckx_ast_stmt* x : stmts)
         delete x;
-    delete local_table;
 }
 
 void
@@ -246,6 +244,7 @@ ckx_ast_variant_stmt::get_fields() const
     return fields;
 }
 
+void
 ckx_ast_variant_stmt::add_field(saber_ptr<ckx_type> _type,
                                 saber_string_view _name)
 {

@@ -58,8 +58,7 @@ protected:
     ckx_ast_expr*            parse_basic_expr();
     ckx_ast_id_expr*         parse_id();
 
-    template <typename CkxAstRecordStmt, typename CkxRecordType>
-    CkxAstRecordStmt* parse_record_stmt();
+    template <typename CkxAstRecordStmt> CkxAstRecordStmt* parse_record_stmt();
 
 protected:
 
@@ -77,11 +76,6 @@ protected:
     inline  void                  expect_n_eat(ckx_token::type _token_type);
     inline  void                  expect(ckx_token::type _token_type);
 
-    /// @brief interact with environment/symbol-table.
-    inline  ckx_env*        env();
-    inline  void            enter_scope(ckx_env* _new_scope_env);
-    inline  void            leave_scope();
-
     /// @brief functions for reporting problem.
     void syntax_error(saber_string&& _reason, const qcoord& _pos);
     void syntax_warn(saber_string&& _reason, const qcoord& _pos);
@@ -92,7 +86,6 @@ protected:
 
 protected:
     saber_ptr<CkxTokenStream> token_stream;
-    ckx_env *current_env;
 
     saber::list<ckx_error*> *error_list = nullptr;
     saber::list<ckx_error*> *warn_list = nullptr;

@@ -90,12 +90,10 @@ ckx_parser_impl<CkxTokenStream>::parse_impl(
     ckx_ast_translation_unit *trans_unit =
          new ckx_ast_translation_unit(current_token());
 
-    enter_scope(new ckx_env(nullptr));
     while (current_token()->token_type != ckx_token::type::tk_eoi)
     {
         trans_unit->add_new_stmt(parse_global_stmt());
     }
-    leave_scope();
 
     typename ckx_parser<CkxTokenStream>::parse_result ret =
          typename ckx_parser<CkxTokenStream>::parse_result(
@@ -137,10 +135,10 @@ ckx_parser_impl<CkxTokenStream>::parse_global_stmt()
         return parse_func_stmt();
 
     case ckx_token::type::tk_struct:
-        return parse_record_stmt<ckx_ast_struct_stmt, ckx_struct_type>();
+        return parse_record_stmt<ckx_ast_struct_stmt>();
 
     case ckx_token::type::tk_variant:
-        return parse_record_stmt<ckx_ast_variant_stmt, ckx_variant_type>();
+        return parse_record_stmt<ckx_ast_variant_stmt>();
 
     case ckx_token::type::tk_enum:
         return parse_enum_stmt();
@@ -186,12 +184,7 @@ ckx_parser_impl<CkxTokenStream>::parse_stmt()
     case ckx_token::type::tk_id:
         if ( is_typename(current_token()) )
         {
-            ckx_type::category type_category =
-                    env()->lookup_type(current_token()->str)
-                         ->type->get_category();
-            if ( type_category == ckx_type::category::type_enum )
-                if (peek_next_token()->token_type == ckx_token::type::tk_scope)
-                    return parse_expr_stmt();
+            /// @todo need to rework after changing the main framework
             return parse_decl_stmt();
         }
         else
@@ -259,11 +252,11 @@ ckx_parser_impl<CkxTokenStream>::parse_decl_stmt()
             init = parse_expr();
         }
 
-        auto status = env()->add_new_var(token->str, type);
-        ret->add_decl(new ckx_ast_init_decl(token, status.second, init));
+        ret->add_decl(new ckx_ast_init_decl(token, type, token->str, init));
 
         if ( peek_next_token()->token_type == ckx_token::type::tk_semicolon )
             break;
+        expect_n_eat(ckx_token::type::tk_comma);
     }
 
     expect_n_eat(ckx_token::type::tk_semicolon);
@@ -282,51 +275,36 @@ ckx_parser_impl<CkxTokenStream>::parse_func_stmt()
     saber_string_view func_name = current_token()->str;
 
     expect_n_eat(ckx_token::type::tk_lparth);
-    ckx_env *param_env = new ckx_env(env());
     saber::vector<saber_ptr<ckx_type>> param_type_list;
     saber::vector<ckx_ast_init_decl*> param_decl_list;
-    enter_scope(param_env);
     while (1)
     {
         saber_ptr<ckx_token> param_at_token = current_token();
         saber_ptr<ckx_type> param_type = parse_type();
         saber_string_view param_name = current_token()->str;
-        auto add_result = env()->add_new_var(param_name, param_type);
         param_type_list.push_back(param_type);
         param_decl_list.push_back(
-             new ckx_ast_init_decl(param_at_token, add_result.second, nullptr));
+            new ckx_ast_init_decl(
+                param_at_token, param_type, param_name, nullptr));
 
         if (current_token()->token_type == ckx_token::type::tk_comma)
             continue;
         if (current_token()->token_type == ckx_token::type::tk_rparth)
             break;
     }
-    leave_scope();
     expect_n_eat(ckx_token::type::tk_rparth);
     expect_n_eat(ckx_token::type::tk_colon);
     saber_ptr<ckx_type> ret_type = parse_type();
 
-    ckx_func_type *func_type =
-            new ckx_func_type(ret_type, saber::move(param_type_list));
-    auto add_result = env()->add_new_func(func_name, func_type);
-
+    ckx_ast_compound_stmt *fnbody = nullptr;
     if (current_token()->token_type == ckx_token::type::tk_lbrace)
-    {
-        enter_scope(param_env);
-        add_result.second->the_function->define(parse_compound_stmt());
-        leave_scope();
-    }
-    else if (current_token()->token_type == ckx_token::type::tk_semicolon)
-    {
-        next_token();
-    }
+        fnbody = parse_compound_stmt();
 
-    return new ckx_ast_func_stmt(at_token, add_result.second, param_env,
-                                 saber::move(param_decl_list));
+    return new ckx_ast_func_stmt(at_token, saber::move(param_decl_list));
 }
 
 template <typename CkxTokenStream>
-template <typename CkxAstRecordStmt, typename CkxRecordType>
+template <typename CkxAstRecordStmt>
 CkxAstRecordStmt*
 ckx_parser_impl<CkxTokenStream>::parse_record_stmt()
 {
@@ -340,9 +318,7 @@ ckx_parser_impl<CkxTokenStream>::parse_record_stmt()
     next_token();
     expect_n_eat(ckx_token::type::tk_lbrace);
 
-    CkxRecordType *record_type = new CkxRecordType(record_name);
-    saber_ptr<ckx_type> saber_type(record_type);
-    auto add_result = env()->add_new_type(record_name, saber_type);
+    CkxAstRecordStmt *ret = new CkxAstRecordStmt(at_token, record_name);
 
     while (1)
     {
@@ -350,7 +326,7 @@ ckx_parser_impl<CkxTokenStream>::parse_record_stmt()
         while (1)
         {
             saber_string_view dclr_name = current_token()->str;
-            record_type->add_field(dclr_name, decl_type);
+            ret->add_field(decl_type, dclr_name);
 
             if (current_token()->token_type == ckx_token::type::tk_comma)
                 { next_token(); continue; }
@@ -362,9 +338,6 @@ ckx_parser_impl<CkxTokenStream>::parse_record_stmt()
         if ( current_token()->token_type == ckx_token::type::tk_rbrace )
             break;
     }
-
-    expect_n_eat(ckx_token::type::tk_rbrace);
-    return new CkxAstRecordStmt(at_token, add_result.second);
 }
 
 template <typename CkxTokenStream>
@@ -374,26 +347,21 @@ ckx_parser_impl<CkxTokenStream>::parse_enum_stmt()
     assert(current_token()->token_type == ckx_token::type::tk_enum);
     saber_ptr<ckx_token> at_token = current_token();
     next_token();
-
     saber_string_view enum_name = current_token()->str;
+    ckx_ast_enum_stmt *ret = new ckx_ast_enum_stmt(at_token, enum_name);
+
     next_token();
     expect_n_eat(ckx_token::type::tk_lbrace);
-
-    ckx_enum_type *type = new ckx_enum_type(enum_name);
-    auto add_result =
-        env()->add_new_type(enum_name, saber_ptr<ckx_type>(type));
 
     while (current_token()->token_type != ckx_token::type::tk_rbrace)
     {
         saber_string_view enumerator_name = current_token()->str;
         expect_n_eat(ckx_token::type::tk_assign);
         qint64 enumerator_value = current_token()->v.i64;
-
-        type->add_enumerator(enumerator_name, enumerator_value);
+        ret->add_enumerator(enumerator_name, enumerator_value);
     }
-
     expect_n_eat(ckx_token::type::tk_rbrace);
-    return new ckx_ast_enum_stmt(at_token, add_result.second);
+    return ret;
 }
 
 template <typename CkxTokenStream>
@@ -539,18 +507,12 @@ ckx_parser_impl<CkxTokenStream>::parse_compound_stmt()
 {
     saber_ptr<ckx_token> at_token = current_token();
     expect_n_eat(ckx_token::type::tk_lbrace);
-
-    ckx_env *new_env = new ckx_env(env());
-    enter_scope(new_env);
-
-    ckx_ast_compound_stmt *ret = new ckx_ast_compound_stmt(at_token, new_env);
+    ckx_ast_compound_stmt *ret = new ckx_ast_compound_stmt(at_token);
     while (current_token()->token_type != ckx_token::type::tk_rbrace)
     {
         ret->add_new_stmt(parse_stmt());
     }
     expect_n_eat(ckx_token::type::tk_rbrace);
-    leave_scope();
-
     return ret;
 }
 
@@ -771,12 +733,9 @@ ckx_parser_impl<CkxTokenStream>::parse_basic_expr()
 
     case ckx_token::type::tk_id:
         {
-            ckx_var_entry* entry = env()->lookup_var(current_token()->str);
-            if (entry != nullptr)
-            {
-                next_token();
-                return new ckx_ast_id_expr(at_token, entry);
-            }
+            saber_string_view name = current_token()->str;
+            next_token();
+            return new ckx_ast_id_expr(at_token, name);
         }
 
     case ckx_token::type::tk_lparth:
@@ -799,7 +758,7 @@ ckx_parser_impl<CkxTokenStream>::parse_type()
     saber_ptr<ckx_type> type;
     if (current_token()->token_type == ckx_token::type::tk_id)
     {
-        type = env()->lookup_type( current_token()->str )->type;
+        /// @todo
     }
     else
     {
@@ -866,31 +825,10 @@ ckx_parser_impl<CkxTokenStream>::expect(ckx_token::type _token_type)
 }
 
 template <typename CkxTokenStream>
-inline ckx_env*
-ckx_parser_impl<CkxTokenStream>::env()
-{
-    return current_env;
-}
-
-template <typename CkxTokenStream>
-inline void
-ckx_parser_impl<CkxTokenStream>::enter_scope(ckx_env *_new_scope_env)
-{
-    current_env = _new_scope_env;
-}
-
-template <typename CkxTokenStream>
-inline void
-ckx_parser_impl<CkxTokenStream>::leave_scope()
-{
-    current_env = current_env->get_parent();
-}
-
-template <typename CkxTokenStream>
 bool
 ckx_parser_impl<CkxTokenStream>::is_typename(saber_ptr<ckx_token> _token)
 {
-    return env()->lookup_type(_token->str);
+    /// @todo
 }
 
 
