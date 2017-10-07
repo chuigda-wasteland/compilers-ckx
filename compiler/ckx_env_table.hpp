@@ -52,7 +52,6 @@ open_class ckx_func_entry
 
     saber_ptr<ckx_func_type> func_type;
     saber_string_view func_name;
-    ckx_ast_func_stmt *the_function;
 };
 
 open_class ckx_type_entry
