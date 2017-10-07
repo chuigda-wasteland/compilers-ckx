@@ -296,6 +296,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
 
         ckx_ast_expr *expr = base::parse_cast_expr();
         expr->ast_dump(writer, 0);
+        delete expr;
 
         cleanup_test();
         base::token_stream = nullptr;
@@ -308,6 +309,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
 
         ckx_ast_expr *expr = base::parse_cast_expr();
         expr->ast_dump(writer, 0);
+        delete expr;
 
         cleanup_test();
         base::token_stream = nullptr;
@@ -321,6 +323,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
 
         ckx_ast_expr *expr = base::parse_cast_expr();
         expr->ast_dump(writer, 0);
+        delete expr;
 
         cleanup_test();
         base::token_stream = nullptr;
@@ -336,6 +339,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
 
         ckx_ast_expr *expr = base::parse_cast_expr();
         expr->ast_dump(writer, 0);
+        delete expr;
 
         cleanup_test();
         base::token_stream = nullptr;
@@ -354,6 +358,7 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_binary_expr()
 
         ckx_ast_expr *expr = base::parse_binary_expr(0);
         expr->ast_dump(writer, 0);
+        delete expr;
 
         cleanup_test();
         base::token_stream = nullptr;
@@ -366,6 +371,7 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_binary_expr()
 
         ckx_ast_expr *expr = base::parse_binary_expr(0);
         expr->ast_dump(writer, 0);
+        delete expr;
 
         cleanup_test();
         base::token_stream = nullptr;
@@ -379,6 +385,7 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_binary_expr()
 
         ckx_ast_expr *expr = base::parse_binary_expr(0);
         expr->ast_dump(writer, 0);
+        delete expr;
 
         cleanup_test();
         base::token_stream = nullptr;
@@ -396,6 +403,7 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_cond_expr()
 
         ckx_ast_expr *expr = base::parse_cond_expr();
         expr->ast_dump(writer, 0);
+        delete expr;
 
         cleanup_test();
         base::token_stream = nullptr;
@@ -413,6 +421,7 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_assign_expr()
 
         ckx_ast_expr *expr = base::parse_assign_expr();
         expr->ast_dump(writer, 0);
+        delete expr;
 
         cleanup_test();
         base::token_stream = nullptr;
@@ -426,6 +435,7 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_assign_expr()
 
         ckx_ast_expr *expr = base::parse_assign_expr();
         expr->ast_dump(writer, 0);
+        delete expr;
 
         cleanup_test();
         base::token_stream = nullptr;
