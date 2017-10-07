@@ -21,6 +21,8 @@
 namespace ckx
 {
 
+constexpr quint16 indent_size = 2;
+
 void ckx_ast_translation_unit::ast_dump(ckx_file_writer& _writer,
                                         quint16 _level)
 { Q_UNUSED(_writer); Q_UNUSED(_level); }
@@ -87,12 +89,68 @@ void ckx_ast_enum_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 
 
 void ckx_ast_binary_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("Operator "));
+    switch (opercode)
+    {
+    case ckx_op::op_add:
+        _writer.write(reinterpret_cast<const qchar*>("+")); break;
+    case ckx_op::op_sub:
+        _writer.write(reinterpret_cast<const qchar*>("-")); break;
+    case ckx_op::op_mul:
+        _writer.write(reinterpret_cast<const qchar*>("*")); break;
+    case ckx_op::op_div:
+        _writer.write(reinterpret_cast<const qchar*>("/")); break;
+    case ckx_op::op_mod:
+        _writer.write(reinterpret_cast<const qchar*>("%")); break;
+    case ckx_op::op_bit_and:
+        _writer.write(reinterpret_cast<const qchar*>("&")); break;
+    case ckx_op::op_bit_or:
+        _writer.write(reinterpret_cast<const qchar*>("|")); break;
+    case ckx_op::op_bit_xor:
+        _writer.write(reinterpret_cast<const qchar*>("^")); break;
+    case ckx_op::op_logic_and:
+        _writer.write(reinterpret_cast<const qchar*>("&&")); break;
+    case ckx_op::op_logic_or:
+        _writer.write(reinterpret_cast<const qchar*>("||")); break;
+    case ckx_op::op_lt:
+        _writer.write(reinterpret_cast<const qchar*>("<")); break;
+    case ckx_op::op_gt:
+        _writer.write(reinterpret_cast<const qchar*>(">")); break;
+    case ckx_op::op_eq:
+        _writer.write(reinterpret_cast<const qchar*>("==")); break;
+    case ckx_op::op_leq:
+        _writer.write(reinterpret_cast<const qchar*>("<=")); break;
+    case ckx_op::op_geq:
+        _writer.write(reinterpret_cast<const qchar*>(">=")); break;
+    case ckx_op::op_neq:
+        _writer.write(reinterpret_cast<const qchar*>("!=")); break;
+
+    case ckx_op::op_assign:
+        _writer.write(reinterpret_cast<const qchar*>("=")); break;
+    case ckx_op::op_add_assign:
+        _writer.write(reinterpret_cast<const qchar*>("+=")); break;
+    case ckx_op::op_sub_assign:
+        _writer.write(reinterpret_cast<const qchar*>("-=")); break;
+    case ckx_op::op_mul_assign:
+        _writer.write(reinterpret_cast<const qchar*>("*=")); break;
+    case ckx_op::op_div_assign:
+        _writer.write(reinterpret_cast<const qchar*>("/=")); break;
+    case ckx_op::op_mod_assign:
+        _writer.write(reinterpret_cast<const qchar*>("%=")); break;
+
+    default: assert(false); // What the fuck!
+    }
+    _writer.write(reinterpret_cast<const qchar*>("\n"));
+    loperand->ast_dump(_writer, _level+1);
+    roperand->ast_dump(_writer, _level+1);
+}
 
 
 void ckx_ast_unary_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 {
-    _writer.write_whitespace(_level*2);
+    _writer.write_whitespace(_level*indent_size);
     switch (opercode)
     {
     case ckx_op::op_unary_negative:
@@ -121,7 +179,7 @@ void ckx_ast_unary_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 
 void ckx_ast_subscript_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 {
-    _writer.write_whitespace(_level*2);
+    _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Array Subscript Operator\n"));
     base->ast_dump(_writer, _level+1);
     subscript->ast_dump(_writer, _level+1);
@@ -130,15 +188,15 @@ void ckx_ast_subscript_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 
 void ckx_ast_invoke_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 {
-    _writer.write_whitespace(_level*2);
+    _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Function Invokation\n"));
-    _writer.write_whitespace((_level+1)*2);
+    _writer.write_whitespace((_level+1)*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Invoking\n"));
-    this->invokable->ast_dump(_writer, _level+2);
-    _writer.write_whitespace((_level+1)*2);
+    this->invokable->ast_dump(_writer, _level+indent_size);
+    _writer.write_whitespace((_level+1)*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("With arguments\n"));
     for (auto& arg : args)
-        arg->ast_dump(_writer, _level+2);
+        arg->ast_dump(_writer, _level+indent_size);
 }
 
 
@@ -151,12 +209,24 @@ void ckx_ast_enumerator_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
 
 
 void ckx_ast_cond_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("Conditional Operator\n"));
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("Condi\n"));
+    cond_expr->ast_dump(_writer, _level+2);
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("Then\n"));
+    then_expr->ast_dump(_writer, _level+2);
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("Else\n"));
+    else_expr->ast_dump(_writer, _level+2);
+}
 
 
 void ckx_ast_id_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 {
-    _writer.write_whitespace(_level*2);
+    _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Identifier \""));
     _writer.write(name);
     _writer.write(reinterpret_cast<const qchar*>("\"\n"));
@@ -164,12 +234,36 @@ void ckx_ast_id_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 
 
 void ckx_ast_cast_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    switch (op)
+    {
+    case castop::cst_ckx:
+        _writer.write(reinterpret_cast<const qchar*>("Ckx Cast\n")); break;
+    case castop::cst_const:
+        _writer.write(reinterpret_cast<const qchar*>("Const Cast\n")); break;
+    case castop::cst_static:
+        _writer.write(reinterpret_cast<const qchar*>("Static Cast\n")); break;
+    case castop::cst_reinterpret:
+        _writer.write(reinterpret_cast<const qchar*>("Reinterpret Cast\n"));
+        break;
+    }
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("From\n"));
+    expr->ast_dump(_writer, _level+2);
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("To\n"));
+    _writer.write_whitespace((_level+2)*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("[["));
+    _writer.write(this->desired_type->to_string());
+    _writer.write(reinterpret_cast<const qchar*>("]]\n"));
+
+}
 
 
 void ckx_ast_sizeof_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
 {
-    _writer.write_whitespace(_level*2);
+    _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Sizeof [["));
     _writer.write(type->to_string());
     _writer.write(reinterpret_cast<const qchar*>("]]\n"));
@@ -178,7 +272,7 @@ void ckx_ast_sizeof_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
 
 void ckx_ast_vi_literal_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
 {
-    _writer.write_whitespace(_level*2);
+    _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Integral literal "));
     _writer.write(val);
     _writer.write(reinterpret_cast<const qchar*>("\n"));
@@ -187,7 +281,7 @@ void ckx_ast_vi_literal_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
 
 void ckx_ast_vr_literal_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
 {
-    _writer.write_whitespace(_level*2);
+    _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Real literal "));
     _writer.write(val);
     _writer.write(reinterpret_cast<const qchar*>("\n"));
