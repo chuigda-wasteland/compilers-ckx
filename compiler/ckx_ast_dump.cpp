@@ -21,7 +21,7 @@
 namespace ckx
 {
 
-constexpr quint16 indent_size = 2;
+constexpr quint16 indent_size = 4;
 
 void ckx_ast_translation_unit::ast_dump(ckx_file_writer& _writer,
                                         quint16 _level)
@@ -201,11 +201,26 @@ void ckx_ast_invoke_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 
 
 void ckx_ast_extract_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("Extraction\n"));
+    extracted->ast_dump(_writer, _level+1);
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write(field_name);
+    _writer.write(reinterpret_cast<const qchar*>("\n"));
+}
 
 
 void ckx_ast_enumerator_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("Enumerator\n"));
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write(enum_name);
+    _writer.write(reinterpret_cast<const qchar*>(" :: "));
+    _writer.write(enumerator_name);
+    _writer.write(reinterpret_cast<const qchar*>("\n"));
+}
 
 
 void ckx_ast_cond_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)

@@ -85,20 +85,36 @@ template <typename CkxTokenStream>
 void
 ckx_parser_impl_test<CkxTokenStream>::test_parse_basic_expr()
 {
-    ckx_test_filereader reader {"123 literal number   39.5 array"};
     ckx_fp_writer writer { stdout };
 
-    base::token_stream = new CkxTokenStream(reader);
-    initialize_test();
-    for (int i = 0; i < 5; i++)
     {
+        ckx_test_filereader reader {"123 literal number   39.5 array"};
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+        for (int i = 0; i < 5; i++)
+        {
+            ckx_ast_expr *expr =
+                    base::parse_basic_expr();
+            expr->ast_dump(writer, 0);
+            delete expr;
+        }
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
+
+    {
+        ckx_test_filereader reader {"etype::ename"};
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+        base::typename_table->add_typename(
+        saber_string_pool::get().create_view("etype"));
         ckx_ast_expr *expr =
             base::parse_basic_expr();
         expr->ast_dump(writer, 0);
         delete expr;
+        cleanup_test();
+        base::token_stream = nullptr;
     }
-    cleanup_test();
-    base::token_stream = nullptr;
 }
 
 template <typename CkxTokenStream>
@@ -182,6 +198,30 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_postfix_expr()
 
     {
         ckx_test_filereader reader { "sum(a, 2, sum(5, 6), 4, number)" };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+
+        ckx_ast_expr* expr = base::parse_postfix_expr();
+        expr->ast_dump(writer, 0);
+        delete expr;
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
+
+    {
+        ckx_test_filereader reader { "a.b" };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+
+        ckx_ast_expr* expr = base::parse_postfix_expr();
+        expr->ast_dump(writer, 0);
+        delete expr;
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
+
+    {
+        ckx_test_filereader reader { "a.b.c" };
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
 

@@ -709,6 +709,15 @@ ckx_parser_impl<CkxTokenStream>::parse_postfix_expr()
                 break;
             }
 
+        case ckx_token::type::tk_dot:
+            {
+                next_token();
+                ret = new ckx_ast_extract_expr(
+                          at_token, ret, current_token()->str);
+                next_token();
+                break;
+            }
+
         default:
             return ret;
         }
@@ -744,6 +753,20 @@ ckx_parser_impl<CkxTokenStream>::parse_basic_expr()
     case ckx_token::type::tk_id:
         {
             saber_string_view name = current_token()->str;
+            if (is_typename(current_token()))
+            {
+                if (peek_next_token()->token_type == ckx_token::type::tk_scope)
+                {
+                    next_token();
+                    next_token();
+                    expect(ckx_token::type::tk_id);
+                    saber_string_view enumer = current_token()->str;
+                    ckx_ast_expr *ret =
+                        new ckx_ast_enumerator_expr(at_token, name, enumer);
+                    next_token();
+                    return ret;
+                }
+            }
             next_token();
             return new ckx_ast_id_expr(at_token, name);
         }
