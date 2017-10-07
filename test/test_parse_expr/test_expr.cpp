@@ -150,21 +150,8 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_type()
         ckx_test_filereader reader { "st" };
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
-        ckx_struct_type *struct_type =
-            new ckx_struct_type(saber_string_pool::get().create_view("st"));
-        struct_type->add_field(
-            saber_string_pool::get().create_view("integer"),
-            ckx_type_helper::get_type(ckx_token::type::tk_vi64));
-        struct_type->add_field(
-            saber_string_pool::get().create_view("real"),
-            ckx_type_helper::get_type(ckx_token::type::tk_vr64));
-        struct_type->add_field(
-            saber_string_pool::get().create_view("nquadra"),
-            ckx_type_helper::pointer_to(
-                ckx_type_helper::get_type(ckx_token::type::tk_vi64)));
-        saber_ptr<ckx_type> saber_type{ struct_type };
-        base::env()->add_new_type(
-            saber_string_pool::get().create_view("st"), saber_type);
+        base::typename_table->add_typename(
+            saber_string_pool::get().create_view("st"));
 
         saber_ptr<ckx_type> type = base::parse_type();
         writer.write(type->to_string());
@@ -185,10 +172,6 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_postfix_expr()
         ckx_test_filereader reader { "a[5]" };
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
-        base::env()->add_new_var(
-            saber_string_pool::get().create_view("a"),
-            ckx_type_helper::pointer_to(
-                ckx_type_helper::get_type(ckx_token::type::tk_vi8)));
 
         ckx_ast_expr* expr = base::parse_postfix_expr();
         expr->ast_dump(writer, 0);
@@ -201,15 +184,6 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_postfix_expr()
         ckx_test_filereader reader { "sum(a, 2, sum(5, 6), 4, number)" };
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
-        base::env()->add_new_var(
-            saber_string_pool::get().create_view("sum"),
-            ckx_type_helper::get_type(ckx_token::type::tk_vu8));
-        base::env()->add_new_var(
-            saber_string_pool::get().create_view("a"),
-            ckx_type_helper::get_type(ckx_token::type::tk_vu8));
-        base::env()->add_new_var(
-            saber_string_pool::get().create_view("b"),
-            ckx_type_helper::get_type(ckx_token::type::tk_vu8));
 
         ckx_ast_expr* expr = base::parse_postfix_expr();
         expr->ast_dump(writer, 0);
@@ -351,6 +325,21 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
         cleanup_test();
         base::token_stream = nullptr;
     }
+
+    {
+        ckx_test_filereader reader {
+            "reinterpret_cast<st const*>(array)" };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+        base::typename_table->add_typename(
+            saber_string_pool::get().create_view("st"));
+
+        ckx_ast_expr *expr = base::parse_cast_expr();
+        expr->ast_dump(writer, 0);
+
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
 }
 
 template<typename CkxTokenStream>
@@ -447,9 +436,9 @@ template <typename CkxTokenStream>
 void
 ckx_parser_impl_test<CkxTokenStream>::initialize_test()
 {
-    base::enter_scope(new ckx_env(nullptr));
     base::error_list = new saber::list<ckx_error*>;
     base::warn_list = new saber::list<ckx_error*>;
+    base::typename_table = new detail::ckx_typename_table;
 
     std::array<saber_string_view, 3> names
     {
@@ -461,22 +450,12 @@ ckx_parser_impl_test<CkxTokenStream>::initialize_test()
             saber_string_pool::get().create_view("literal")
         }
     };
-
-    for (auto& name : names)
-        base::env()->add_new_var(
-            name, ckx_type_helper::get_type(ckx_token::type::tk_vi32));
-
-    base::env()->add_new_var(
-        saber_string_pool::get().create_view("array"),
-        ckx_type_helper::pointer_to(
-            ckx_type_helper::get_type(ckx_token::type::tk_vi8)));
 }
 
 template <typename CkxTokenStream>
 void ckx_parser_impl_test<CkxTokenStream>::cleanup_test()
 {
-    delete base::current_env;
     delete base::error_list;
     delete base::warn_list;
-    base::current_env = nullptr;
+    delete base::typename_table;
 }

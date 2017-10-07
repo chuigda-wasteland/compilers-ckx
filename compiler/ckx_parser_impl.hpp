@@ -48,7 +48,7 @@ private:
 
 
 template <typename CkxTokenStream>
-class ckx_parser_impl final
+class ckx_parser_impl
 {
 public:
     explicit ckx_parser_impl() = default;
