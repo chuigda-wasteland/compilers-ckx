@@ -314,6 +314,12 @@ ckx_parser_impl<CkxTokenStream>::parse_record_stmt()
 {
     assert(current_token()->token_type == ckx_token::type::tk_struct \
            || current_token()->token_type == ckx_token::type::tk_variant);
+    static_assert(
+        saber::traits::type_equivalent<CkxAstRecordStmt, ckx_ast_struct_stmt>::
+                value ||
+        saber::traits::type_equivalent<CkxAstRecordStmt, ckx_ast_variant_stmt>::
+                value,
+        "What the fuck!");
 
     saber_ptr<ckx_token> at_token = current_token();
     next_token();
