@@ -4,9 +4,5 @@
 int main()
 {
     using namespace ckx;
-
-    ckx_parser<ckx_default_token_stream> parser;
-    parser.parse(nullptr);
-
     return 0;
 }

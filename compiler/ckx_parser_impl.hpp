@@ -66,6 +66,7 @@ protected:
     ckx_ast_decl_stmt*      parse_decl_stmt();
     ckx_ast_func_stmt*      parse_func_stmt();
     ckx_ast_enum_stmt*      parse_enum_stmt();
+    ckx_ast_alias_stmt*     parse_alias_stmt();
     ckx_ast_compound_stmt*  parse_ckx_block();
 
     ckx_ast_expr_stmt*      parse_expr_stmt();

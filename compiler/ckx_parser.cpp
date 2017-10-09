@@ -145,6 +145,9 @@ ckx_parser_impl<CkxTokenStream>::parse_global_stmt()
     case ckx_token::type::tk_enum:
         return parse_enum_stmt();
 
+    case ckx_token::type::tk_alias:
+        return parse_alias_stmt();
+
     case ckx_token::type::tk_ckx:
         return parse_ckx_block();
 
@@ -378,6 +381,24 @@ ckx_parser_impl<CkxTokenStream>::parse_enum_stmt()
 
     typename_table->add_typename(enum_name);
     return ret;
+}
+
+template<typename CkxTokenStream>
+ckx_ast_alias_stmt *ckx_parser_impl<CkxTokenStream>::parse_alias_stmt()
+{
+    assert(current_token()->token_type == ckx_token::type::tk_alias);
+    saber_ptr<ckx_token> at_token = current_token();
+    next_token();
+
+    expect(ckx_token::type::tk_id);
+    saber_string_view name = current_token()->str;
+    next_token();
+    expect_n_eat(ckx_token::type::tk_eq);
+    saber_ptr<ckx_type> type = parse_type();
+    expect_n_eat(ckx_token::type::tk_semicolon);
+
+    typename_table->add_typename(name);
+    return new ckx_ast_alias_stmt(at_token, name, type);
 }
 
 template <typename CkxTokenStream>
