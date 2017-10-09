@@ -194,13 +194,15 @@ private:
 class ckx_ast_decl_stmt final implements ckx_ast_stmt
 {
 public:
-    explicit ckx_ast_decl_stmt(saber_ptr<ckx_token> _at_token);
+    explicit ckx_ast_decl_stmt(saber_ptr<ckx_token> _at_token,
+                               saber_ptr<ckx_type> _type);
     ~ckx_ast_decl_stmt() override final;
 
     void add_decl(ckx_ast_init_decl* _decl);
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
 private:
+    saber_ptr<ckx_type> type;
     saber::vector<ckx_ast_init_decl*> decls;
 };
 

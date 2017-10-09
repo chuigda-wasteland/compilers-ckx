@@ -61,7 +61,16 @@ void ckx_ast_return_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 
 
 void ckx_ast_decl_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("Declaration\n");
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write("Type [[");
+    _writer.write(type->to_string());
+    _writer.write("]]\n");
+    for (auto &decl : decls)
+        decl->ast_dump(_writer, _level+1);
+}
 
 
 void ckx_ast_expr_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
@@ -73,7 +82,24 @@ void ckx_ast_func_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 
 
 void ckx_ast_init_decl::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("Init-decl\n");
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write("\"");
+    _writer.write(name);
+    _writer.write("\" initialized with ");
+    if (init == nullptr)
+    {
+        _writer.write("{Nothing}\n");
+    }
+    else
+    {
+        _writer.write("\n");
+        init->ast_dump(_writer, _level+2);
+    }
+
+}
 
 
 void ckx_ast_struct_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)

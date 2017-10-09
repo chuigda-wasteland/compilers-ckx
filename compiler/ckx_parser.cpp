@@ -245,23 +245,23 @@ template <typename CkxTokenStream>
 ckx_ast_decl_stmt*
 ckx_parser_impl<CkxTokenStream>::parse_decl_stmt()
 {
-    ckx_ast_decl_stmt* ret = new ckx_ast_decl_stmt(current_token());
     saber_ptr<ckx_type> type = parse_type();
+    ckx_ast_decl_stmt* ret = new ckx_ast_decl_stmt(current_token(), type);
 
     while (1)
     {
         saber_ptr<ckx_token> token = current_token();
         ckx_ast_expr *init = nullptr;
-        if ( peek_next_token()->token_type == ckx_token::type::tk_assign )
+        next_token();
+        if ( current_token()->token_type == ckx_token::type::tk_assign )
         {
-            next_token();
             next_token();
             init = parse_expr();
         }
 
         ret->add_decl(new ckx_ast_init_decl(token, type, token->str, init));
 
-        if ( peek_next_token()->token_type == ckx_token::type::tk_semicolon )
+        if ( current_token()->token_type == ckx_token::type::tk_semicolon )
             break;
         expect_n_eat(ckx_token::type::tk_comma);
     }

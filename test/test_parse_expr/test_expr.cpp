@@ -489,17 +489,6 @@ ckx_parser_impl_test<CkxTokenStream>::initialize_test()
     base::error_list = new saber::list<ckx_error*>;
     base::warn_list = new saber::list<ckx_error*>;
     base::typename_table = new detail::ckx_typename_table;
-
-    std::array<saber_string_view, 3> names
-    {
-        /// Clang recommended me to add a pair of brace here,
-        /// but I don't know why. >_<
-        {
-            saber_string_pool::get().create_view("number"),
-            saber_string_pool::get().create_view("integer"),
-            saber_string_pool::get().create_view("literal")
-        }
-    };
 }
 
 template <typename CkxTokenStream>
