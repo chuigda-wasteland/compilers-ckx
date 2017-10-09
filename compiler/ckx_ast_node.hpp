@@ -318,7 +318,20 @@ private:
     saber::vector<enumerator> enumerators;
 };
 
+class ckx_ast_alias_stmt final implements ckx_ast_stmt
+{
+public:
+    ckx_ast_alias_stmt(saber_ptr<ckx_token> _at_token,
+                       saber_string_view _name,
+                       saber_ptr<ckx_type> _type);
+    ~ckx_ast_alias_stmt() override final = default;
 
+    void ast_dump(ckx_file_writer &_writer, quint16 _level) override final;
+
+private:
+    saber_string_view name;
+    saber_ptr<ckx_type> type;
+};
 
 interface ckx_ast_expr implements ckx_ast_node
 {

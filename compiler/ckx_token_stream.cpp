@@ -245,22 +245,22 @@ void ckx_default_token_stream_impl::do_split_tokens()
         case '?':
             solve_ordinary_op(); break;
 
-        case 'b': case 'c': case 'd': case 'e': case 'f':
-        case 'i': case 'o': case 'r': case 's': case 'v':
-        case 'w':
+        case 'a': case 'b': case 'c': case 'd': case 'e':
+        case 'f': case 'i': case 'o': case 'r': case 's':
+        case 'v': case 'w':
             scan_full_id_string();
             if (!solve_keyword()) goto ordinary_identifier_tag;
             break;
 
-        case 'a': case 'g': case 'h': case 'j': case 'k':
-        case 'l': case 'm': case 'n': case 'p': case 'q':
-        case 't': case 'u': case 'x': case 'y': case 'z':
-        case 'A': case 'B': case 'C': case 'D': case 'E':
-        case 'F': case 'G': case 'H': case 'I': case 'J':
-        case 'K': case 'L': case 'M': case 'N': case 'O':
-        case 'P': case 'Q': case 'R': case 'S': case 'T':
-        case 'U': case 'V': case 'W': case 'X': case 'Y':
-        case 'Z': case '_':
+        case 'g': case 'h': case 'j': case 'k': case 'l':
+        case 'm': case 'n': case 'p': case 'q': case 't':
+        case 'u': case 'x': case 'y': case 'z': case 'A':
+        case 'B': case 'C': case 'D': case 'E': case 'F':
+        case 'G': case 'H': case 'I': case 'J': case 'K':
+        case 'L': case 'M': case 'N': case 'O': case 'P':
+        case 'Q': case 'R': case 'S': case 'T': case 'U':
+        case 'V': case 'W': case 'X': case 'Y': case 'Z':
+        case '_':
             scan_full_id_string();
         ordinary_identifier_tag:
             solve_identifier(); break;
@@ -271,7 +271,7 @@ void ckx_default_token_stream_impl::do_split_tokens()
     }
 
     token_buffer.emplace_back(
-                new ckx_token(char_coord(), ckx_token::type::tk_eoi));
+        new ckx_token(char_coord(), ckx_token::type::tk_eoi));
 }
 
 /**

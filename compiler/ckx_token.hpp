@@ -101,6 +101,7 @@ open_class ckx_token
         tk_struct,             // struct
         tk_variant,            // variant
         tk_enum,               // enum
+        tk_alias,              // alias
 
         tk_const,              // const
 

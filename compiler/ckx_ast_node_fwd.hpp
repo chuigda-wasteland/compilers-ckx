@@ -38,6 +38,7 @@ class ckx_ast_stmt;
     class ckx_ast_struct_stmt;
     class ckx_ast_variant_stmt;
     class ckx_ast_enum_stmt;
+    class ckx_ast_alias_stmt;
     class ckx_ast_decl_stmt;
     class ckx_ast_func_stmt;
     class ckx_ast_expr_stmt;

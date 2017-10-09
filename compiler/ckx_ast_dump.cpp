@@ -84,6 +84,9 @@ void ckx_ast_variant_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 { Q_UNUSED(_writer); Q_UNUSED(_level); }
 
 
+void ckx_ast_alias_stmt::ast_dump(ckx_file_writer &_writer, quint16 _level)
+{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+
 void ckx_ast_enum_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 { Q_UNUSED(_writer); Q_UNUSED(_level); }
 

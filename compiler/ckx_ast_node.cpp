@@ -251,7 +251,13 @@ ckx_ast_variant_stmt::add_field(saber_ptr<ckx_type> _type,
     fields.emplace_back(_type, _name);
 }
 
-
+ckx_ast_alias_stmt::ckx_ast_alias_stmt(saber_ptr<ckx_token> _at_token,
+                                       saber_string_view _name,
+                                       saber_ptr<ckx_type> _type) :
+    ckx_ast_stmt(_at_token),
+    name(_name),
+    type(_type)
+{}
 
 ckx_ast_enum_stmt::ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token,
                                      saber_string_view _name) :
