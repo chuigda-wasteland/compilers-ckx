@@ -121,18 +121,68 @@ void ckx_ast_init_decl::ast_dump(ckx_file_writer& _writer, quint16 _level)
 
 
 void ckx_ast_struct_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("Struct \"");
+    _writer.write(name);
+    _writer.write("\" contains\n");
+    for (auto &field : fields)
+    {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write("Field \"");
+        _writer.write(field.name);
+        _writer.write("\" of type [[");
+        _writer.write(field.type->to_string());
+        _writer.write("]]\n");
+    }
+}
 
 
 void ckx_ast_variant_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("Variant \"");
+    _writer.write(name);
+    _writer.write("\" contains\n");
+    for (auto &field : fields)
+    {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write("Field \"");
+        _writer.write(field.name);
+        _writer.write("\" of type [[");
+        _writer.write(field.type->to_string());
+        _writer.write("]]\n");
+    }
+}
 
 
 void ckx_ast_alias_stmt::ast_dump(ckx_file_writer &_writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("Alias \"");
+    _writer.write(name);
+    _writer.write("\" to [[");
+    _writer.write(type->to_string());
+    _writer.write("]]\n");
+}
+
 
 void ckx_ast_enum_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("Enumeration \"");
+    _writer.write(name);
+    _writer.write("\" contains\n");
+    for (auto &enumerator : enumerators)
+    {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write("Enumerator \"");
+        _writer.write(enumerator.name);
+        _writer.write("\" = ");
+        _writer.write(enumerator.value);
+        _writer.write("\n");
+    }
+}
 
 
 void ckx_ast_binary_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)

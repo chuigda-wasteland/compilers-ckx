@@ -47,8 +47,12 @@ class ckx_parser_impl_test final :
     using base = detail::ckx_parser_impl<CkxTokenStream>;
 
 public:
-    void test_parse_func_decl();
-    void test_parse_func_def();
+    void test_parse_struct();
+    /// @note we are not about to deal with variant type
+    /// since the processing of variant is identical with struct
+    /// void test_parse_variant();
+    void test_parse_enum();
+    void test_parse_alias();
 
 private:
     void initialize_test();
@@ -60,75 +64,81 @@ private:
 int main()
 {
     ckx_parser_impl_test<ckx_default_token_stream> test;
-    test.test_parse_func_decl();
+    test.test_parse_struct();
+    test.test_parse_enum();
+    test.test_parse_alias();
+
     return 0;
 }
 
 
 template <typename CkxTokenStream>
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_func_decl()
+ckx_parser_impl_test<CkxTokenStream>::test_parse_struct()
 {
     ckx_fp_writer writer { stdout };
 
     {
-        ckx_test_filereader reader
-            { "fn add (vi8 a, vi8 b) : vi8;" };
+        const char* str =
+R"noip(
+        struct student {
+            vi8 const* name;
+            vu8 chinese;
+            vu8 math;
+            vu8 english;
+        }
+)noip";
+        ckx_test_filereader reader { str };
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
-
-        ckx_ast_func_stmt *func = base::parse_func_stmt();
-        func->ast_dump(writer, 0);
-        delete func;
-
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        ckx_ast_struct_stmt *stmt =
+            base::template parse_record_stmt<ckx_ast_struct_stmt>();
+        stmt->ast_dump(writer, 0);
+        delete stmt;
         cleanup_test();
-        base::token_stream = nullptr;
-    }
-
-    {
-        ckx_test_filereader reader
-            { "fn heap_alloc (vu32 sz) : vi8*;" };
-        base::token_stream = new CkxTokenStream(reader);
-        initialize_test();
-
-        ckx_ast_func_stmt *func = base::parse_func_stmt();
-        func->ast_dump(writer, 0);
-        delete func;
-
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
-        cleanup_test();
-        base::token_stream = nullptr;
-    }
-
-    {
-        ckx_test_filereader reader
-            { "fn CreateStudent (vi8 const * name,\n"
-              "                  vi8 chinese,\n"
-              "                  vi8 math) : Student* const;" };
-        base::token_stream = new CkxTokenStream(reader);
-        initialize_test();
-        base::typename_table->add_typename(
-            saber_string_pool::get().create_view("Student"));
-
-        ckx_ast_func_stmt *func = base::parse_func_stmt();
-        func->ast_dump(writer, 0);
-        delete func;
-
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
-        cleanup_test();
-        base::token_stream = nullptr;
     }
 }
 
 template <typename CkxTokenStream>
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_func_def()
+ckx_parser_impl_test<CkxTokenStream>::test_parse_enum()
 {
-    /// @todo finish this part after other works are done.
+    ckx_fp_writer writer { stdout };
+
+    {
+        const char* str =
+R"noip(
+        enum color {
+            red = 1,
+            yellow = 2,
+            blue = 3
+        }
+)noip";
+        ckx_test_filereader reader { str };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+        ckx_ast_enum_stmt *stmt = base::parse_enum_stmt();
+        stmt->ast_dump(writer, 0);
+        delete stmt;
+        cleanup_test();
+    }
+}
+
+template <typename CkxTokenStream>
+void
+ckx_parser_impl_test<CkxTokenStream>::test_parse_alias()
+{
+    ckx_fp_writer writer { stdout };
+
+    {
+        ckx_test_filereader reader { "alias pcvi8 = vi8 const *;" };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+        ckx_ast_alias_stmt *stmt = base::parse_alias_stmt();
+        stmt->ast_dump(writer, 0);
+        delete stmt;
+        cleanup_test();
+    }
 }
 
 template <typename CkxTokenStream>
@@ -148,3 +158,4 @@ ckx_parser_impl_test<CkxTokenStream>::cleanup_test()
     delete base::warn_list;
     delete base::typename_table;
 }
+

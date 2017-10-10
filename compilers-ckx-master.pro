@@ -6,5 +6,6 @@ SUBDIRS += \
     test/env_test \
     test/test_parse_expr \
     test/test_parse_decl \
-    test/test_parse_func
+    test/test_parse_func \
+    test/test_parse_udt
 

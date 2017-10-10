@@ -15,11 +15,11 @@ SOURCES += \
     ../../compiler/ckx_parser.cpp \
     ../../compiler/ckx_token.cpp \
     ../../compiler/ckx_token_set.cpp \
-    ../../compiler/ckx_token_stream.cpp
+    ../../compiler/ckx_token_stream.cpp \
+    test_udt.cpp
 
 INCLUDEPATH += \
     ../../saber/include/ \
     ../../compiler/
 
-SOURCES += \
-    test_func.cpp
+SOURCES +=

@@ -349,6 +349,7 @@ ckx_parser_impl<CkxTokenStream>::parse_record_stmt()
         {
             saber_string_view dclr_name = current_token()->str;
             ret->add_field(decl_type, dclr_name);
+            next_token();
 
             if (current_token()->token_type == ckx_token::type::tk_comma)
                 { next_token(); continue; }
@@ -379,12 +380,20 @@ ckx_parser_impl<CkxTokenStream>::parse_enum_stmt()
     next_token();
     expect_n_eat(ckx_token::type::tk_lbrace);
 
-    while (current_token()->token_type != ckx_token::type::tk_rbrace)
+    while (1)
     {
         saber_string_view enumerator_name = current_token()->str;
+        next_token();
         expect_n_eat(ckx_token::type::tk_assign);
         qint64 enumerator_value = current_token()->v.i64;
         ret->add_enumerator(enumerator_name, enumerator_value);
+        next_token();
+
+        if (current_token()->token_type == ckx_token::type::tk_comma)
+            { next_token(); continue; }
+
+        if (current_token()->token_type == ckx_token::type::tk_rbrace)
+            { next_token(); break; }
     }
     expect_n_eat(ckx_token::type::tk_rbrace);
 
@@ -402,7 +411,7 @@ ckx_ast_alias_stmt *ckx_parser_impl<CkxTokenStream>::parse_alias_stmt()
     expect(ckx_token::type::tk_id);
     saber_string_view name = current_token()->str;
     next_token();
-    expect_n_eat(ckx_token::type::tk_eq);
+    expect_n_eat(ckx_token::type::tk_assign);
     saber_ptr<ckx_type> type = parse_type();
     expect_n_eat(ckx_token::type::tk_semicolon);
 
