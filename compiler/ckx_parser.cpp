@@ -316,6 +316,8 @@ ckx_parser_impl<CkxTokenStream>::parse_func_stmt()
     ckx_ast_compound_stmt *fnbody = nullptr;
     if (current_token()->token_type == ckx_token::type::tk_lbrace)
         fnbody = parse_compound_stmt();
+    else
+        expect_n_eat(ckx_token::type::tk_semicolon);
 
     return new ckx_ast_func_stmt(
         at_token, func_name, saber::move(param_decl_list), ret_type, fnbody);
