@@ -78,7 +78,24 @@ void ckx_ast_expr_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 
 
 void ckx_ast_func_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("Function \"");
+    _writer.write(name);
+    _writer.write("\"\n");
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write("Takes\n");
+    for (auto &param_decl : param_decls)
+        param_decl->ast_dump(_writer, _level+2);
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write("returns [[");
+    _writer.write(ret_type->to_string());
+    _writer.write("]]\n");
+    if (fnbody != nullptr)
+    {
+        fnbody->ast_dump(_writer, _level+2);
+    }
+}
 
 
 void ckx_ast_init_decl::ast_dump(ckx_file_writer& _writer, quint16 _level)
@@ -88,7 +105,9 @@ void ckx_ast_init_decl::ast_dump(ckx_file_writer& _writer, quint16 _level)
     _writer.write_whitespace((_level+1)*indent_size);
     _writer.write("\"");
     _writer.write(name);
-    _writer.write("\" initialized with ");
+    _writer.write("\" Of type [[");
+    _writer.write(type->to_string());
+    _writer.write("]] initialized with ");
     if (init == nullptr)
     {
         _writer.write("{Nothing}\n");
@@ -98,7 +117,6 @@ void ckx_ast_init_decl::ast_dump(ckx_file_writer& _writer, quint16 _level)
         _writer.write("\n");
         init->ast_dump(_writer, _level+2);
     }
-
 }
 
 

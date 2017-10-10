@@ -492,7 +492,8 @@ ckx_parser_impl_test<CkxTokenStream>::initialize_test()
 }
 
 template <typename CkxTokenStream>
-void ckx_parser_impl_test<CkxTokenStream>::cleanup_test()
+void
+ckx_parser_impl_test<CkxTokenStream>::cleanup_test()
 {
     delete base::error_list;
     delete base::warn_list;

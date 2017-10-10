@@ -222,14 +222,18 @@ class ckx_ast_func_stmt implements ckx_ast_stmt
 {
 public:
     ckx_ast_func_stmt(saber_ptr<ckx_token> _at_token,
+                      saber_string_view _name,
                       saber::vector<ckx_ast_init_decl*>&& _param_decls,
+                      saber_ptr<ckx_type> _ret_type,
                       ckx_ast_compound_stmt *_fnbody = nullptr);
     ~ckx_ast_func_stmt();
 
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
 private:
+    saber_string_view name;
     saber::vector<ckx_ast_init_decl*> param_decls;
+    saber_ptr<ckx_type> ret_type;
     ckx_ast_compound_stmt *fnbody;
 };
 

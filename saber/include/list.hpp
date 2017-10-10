@@ -356,7 +356,7 @@ template <typename T, typename Allocator>
 bool
 list<T, Allocator>::empty() const
 {
-    return (head->next == head);
+    return (begin() == end());
 }
 
 template <typename T, typename Allocator>
