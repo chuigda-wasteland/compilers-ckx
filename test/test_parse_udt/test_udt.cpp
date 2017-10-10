@@ -88,11 +88,31 @@ R"noip(
             vu8 english;
         }
 )noip";
+
         ckx_test_filereader reader { str };
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
         ckx_ast_struct_stmt *stmt =
             base::template parse_record_stmt<ckx_ast_struct_stmt>();
+        stmt->ast_dump(writer, 0);
+        delete stmt;
+        cleanup_test();
+    }
+
+    {
+        const char* str =
+R"noip(
+        struct listNode {
+            vi8 * const data;
+            listNode * next;
+        }
+)noip";
+
+        ckx_test_filereader reader { str };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+        ckx_ast_struct_stmt *stmt =
+                base::template parse_record_stmt<ckx_ast_struct_stmt>();
         stmt->ast_dump(writer, 0);
         delete stmt;
         cleanup_test();

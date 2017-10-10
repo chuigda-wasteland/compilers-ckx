@@ -240,7 +240,9 @@ ckx_ast_expr_stmt*
 ckx_parser_impl<CkxTokenStream>::parse_expr_stmt()
 {
     saber_ptr<ckx_token> at_token = current_token();
-    return new ckx_ast_expr_stmt(at_token, parse_expr());
+    ckx_ast_expr_stmt *ret = new ckx_ast_expr_stmt(at_token, parse_expr());
+    expect_n_eat(ckx_token::type::tk_semicolon);
+    return ret;
 }
 
 template <typename CkxTokenStream>
@@ -724,6 +726,11 @@ ckx_parser_impl<CkxTokenStream>::parse_postfix_expr()
         switch (current_token()->token_type)
         {
         case ckx_token::type::tk_id:
+            if (peek_next_token()->token_type == ckx_token::type::tk_scope)
+                /// @todo add solution for enumerators
+                ;
+            /// @attention fallthrough
+
         case ckx_token::type::tk_vi_literal:
         case ckx_token::type::tk_vr_literal:
             {

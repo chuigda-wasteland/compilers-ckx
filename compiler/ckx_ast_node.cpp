@@ -152,6 +152,11 @@ ckx_ast_return_stmt::ckx_ast_return_stmt(saber_ptr<ckx_token> _at_token,
     return_expr(_return_expr)
 {}
 
+ckx_ast_return_stmt::~ckx_ast_return_stmt()
+{
+    delete return_expr;
+}
+
 ckx_ast_decl_stmt::ckx_ast_decl_stmt(saber_ptr<ckx_token> _at_token,
                                      saber_ptr<ckx_type> _type) :
     ckx_ast_stmt(_at_token),

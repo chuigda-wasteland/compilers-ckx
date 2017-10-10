@@ -29,35 +29,113 @@ void ckx_ast_translation_unit::ast_dump(ckx_file_writer& _writer,
 
 
 void ckx_ast_compound_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("Compound-statement\n");
+    for (auto &stmt : stmts)
+        stmt->ast_dump(_writer, _level+1);
+    _writer.write_whitespace(_level*indent_size);
+}
 
 
 void ckx_ast_if_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("If-statement\n");
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write("Condition\n");
+    condition->ast_dump(_writer, _level+2);
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write("Then\n");
+    then_clause->ast_dump(_writer, _level+2);
+    if (else_clause != nullptr)
+    {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write("Else\n");
+        else_clause->ast_dump(_writer, _level+2);
+    }
+}
 
 
 void ckx_ast_while_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("While-statement\n");
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write("Condition\n");
+    condition->ast_dump(_writer, _level+2);
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write("Loop\n");
+    clause->ast_dump(_writer, _level+2);
+}
 
 
 void ckx_ast_do_while_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("Do-while-statement\n");
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write("Condition\n");
+    condition->ast_dump(_writer, _level+2);
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write("Loop\n");
+    clause->ast_dump(_writer, _level+2);
+}
 
 
 void ckx_ast_for_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("For-statement\n");
+    if (init != nullptr)
+    {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write("Initialization\n");
+        init->ast_dump(_writer, _level+2);
+    }
+    if (condition != nullptr)
+    {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write("Condition\n");
+        condition->ast_dump(_writer, _level+2);
+    }
+    if (incr != nullptr)
+    {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write("Increment\n");
+        incr->ast_dump(_writer, _level+2);
+    }
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write("Loop\n");
+    clause->ast_dump(_writer, _level+2);
+}
 
 
 void ckx_ast_break_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("Break-statement\n");
+}
 
 
 void ckx_ast_continue_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("Continue-statement\n");
+}
 
 
 void ckx_ast_return_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("Return-statement\n");
+    if (return_expr != nullptr)
+    {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write("Returns \n");
+        return_expr->ast_dump(_writer, _level+2);
+    }
+}
 
 
 void ckx_ast_decl_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
@@ -74,7 +152,11 @@ void ckx_ast_decl_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 
 
 void ckx_ast_expr_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("Expression-statement\n");
+    expr->ast_dump(_writer, _level+1);
+}
 
 
 void ckx_ast_func_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
@@ -289,11 +371,18 @@ void ckx_ast_invoke_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
     _writer.write(reinterpret_cast<const qchar*>("Function Invokation\n"));
     _writer.write_whitespace((_level+1)*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Invoking\n"));
-    this->invokable->ast_dump(_writer, _level+indent_size);
+    invokable->ast_dump(_writer, _level+2);
     _writer.write_whitespace((_level+1)*indent_size);
-    _writer.write(reinterpret_cast<const qchar*>("With arguments\n"));
-    for (auto& arg : args)
-        arg->ast_dump(_writer, _level+indent_size);
+    if (args.empty())
+    {
+        _writer.write(reinterpret_cast<const qchar*>("With no arguments\n"));
+    }
+    else
+    {
+        _writer.write(reinterpret_cast<const qchar*>("With arguments\n"));
+        for (auto& arg : args)
+            arg->ast_dump(_writer, _level+2);
+    }
 }
 
 

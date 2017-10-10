@@ -183,7 +183,7 @@ class ckx_ast_return_stmt final implements ckx_ast_stmt
 public:
     ckx_ast_return_stmt(saber_ptr<ckx_token> _at_token,
                         ckx_ast_expr* _return_expr);
-    ~ckx_ast_return_stmt() override final = default;
+    ~ckx_ast_return_stmt() override final;
 
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
