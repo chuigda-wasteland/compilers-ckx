@@ -25,7 +25,13 @@ constexpr quint16 indent_size = 4;
 
 void ckx_ast_translation_unit::ast_dump(ckx_file_writer& _writer,
                                         quint16 _level)
-{ Q_UNUSED(_writer); Q_UNUSED(_level); }
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write("Translation-unit\n");
+    for (auto &stmt : stmts)
+        stmt->ast_dump(_writer, _level+1);
+    _writer.write_whitespace(_level*indent_size);
+}
 
 
 void ckx_ast_compound_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
@@ -34,7 +40,7 @@ void ckx_ast_compound_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
     _writer.write("Compound-statement\n");
     for (auto &stmt : stmts)
         stmt->ast_dump(_writer, _level+1);
-    _writer.write_whitespace(_level*indent_size);
+    _writer.write("\n");
 }
 
 
@@ -170,11 +176,13 @@ void ckx_ast_func_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
     for (auto &param_decl : param_decls)
         param_decl->ast_dump(_writer, _level+2);
     _writer.write_whitespace((_level+1)*indent_size);
-    _writer.write("returns [[");
+    _writer.write("Returns [[");
     _writer.write(ret_type->to_string());
     _writer.write("]]\n");
     if (fnbody != nullptr)
     {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write("Function body\n");
         fnbody->ast_dump(_writer, _level+2);
     }
 }

@@ -61,6 +61,7 @@ int main()
 {
     ckx_parser_impl_test<ckx_default_token_stream> test;
     test.test_parse_func_decl();
+    test.test_parse_func_def();
     return 0;
 }
 
@@ -128,7 +129,34 @@ template <typename CkxTokenStream>
 void
 ckx_parser_impl_test<CkxTokenStream>::test_parse_func_def()
 {
-    /// @todo finish this part after other works are done.
+    ckx_fp_writer writer { stdout };
+
+    {
+        const char* str =
+R"cpp(
+    fn fibonacci(vu64 n) : vu64
+    {
+        if (n == 0) return 0;
+        if (n == 1) return 1;
+        return fibonacci(n-1) + fibonacci(n-2);
+    }
+)cpp";
+
+        ckx_test_filereader reader { str };
+        base::token_stream = new CkxTokenStream(reader);
+        initialize_test();
+        base::typename_table->add_typename(
+            saber_string_pool::get().create_view("Student"));
+
+        ckx_ast_func_stmt *func = base::parse_func_stmt();
+        func->ast_dump(writer, 0);
+        delete func;
+
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
 }
 
 template <typename CkxTokenStream>
