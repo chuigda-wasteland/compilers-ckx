@@ -511,7 +511,7 @@ ckx_parser_impl<CkxTokenStream>::parse_for_stmt()
     if (current_token()->token_type != ckx_token::type::tk_semicolon)
         cond = parse_expr();
     expect_n_eat(ckx_token::type::tk_semicolon);
-    if (current_token()->token_type != ckx_token::type::tk_semicolon)
+    if (current_token()->token_type != ckx_token::type::tk_rparth)
         incr = parse_expr();
     expect_n_eat(ckx_token::type::tk_semicolon);
     expect_n_eat(ckx_token::type::tk_rparth);
@@ -711,35 +711,12 @@ ckx_ast_expr*
 ckx_parser_impl<CkxTokenStream>::parse_postfix_expr()
 {
     saber_ptr<ckx_token> at_token = current_token();
-    ckx_ast_expr *ret = nullptr;
-
-    /// @todo note that this is a temporary solution.
-    /// Disgusting. Remove it as soon as possible.
-    if (current_token()->token_type == ckx_token::type::tk_lparth)
-    {
-        next_token();
-        ret = parse_expr();
-        expect_n_eat(ckx_token::type::tk_rparth);
-        return ret;
-    }
+    ckx_ast_expr *ret = parse_basic_expr();
 
     while (1)
     {
         switch (current_token()->token_type)
         {
-        case ckx_token::type::tk_id:
-            if (peek_next_token()->token_type == ckx_token::type::tk_scope)
-                /// @todo add solution for enumerators
-                ;
-            /// @attention fallthrough
-
-        case ckx_token::type::tk_vi_literal:
-        case ckx_token::type::tk_vr_literal:
-            {
-                ret = parse_basic_expr();
-                break;
-            }
-
         case ckx_token::type::tk_lparth:
             {
                 next_token();
@@ -831,6 +808,15 @@ ckx_parser_impl<CkxTokenStream>::parse_basic_expr()
             ckx_ast_expr *ret = parse_expr();
             expect_n_eat(ckx_token::type::tk_rparth);
             return ret;
+        }
+
+    case ckx_token::type::tk_sizeof:
+        {
+            next_token();
+            expect_n_eat(ckx_token::type::tk_lparth);
+            saber_ptr<ckx_type> type = parse_type();
+            expect_n_eat(ckx_token::type::tk_rparth);
+            return new ckx_ast_sizeof_expr(at_token, type);
         }
 
     default:

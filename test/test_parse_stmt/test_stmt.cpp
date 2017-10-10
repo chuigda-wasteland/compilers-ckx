@@ -238,7 +238,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_return_stmt()
     }
 
     {
-        initialize_test("return how_fuck_cpp_is(cpp17);");
+        initialize_test("return how_fuck_cpp_is(cpp_std::cpp17);");
+        base::typename_table->add_typename(
+            saber_string_pool::get().create_view("cpp_std"));
         ckx_ast_return_stmt *return_stmt = base::parse_return_stmt();
         return_stmt->ast_dump(writer, 0);
         delete return_stmt;
