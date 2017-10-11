@@ -1,0 +1,18 @@
+struct student
+{
+	vi8* name;
+	vu8 chinese;
+	vu8 math;
+	vu8 english;
+}
+
+fn createStudent(vi8 const* name, vu8 chinese, vu8 math, vu8 english) : student*
+{
+	student *ret = reinterpret_cast<student*>(heap_alloc(sizeof(student)));
+	string_copy(ret.name, name);
+	ret.chinese = chinese;
+	ret.math = math;
+	ret.english = english;
+	return ret;
+}
+

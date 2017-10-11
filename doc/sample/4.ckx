@@ -1,0 +1,19 @@
+fn input(vu64 *n) : void;
+fn print(vu64 n) : void;
+fn fibonacci(vu64 n) : vu64;
+
+ckx
+{
+	vu64 n;
+	input(&n);
+	print(fibonacci(n));
+	return 0;
+}
+
+fn fibonacci(vu64 n) : vu64
+{
+	if (n == 0) return 0;
+	if (n == 1) return 1;
+	return fibonacci(n-1) + fibonacci(n-2);
+}
+

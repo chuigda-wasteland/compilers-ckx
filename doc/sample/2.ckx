@@ -1,0 +1,27 @@
+struct student {
+    vu16 id;
+    vu8 chinese;
+    vu8 math;
+    vu8 english;
+}
+
+fn create_student(student* stu,
+                  vu16 id, 
+                  vu8 chinese,
+                  vu8 math, 
+                  vu8 english) : void 
+{
+    stu.id = id;
+    stu.chinese = chinese;
+    stu.math = math;
+    stu.english = english;
+}
+
+fn print_student(student const* stu) : void
+{
+    println(stu.id);
+    println(stu.chinese);
+    println(stu.math);
+    println(stu.english);
+}
+

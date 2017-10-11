@@ -15,10 +15,11 @@ SOURCES += \
     ../../compiler/ckx_parser.cpp \
     ../../compiler/ckx_token.cpp \
     ../../compiler/ckx_token_set.cpp \
-    ../../compiler/ckx_token_stream.cpp
+    ../../compiler/ckx_token_stream.cpp \
+    test_parser.cpp
 
 INCLUDEPATH += \
     ../../saber/include/ \
     ../../compiler/
 
-SOURCES += main.cpp
+SOURCES +=

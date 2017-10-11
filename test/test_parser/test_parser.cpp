@@ -45,9 +45,11 @@ int main(int argc, const char* argv[])
         new ckx_default_token_stream(reader);
 
     ckx_parser<ckx_default_token_stream> parser;
-    ckx_ast_translation_unit *trans_unit = parser.parse(stream).trans_unit;
-    trans_unit->ast_dump(writer, 0);
-    delete trans_unit;
+    auto parse_result = parser.parse(stream);
+    parse_result.trans_unit->ast_dump(writer, 0);
+    delete parse_result.trans_unit;
+    delete parse_result.error_list;
+    delete parse_result.warn_list;
 
     std::fclose(fp);
     return 0;

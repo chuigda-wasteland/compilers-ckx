@@ -1,0 +1,26 @@
+fn string_copy(vi8* _dest, vi8 const* _from) : void;
+fn inputstr(vi8* _dest) : void;
+fn printstr(vi8 const* _from) : void;
+fn heap_alloc(vu64 size) : void*;
+fn heap_free(void* address) : void;
+
+ckx
+{
+  vi8* stra = reinterpret_cast<vi8*>(heap_alloc(256*sizeof(vi8))),
+       strb = reinterpret_cast<vi8*>(heap_alloc(256*sizeof(vi8)));
+  inputstr(stra);
+  string_copy(strb, stra);
+  printstr(strb);
+  heap_free(reinterpret_cast<void*>(stra));
+  heap_free(reinterpret_cast<void*>(strb));
+  return 0;
+}
+
+fn string_copy(vi8* _dest, vi8 const * _from) : void {
+  while (*_from != 0) {
+    *_dest = *_from;
+    ++_dest;
+    ++_from;
+  }
+}
+

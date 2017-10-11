@@ -95,11 +95,20 @@ ckx_fp_reader_impl::ckx_fp_reader_impl(FILE *_fp) : fp(_fp) {}
 
 inline qchar ckx_fp_reader_impl::get_next_char_impl()
 {
+//    if (std::feof(fp))
+//    {
+//        return static_cast<qchar>(std::char_traits<qchar>::eof());
+//    }
+//    else
+//    {
+//        qchar ret;
+//        std::fscanf(fp, "%c", &ret);
+//        return ret;
+//    }
+
     qchar ret;
-    if (std::feof(fp))
-        return static_cast<qchar>(std::char_traits<qchar>::eof());
-    std::fscanf(this->fp, "%c", &ret);
-    return ret;
+    if (~std::fscanf(fp, "%c", &ret)) return ret;
+    else return static_cast<qchar>(std::char_traits<qchar>::eof());
 }
 
 

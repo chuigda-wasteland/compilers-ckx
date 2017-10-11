@@ -1,0 +1,10 @@
+struct type { vu8 value; }
+struct utype { type t; }
+struct vtype { utype u; }
+
+ckx
+{
+    vtype v;
+    print(v.u.t.value);
+    return 0;
+}

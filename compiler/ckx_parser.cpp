@@ -205,6 +205,8 @@ ckx_parser_impl<CkxTokenStream>::parse_stmt()
     case ckx_token::type::tk_bit_and:
     case ckx_token::type::tk_bit_not:
     case ckx_token::type::tk_logic_not:
+    case ckx_token::type::tk_inc:
+    case ckx_token::type::tk_dec:
 
     case ckx_token::type::tk_static_cast:
     case ckx_token::type::tk_reinterpret_cast:
@@ -424,15 +426,20 @@ ckx_ast_alias_stmt *ckx_parser_impl<CkxTokenStream>::parse_alias_stmt()
 }
 
 template <typename CkxTokenStream>
-ckx_ast_compound_stmt*
-ckx_parser_impl<CkxTokenStream>::parse_ckx_block()
+ckx_ast_func_stmt *ckx_parser_impl<CkxTokenStream>::parse_ckx_block()
 {
     assert(current_token()->token_type == ckx_token::type::tk_ckx);
     saber_ptr<ckx_token> at_token = current_token();
     next_token();
 
     expect(ckx_token::type::tk_lbrace);
-    return parse_compound_stmt();
+    ckx_ast_compound_stmt *fnbody = parse_compound_stmt();
+
+    return new ckx_ast_func_stmt(at_token,
+                                 saber_string_pool::get().create_view("main"),
+                                 saber::vector<ckx_ast_init_decl*>(),
+                                 ckx_type_helper::get_vi16_type(),
+                                 fnbody);
 }
 
 template <typename CkxTokenStream>

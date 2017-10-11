@@ -166,11 +166,11 @@ ckx_default_token_stream_impl::ckx_default_token_stream_impl(
 {
     src.reserve(default_reserved_size);
 
-    qchar ch;
-    while ((ch = _file_reader.get_next_char())
-           != (qchar)saber::char_traits<qchar>::eof())
+    qchar ch = _file_reader.get_next_char();
+    while (ch != (qchar)saber::char_traits<qchar>::eof())
     {
         src.push_back(ch);
+        ch = _file_reader.get_next_char();
     }
 
     do_split_tokens();
