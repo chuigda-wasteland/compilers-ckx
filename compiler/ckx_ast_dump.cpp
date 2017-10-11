@@ -400,8 +400,9 @@ void ckx_ast_extract_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
     _writer.write(reinterpret_cast<const qchar*>("Extraction\n"));
     extracted->ast_dump(_writer, _level+1);
     _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("Field \""));
     _writer.write(field_name);
-    _writer.write(reinterpret_cast<const qchar*>("\n"));
+    _writer.write(reinterpret_cast<const qchar*>("\"\n"));
 }
 
 
