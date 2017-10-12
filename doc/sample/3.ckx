@@ -14,12 +14,12 @@ fn create_student(student* stu, vu16 id) : void {
 }
 
 fn add_grade(student* stu, vu8 new_grade) : void {
-    grade **g = &stu.g;
+    grade** g = &stu.g;
     while (*g != nullptr) {
         *g = (*g).next;
     }
     *g = reinterpret_cast<grade*>(heap_alloc(sizeof(grade)));
-    g.value = new_grade;
-    g.next = nullptr;
+    (*g).value = new_grade;
+    (*g).next = nullptr;
 }
 
