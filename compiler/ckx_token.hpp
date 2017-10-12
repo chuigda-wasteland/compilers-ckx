@@ -74,8 +74,8 @@ open_class ckx_token
         tk_rbrace,             // }
         tk_lbracket,           // [
         tk_rbracket,           // ]
-        tk_lparth,             // (
-        tk_rparth,             // )
+        tk_lparen,             // (
+        tk_rparen,             // )
 
         tk_ques,               // ?
 

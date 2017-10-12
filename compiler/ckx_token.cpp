@@ -70,7 +70,7 @@ ckx_token::~ckx_token()
 
 ckx_token::ckx_token(const qcoord &_coord) :
     position(_coord),
-    str(saber_string_pool::get().create_view(""))
+    str(saber_string_pool::create_view(""))
 {}
 
 } // namespace ckx;

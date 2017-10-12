@@ -162,7 +162,7 @@ ckx_default_token_stream_impl::ckx_default_token_stream_impl(
     current_pos(0),
     char_coord_temp(1, 1),
     char_index_temp(0),
-    string_temp(saber_string_pool::get().create_view(""))
+    string_temp(saber_string_pool::create_view(""))
 {
     src.reserve(default_reserved_size);
 
@@ -560,8 +560,8 @@ void ckx_default_token_stream_impl::solve_ordinary_op()
     case '}': new_token_type = ckx_token::type::tk_rbrace;     break;
     case '[': new_token_type = ckx_token::type::tk_lbracket;   break;
     case ']': new_token_type = ckx_token::type::tk_rbracket;   break;
-    case '(': new_token_type = ckx_token::type::tk_lparth;     break;
-    case ')': new_token_type = ckx_token::type::tk_rparth;     break;
+    case '(': new_token_type = ckx_token::type::tk_lparen;     break;
+    case ')': new_token_type = ckx_token::type::tk_rparen;     break;
     case '?': new_token_type = ckx_token::type::tk_ques;       break;
         break;
     default:
@@ -593,7 +593,7 @@ void ckx_default_token_stream_impl::scan_full_id_string()
         next_char();
     }
 
-    string_temp = saber_string_pool::get().create_view(saber::move(strtemp));
+    string_temp = saber_string_pool::create_view(saber::move(strtemp));
 }
 
 bool ckx_default_token_stream_impl::solve_keyword()
@@ -725,14 +725,14 @@ inline void ckx_default_token_stream_impl::next_line()
 inline void ckx_default_token_stream_impl::lex_error(saber_string&& _desc)
 {
     errors.emplace_back(
-        char_coord(), saber_string_pool::get().create_view(saber::move(_desc)),
+        char_coord(), saber_string_pool::create_view(saber::move(_desc)),
         true);
 }
 
 inline void ckx_default_token_stream_impl::lex_warn(saber_string&& _desc)
 {
     errors.emplace_back(
-        char_coord(), saber_string_pool::get().create_view(saber::move(_desc)),
+        char_coord(), saber_string_pool::create_view(saber::move(_desc)),
         true);
 }
 

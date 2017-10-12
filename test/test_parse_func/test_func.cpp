@@ -112,7 +112,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_func_decl()
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
         base::typename_table->add_typename(
-            saber_string_pool::get().create_view("Student"));
+            saber_string_pool::create_view("Student"));
 
         ckx_ast_func_stmt *func = base::parse_func_stmt();
         func->ast_dump(writer, 0);
@@ -146,7 +146,7 @@ R"cpp(
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
         base::typename_table->add_typename(
-            saber_string_pool::get().create_view("Student"));
+            saber_string_pool::create_view("Student"));
 
         ckx_ast_func_stmt *func = base::parse_func_stmt();
         func->ast_dump(writer, 0);

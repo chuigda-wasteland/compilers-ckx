@@ -107,7 +107,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_basic_expr()
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
         base::typename_table->add_typename(
-        saber_string_pool::get().create_view("etype"));
+        saber_string_pool::create_view("etype"));
         ckx_ast_expr *expr =
             base::parse_basic_expr();
         expr->ast_dump(writer, 0);
@@ -167,7 +167,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_type()
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
         base::typename_table->add_typename(
-            saber_string_pool::get().create_view("st"));
+            saber_string_pool::create_view("st"));
 
         saber_ptr<ckx_type> type = base::parse_type();
         writer.write(type->to_string());
@@ -375,7 +375,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
         base::typename_table->add_typename(
-            saber_string_pool::get().create_view("st"));
+            saber_string_pool::create_view("st"));
 
         ckx_ast_expr *expr = base::parse_cast_expr();
         expr->ast_dump(writer, 0);

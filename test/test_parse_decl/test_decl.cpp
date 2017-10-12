@@ -115,7 +115,7 @@ ckx_parser_impl_test<CkxTokenStream>::test()
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
         base::typename_table->add_typename(
-            saber_string_pool::get().create_view("student"));
+            saber_string_pool::create_view("student"));
         ckx_ast_decl_stmt *decl = base::parse_decl_stmt();
         decl->ast_dump(writer, 0);
         delete decl;

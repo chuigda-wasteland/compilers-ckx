@@ -35,11 +35,14 @@ class string_pool
 {
     friend class string_view<StringType>;
 public:
-    static string_pool& get() noexcept;
-    string_view<StringType> create_view(const StringType& _string);
-    string_view<StringType> create_view(StringType&& _string);
+    static string_view<StringType> create_view(const StringType &_string);
+    static string_view<StringType> create_view(StringType &&_string);
 
 private:
+    static string_pool& get() noexcept;
+    string_view<StringType> create_view_impl(const StringType& _string);
+    string_view<StringType> create_view_impl(StringType&& _string);
+
     using set_type = unordered_map<StringType, size_t>;
 
     string_pool() = default;
@@ -108,6 +111,7 @@ string_view<StringType>::operator= (const string_view& _another) noexcept
 }
 
 
+
 template <typename StringType>
 string_pool<StringType>&
 string_pool<StringType>::get() noexcept
@@ -120,6 +124,21 @@ template <typename StringType>
 string_view<StringType>
 string_pool<StringType>::create_view(const StringType &_string)
 {
+    return string_pool<StringType>::get().create_view_impl(_string);
+}
+
+template <typename StringType>
+string_view<StringType>
+string_pool<StringType>::create_view(StringType &&_string)
+{
+    return string_pool<StringType>::get().create_view_impl(
+        saber::move(_string));
+}
+
+template <typename StringType>
+string_view<StringType>
+string_pool<StringType>::create_view_impl(const StringType &_string)
+{
     auto it = string_set.find(_string);
     if ( it == string_set.end() )
         it = string_set.insert(std::make_pair(_string, 1)).first;
@@ -128,7 +147,7 @@ string_pool<StringType>::create_view(const StringType &_string)
 
 template <typename StringType>
 string_view<StringType>
-string_pool<StringType>::create_view(StringType &&_string)
+string_pool<StringType>::create_view_impl(StringType &&_string)
 {
     auto it = string_set.find(_string);
     if ( it == string_set.end() )
