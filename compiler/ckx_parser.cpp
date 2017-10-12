@@ -207,7 +207,7 @@ ckx_parser_impl<CkxTokenStream>::parse_stmt()
     case ckx_token::type::tk_logic_not:
     case ckx_token::type::tk_inc:
     case ckx_token::type::tk_dec:
-    case ckx_token::type::tk_lparth:
+    case ckx_token::type::tk_lparen:
 
     case ckx_token::type::tk_static_cast:
     case ckx_token::type::tk_reinterpret_cast:
