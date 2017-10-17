@@ -389,7 +389,7 @@ ckx_parser_impl<CkxTokenStream>::parse_enum_stmt()
     next_token();
     expect_n_eat(ckx_token::type::tk_lbrace);
 
-    while (1)
+    while (current_token()->token_type != ckx_token::type::tk_rbrace)
     {
         saber_string_view enumerator_name = current_token()->str;
         next_token();
@@ -399,10 +399,7 @@ ckx_parser_impl<CkxTokenStream>::parse_enum_stmt()
         next_token();
 
         if (current_token()->token_type == ckx_token::type::tk_comma)
-            { next_token(); continue; }
-
-        if (current_token()->token_type == ckx_token::type::tk_rbrace)
-            { next_token(); break; }
+            next_token();
     }
     expect_n_eat(ckx_token::type::tk_rbrace);
 
@@ -523,7 +520,6 @@ ckx_parser_impl<CkxTokenStream>::parse_for_stmt()
     expect_n_eat(ckx_token::type::tk_semicolon);
     if (current_token()->token_type != ckx_token::type::tk_rparen)
         incr = parse_expr();
-    expect_n_eat(ckx_token::type::tk_semicolon);
     expect_n_eat(ckx_token::type::tk_rparen);
 
     ckx_ast_stmt *clause = parse_stmt();

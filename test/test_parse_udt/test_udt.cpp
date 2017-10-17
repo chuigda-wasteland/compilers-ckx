@@ -96,6 +96,8 @@ R"noip(
             base::template parse_record_stmt<ckx_ast_struct_stmt>();
         stmt->ast_dump(writer, 0);
         delete stmt;
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
     }
 
@@ -115,6 +117,8 @@ R"noip(
                 base::template parse_record_stmt<ckx_ast_struct_stmt>();
         stmt->ast_dump(writer, 0);
         delete stmt;
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
     }
 }
@@ -140,6 +144,8 @@ R"noip(
         ckx_ast_enum_stmt *stmt = base::parse_enum_stmt();
         stmt->ast_dump(writer, 0);
         delete stmt;
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
     }
 }
@@ -157,6 +163,8 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_alias()
         ckx_ast_alias_stmt *stmt = base::parse_alias_stmt();
         stmt->ast_dump(writer, 0);
         delete stmt;
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
     }
 }
@@ -178,4 +186,3 @@ ckx_parser_impl_test<CkxTokenStream>::cleanup_test()
     delete base::warn_list;
     delete base::typename_table;
 }
-

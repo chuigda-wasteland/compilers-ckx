@@ -98,6 +98,8 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_basic_expr()
             expr->ast_dump(writer, 0);
             delete expr;
         }
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -112,6 +114,8 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_basic_expr()
             base::parse_basic_expr();
         expr->ast_dump(writer, 0);
         delete expr;
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -132,6 +136,8 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_type()
         writer.write(type->to_string());
         writer.write("\n");
 
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -141,6 +147,8 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_type()
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
 
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         saber_ptr<ckx_type> type = base::parse_type();
         writer.write(type->to_string());
         writer.write("\n");
@@ -154,6 +162,8 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_type()
         base::token_stream = new CkxTokenStream(reader);
         initialize_test();
 
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         saber_ptr<ckx_type> type = base::parse_type();
         writer.write(type->to_string());
         writer.write("\n");
@@ -173,6 +183,8 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_type()
         writer.write(type->to_string());
         writer.write("\n");
 
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -192,6 +204,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_postfix_expr()
         ckx_ast_expr* expr = base::parse_postfix_expr();
         expr->ast_dump(writer, 0);
         delete expr;
+
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -204,6 +219,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_postfix_expr()
         ckx_ast_expr* expr = base::parse_postfix_expr();
         expr->ast_dump(writer, 0);
         delete expr;
+
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -216,6 +234,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_postfix_expr()
         ckx_ast_expr* expr = base::parse_postfix_expr();
         expr->ast_dump(writer, 0);
         delete expr;
+
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -228,6 +249,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_postfix_expr()
         ckx_ast_expr* expr = base::parse_postfix_expr();
         expr->ast_dump(writer, 0);
         delete expr;
+
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -247,6 +271,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
         ckx_ast_expr* expr = base::parse_unary_expr();
         expr->ast_dump(writer, 0);
         delete expr;
+
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -259,6 +286,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
         ckx_ast_expr* expr = base::parse_unary_expr();
         expr->ast_dump(writer, 0);
         delete expr;
+
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -271,6 +301,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
         ckx_ast_expr* expr = base::parse_unary_expr();
         expr->ast_dump(writer, 0);
         delete expr;
+
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -283,6 +316,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
         ckx_ast_expr* expr = base::parse_unary_expr();
         expr->ast_dump(writer, 0);
         delete expr;
+
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -295,6 +331,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
         ckx_ast_expr* expr = base::parse_unary_expr();
         expr->ast_dump(writer, 0);
         delete expr;
+
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -307,6 +346,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
         ckx_ast_expr* expr = base::parse_unary_expr();
         expr->ast_dump(writer, 0);
         delete expr;
+
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -319,6 +361,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
         ckx_ast_expr* expr = base::parse_unary_expr();
         expr->ast_dump(writer, 0);
         delete expr;
+
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -338,6 +383,8 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
         expr->ast_dump(writer, 0);
         delete expr;
 
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -351,6 +398,8 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
         expr->ast_dump(writer, 0);
         delete expr;
 
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -365,6 +414,8 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
         expr->ast_dump(writer, 0);
         delete expr;
 
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -381,6 +432,8 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
         expr->ast_dump(writer, 0);
         delete expr;
 
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -400,6 +453,8 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_binary_expr()
         expr->ast_dump(writer, 0);
         delete expr;
 
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -413,6 +468,8 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_binary_expr()
         expr->ast_dump(writer, 0);
         delete expr;
 
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -427,6 +484,8 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_binary_expr()
         expr->ast_dump(writer, 0);
         delete expr;
 
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -445,6 +504,8 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_cond_expr()
         expr->ast_dump(writer, 0);
         delete expr;
 
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -463,6 +524,8 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_assign_expr()
         expr->ast_dump(writer, 0);
         delete expr;
 
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -477,6 +540,8 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_assign_expr()
         expr->ast_dump(writer, 0);
         delete expr;
 
+        assert(base::error_list->empty());
+        assert(base::warn_list->empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
