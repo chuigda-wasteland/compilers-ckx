@@ -107,9 +107,8 @@ protected:
     inline  saber_ptr<ckx_token>  peek_next_token();
     inline  void                  next_token();
 
-    /// inline  bool  expect_eat_or_ignore(ckx_token::type _token_type);
-    /// inline  bool  expect_eat_or_skip(ckx_token::type _token_type);
-    inline  bool  expect_n_eat(ckx_token::type _token_type);
+    inline  bool  expect_n_eat(ckx_token::type _token_type,
+                               bool _can_skip = true);
     inline  bool  expect(ckx_token::type _token_type);
 
     /// @brief functions for reporting problem.

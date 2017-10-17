@@ -47,6 +47,13 @@ int main(int argc, const char* argv[])
     ckx_parser<ckx_default_token_stream> parser;
     auto parse_result = parser.parse(stream);
     parse_result.trans_unit->ast_dump(writer, 0);
+
+    for (auto &error : *(parse_result.error_list))
+    {
+        std::printf("At (%lu,%lu):", error.pos.first, error.pos.second);
+        std::printf("Error -- %s \n", error.desc.get().c_str());
+    }
+
     delete parse_result.trans_unit;
     delete parse_result.error_list;
     delete parse_result.warn_list;

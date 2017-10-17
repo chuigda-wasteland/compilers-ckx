@@ -735,7 +735,9 @@ ckx_parser_impl<CkxTokenStream>::parse_postfix_expr()
                        != ckx_token::type::tk_rparen)
                 {
                     args.push_back(parse_expr());
-                    expect_n_eat(ckx_token::type::tk_comma);
+
+                    if (current_token()->token_type == ckx_token::type::tk_comma)
+                        next_token();
                 }
                 expect_n_eat(ckx_token::type::tk_rparen);
                 ret = new ckx_ast_invoke_expr(at_token, ret, saber::move(args));
@@ -890,7 +892,8 @@ ckx_parser_impl<CkxTokenStream>::next_token()
 
 template <typename CkxTokenStream>
 inline bool
-ckx_parser_impl<CkxTokenStream>::expect_n_eat(ckx_token::type _token_type)
+ckx_parser_impl<CkxTokenStream>::expect_n_eat(ckx_token::type _token_type,
+                                              bool _can_skip)
 {
     if (current_token()->token_type == _token_type)
     {
@@ -899,6 +902,7 @@ ckx_parser_impl<CkxTokenStream>::expect_n_eat(ckx_token::type _token_type)
     }
     syntax_error(current_token()->position,
                  saber_string_pool::create_view("Unexpected token"));
+    if (_can_skip) next_token();
     return false;
 }
 
