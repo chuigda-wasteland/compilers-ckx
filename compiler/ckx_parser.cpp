@@ -25,8 +25,8 @@ namespace ckx
 template <typename CkxTokenStream>
 ckx_parser<CkxTokenStream>::parse_result::parse_result(
         ckx_ast_translation_unit *_trans_unit,
-        saber::list<ckx_error*> *_error_list,
-        saber::list<ckx_error*> *_warn_list) :
+        saber::list<ckx_error> *_error_list,
+        saber::list<ckx_error> *_warn_list) :
     trans_unit(_trans_unit),
     error_list(_error_list),
     warn_list(_warn_list)
@@ -84,8 +84,8 @@ ckx_parser_impl<CkxTokenStream>::parse_impl(
         saber_ptr<CkxTokenStream> _token_stream)
 {
     token_stream = _token_stream;
-    error_list = new saber::list<ckx_error*>;
-    warn_list = new saber::list<ckx_error*>;
+    error_list = new saber::list<ckx_error>;
+    warn_list = new saber::list<ckx_error>;
     typename_table = new ckx_typename_table;
 
     ckx_ast_translation_unit *trans_unit =
@@ -128,7 +128,7 @@ ckx_parser_impl<CkxTokenStream>::parse_global_stmt()
     /// Note that currently it is impossible for enum-type :: enumerator
     /// to appear in global statements.
     case ckx_token::type::tk_id:
-        if ( is_typename(current_token()) )
+        if ( id_is_typename(current_token()) )
             return parse_decl_stmt();
         else
             goto parse_decl_with_id_typename_failed;
@@ -159,10 +159,10 @@ ckx_parser_impl<CkxTokenStream>::parse_global_stmt()
 
     default:
     parse_decl_with_id_typename_failed:
-        syntax_error(
-            "Expected : typename, 'fn', 'struct', 'variant' or 'enum'"
-            " as the commemce of global declaration.",
-            current_token()->position);
+        syntax_error(current_token()->position,
+                     saber_string_pool::create_view(
+                     "Expected : typename, 'fn', 'struct', 'variant' or 'enum'"
+                     " as the commemce of global declaration."));
         return nullptr;
     }
 }
@@ -187,7 +187,7 @@ ckx_parser_impl<CkxTokenStream>::parse_stmt()
         return parse_decl_stmt();
 
     case ckx_token::type::tk_id:
-        if ( is_typename(current_token()) )
+        if ( id_is_typename(current_token()) )
         {
             if (peek_next_token()->token_type == ckx_token::type::tk_scope)
                 /// @note we just assume that type is an enum
@@ -225,12 +225,14 @@ ckx_parser_impl<CkxTokenStream>::parse_stmt()
     case ckx_token::type::tk_lbrace:    return parse_compound_stmt();
 
     case ckx_token::type::tk_semicolon:
-        syntax_warn("Empty declaration", current_token()->position);
+        syntax_warn(current_token()->position,
+                    saber_string_pool::create_view("Empty declaration"));
         next_token();
         break;
 
     default:
-        syntax_error("Ill-formed statement", current_token()->position);
+        syntax_error(current_token()->position,
+                     saber_string_pool::create_view("Ill-formed statement"));
         return nullptr;
     }
     return nullptr;
@@ -792,7 +794,7 @@ ckx_parser_impl<CkxTokenStream>::parse_basic_expr()
     case ckx_token::type::tk_id:
         {
             saber_string_view name = current_token()->str;
-            if (is_typename(current_token()))
+            if (id_is_typename(current_token()))
             {
                 if (peek_next_token()->token_type == ckx_token::type::tk_scope)
                 {
@@ -887,27 +889,32 @@ ckx_parser_impl<CkxTokenStream>::next_token()
 }
 
 template <typename CkxTokenStream>
-inline void
+inline bool
 ckx_parser_impl<CkxTokenStream>::expect_n_eat(ckx_token::type _token_type)
 {
     if (current_token()->token_type == _token_type)
+    {
         next_token();
-
-    syntax_error("Unexpected token", current_token()->position);
+        return true;
+    }
+    syntax_error(current_token()->position,
+                 saber_string_pool::create_view("Unexpected token"));
+    return false;
 }
 
 template <typename CkxTokenStream>
-inline void
-ckx_parser_impl<CkxTokenStream>::expect(ckx_token::type _token_type)
+inline bool ckx_parser_impl<CkxTokenStream>::expect(ckx_token::type _token_type)
 {
-    if (current_token()->token_type == _token_type)
-        return;
-    syntax_error("Unexpected token", current_token()->position);
+    if (current_token()->token_type == _token_type) return true;
+
+    syntax_error(current_token()->position,
+                 saber_string_pool::create_view("Unexpected token"));
+    return false;
 }
 
 template <typename CkxTokenStream>
 bool
-ckx_parser_impl<CkxTokenStream>::is_typename(saber_ptr<ckx_token> _token)
+ckx_parser_impl<CkxTokenStream>::id_is_typename(saber_ptr<ckx_token> _token)
 {
     assert(_token->token_type == ckx_token::type::tk_id);
     return typename_table->query_typename(_token->str);
@@ -915,25 +922,22 @@ ckx_parser_impl<CkxTokenStream>::is_typename(saber_ptr<ckx_token> _token)
 
 
 
-template <typename CkxTokenStream>
+template<typename CkxTokenStream>
 void
-ckx_parser_impl<CkxTokenStream>::syntax_error(saber_string &&_reason,
-                                              const qcoord &_pos)
+ckx_parser_impl<CkxTokenStream>::syntax_error(const qcoord &_coord,
+                                              saber_string_view _desc)
 {
-    /// @todo finalize this error processing system.
-    Q_UNUSED(_reason);
-    Q_UNUSED(_pos);
+    error_list->emplace_back(_coord, _desc);
 }
 
-template <typename CkxTokenStream>
+template<typename CkxTokenStream>
 void
-ckx_parser_impl<CkxTokenStream>::syntax_warn(saber_string&& _reason,
-                                             const qcoord& _pos)
+ckx_parser_impl<CkxTokenStream>::syntax_warn(const qcoord &_coord,
+                                             saber_string_view _desc)
 {
-    /// @todo finalize this error processing system.
-    Q_UNUSED(_reason);
-    Q_UNUSED(_pos);
+    warn_list->emplace_back(_coord, _desc);
 }
+
 
 
 template <typename CkxTokenStream>

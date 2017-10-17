@@ -276,8 +276,8 @@ template <typename CkxTokenStream>
 void
 ckx_parser_impl_test<CkxTokenStream>::initialize_test(const char* _parse_string)
 {
-    base::error_list = new saber::list<ckx_error*>;
-    base::warn_list = new saber::list<ckx_error*>;
+    base::error_list = new saber::list<ckx_error>;
+    base::warn_list = new saber::list<ckx_error>;
     base::typename_table = new detail::ckx_typename_table;
 
     reader = new ckx_test_filereader(_parse_string);

@@ -29,12 +29,11 @@ namespace ckx
 class ckx_error
 {
 public:
-    ckx_error(const qcoord& _pos, saber_string_view _desc, bool _is_fatal) :
-        pos(_pos), desc(_desc), is_fatal(_is_fatal) {}
+    ckx_error(const qcoord& _pos, saber_string_view _desc) :
+        pos(_pos), desc(_desc) {}
 
     qcoord pos;
     saber_string_view desc;
-    bool is_fatal;
 };
 
 }

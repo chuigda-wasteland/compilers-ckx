@@ -725,15 +725,13 @@ inline void ckx_default_token_stream_impl::next_line()
 inline void ckx_default_token_stream_impl::lex_error(saber_string&& _desc)
 {
     errors.emplace_back(
-        char_coord(), saber_string_pool::create_view(saber::move(_desc)),
-        true);
+        char_coord(), saber_string_pool::create_view(saber::move(_desc)));
 }
 
 inline void ckx_default_token_stream_impl::lex_warn(saber_string&& _desc)
 {
     errors.emplace_back(
-        char_coord(), saber_string_pool::create_view(saber::move(_desc)),
-        true);
+        char_coord(), saber_string_pool::create_view(saber::move(_desc)));
 }
 
 } // namespace detail

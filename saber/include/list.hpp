@@ -169,7 +169,7 @@ private:
     {
         T value;
         template <typename... Args>
-        list_node(Args&& ..._args) : value(_args...) {}
+        list_node(Args&& ..._args) : value(saber::forward<Args>(_args)...) {}
         ~list_node() = default;
     };
 
@@ -435,7 +435,7 @@ template <typename... Args>
 typename list<T, Allocator>::iterator
 list<T, Allocator>::emplace_back(Args&&... _args)
 {
-    emplace(cend(), saber::forward<Args>(_args)...);
+    return emplace(cend(), saber::forward<Args>(_args)...);
 }
 
 template <typename T, typename Allocator>
@@ -443,7 +443,7 @@ template <typename... Args>
 typename list<T, Allocator>::iterator
 list<T, Allocator>::emplace_front(Args&&... _args)
 {
-    emplace(cbegin(), saber::forward<Args>(_args)...);
+    return emplace(cbegin(), saber::forward<Args>(_args)...);
 }
 
 template <typename T, typename Allocator>

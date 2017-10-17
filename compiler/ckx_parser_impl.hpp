@@ -99,29 +99,31 @@ protected:
     saber_ptr<ckx_type> parse_type();
 
     /// @brief utility functions
-    bool is_typename(saber_ptr<ckx_token> _token);
+    bool id_is_typename(saber_ptr<ckx_token> _token);
 
     /// @brief token-access functions
     /// simply encapsuled token-stream again.
     inline  saber_ptr<ckx_token>  current_token();
     inline  saber_ptr<ckx_token>  peek_next_token();
     inline  void                  next_token();
-    inline  void                  expect_n_eat(ckx_token::type _token_type);
-    inline  void                  expect(ckx_token::type _token_type);
+
+    /// inline  bool  expect_eat_or_ignore(ckx_token::type _token_type);
+    /// inline  bool  expect_eat_or_skip(ckx_token::type _token_type);
+    inline  bool  expect_n_eat(ckx_token::type _token_type);
+    inline  bool  expect(ckx_token::type _token_type);
 
     /// @brief functions for reporting problem.
-    void syntax_error(saber_string&& _reason, const qcoord& _pos);
-    void syntax_warn(saber_string&& _reason, const qcoord& _pos);
+    void syntax_error(const qcoord& _coord, saber_string_view _desc);
+    void syntax_warn(const qcoord& _coord, saber_string_view _desc);
 
     /// @brief and here are functions for recovering from a syntax error.
-    /// @todo  implement these functions
     void skip2_token(const ckx_token_set& _token_set);
 
 protected:
     saber_ptr<CkxTokenStream> token_stream;
 
-    saber::list<ckx_error*> *error_list = nullptr;
-    saber::list<ckx_error*> *warn_list = nullptr;
+    saber::list<ckx_error> *error_list = nullptr;
+    saber::list<ckx_error> *warn_list = nullptr;
 
     /// @note still we need a table for storing types occured in parsing
     ckx_typename_table *typename_table;
