@@ -528,6 +528,26 @@ private:
     qreal val;
 };
 
+class ckx_ast_array_expr final implements ckx_ast_expr
+{
+public:
+    ckx_ast_array_expr(saber_ptr<ckx_token> _at_token,
+                       saber_ptr<ckx_type> _array_of_type);
+    ~ckx_ast_array_expr() override final;
+
+    void set_size(qint32 _size);
+    void set_range(ckx_ast_expr* _start, ckx_ast_expr* _finish);
+    void set_init_list(saber::vector<ckx_ast_expr*> &&_init_list);
+    void ast_dump(ckx_file_writer &_writer, quint16 _level) override final;
+
+private:
+    saber_ptr<ckx_type> array_of_type;
+    qint32 size = -1;
+    ckx_ast_expr *start = nullptr;
+    ckx_ast_expr *finish = nullptr;
+    saber::vector<ckx_ast_expr*> init_list;
+};
+
 } // namespace ckx
 
 #endif // CKX_AST_NODE_HPP

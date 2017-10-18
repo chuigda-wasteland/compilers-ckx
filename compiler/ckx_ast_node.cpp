@@ -436,4 +436,33 @@ ckx_ast_vr_literal_expr::ckx_ast_vr_literal_expr(saber_ptr<ckx_token> _at_token,
     val(_val)
 {}
 
+ckx_ast_array_expr::ckx_ast_array_expr(saber_ptr<ckx_token> _at_token,
+                                       saber_ptr<ckx_type> _array_of_type) :
+    ckx_ast_expr(_at_token),
+    array_of_type(_array_of_type)
+{}
+
+ckx_ast_array_expr::~ckx_ast_array_expr()
+{
+    for (auto &item : init_list)
+        delete item;
+}
+
+void ckx_ast_array_expr::set_size(qint32 _size)
+{
+    size = _size;
+}
+
+void ckx_ast_array_expr::set_range(ckx_ast_expr *_start, ckx_ast_expr *_finish)
+{
+    start = _start;
+    finish = _finish;
+}
+
+void ckx_ast_array_expr::set_init_list(
+        saber::vector<ckx_ast_expr *> &&_init_list)
+{
+    init_list = saber::move(_init_list);
+}
+
 } // namespace ckx
