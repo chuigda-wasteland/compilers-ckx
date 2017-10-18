@@ -111,14 +111,17 @@ Unlike in C, an `array` in ckx means a `range`. That is to say, for any array, i
 
 There are four "create array" grammers:
     
-    vi8[] array = vi8[](startpoint, finishpoint);  (1)
-    vi8[] array = vi8[n](startpoint);              (2)
-    vi8[] array = vi8[n];                          (3)
-    vi8[] array = vi8[n]{initializer-list};        (4)
+    type[] array = type[](start-point, finish-point);  (1)
+    type[] array = type[n](start-point);               (2)
+    type[] array = type[n];                            (3)
+    type[] array = type[n] {initializer-list};         (4)
     
-(1) Create an array according to the given storage, specified by startpoint and finishpoint.
+(1) Create an array according to the given storage, specified by start-point and finish-point.
+
 (2) Create an array according to the given storage, unlike (1), the finishpoint is calculated through n automatically.
+
 (3) Create an array on stack, containing n default-initialized elements.
+
 (4) Create an array on stack, containing n elements, with the first several elements initialized with initializer-list.
  
 
