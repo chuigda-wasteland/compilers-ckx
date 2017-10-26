@@ -2,6 +2,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     compiler \
+    llvm_ir_builder \
     test/default_tokenstream \
     test/env_test \
     test/test_parse_expr \
