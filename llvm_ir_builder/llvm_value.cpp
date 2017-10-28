@@ -44,18 +44,22 @@ llvm_constant::llvm_constant(qreal _val) :
 }
 
 llvm_constant::llvm_constant(decltype(nullptr)) :
-    type(constant_type::ct_nullptr)
-{}
+    type(constant_type::ct_nullptr) {}
 
+saber_string_view llvm_constant::to_string()
+{ return saber_string_pool::create_view(""); }
 
 llvm_global::llvm_global(saber_string_view _name) :
-    name(_name)
-{}
+    name(_name) {}
 
+saber_string_view llvm_global::to_string()
+{ return saber_string_pool::create_view(""); }
 
 llvm_variable::llvm_variable(saber_string_view _name) :
-    name(_name)
-{}
+    name(_name) {}
+
+saber_string_view llvm_variable::to_string()
+{ return saber_string_pool::create_view(""); }
 
 
 } // namespace faker

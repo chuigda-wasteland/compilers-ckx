@@ -30,7 +30,7 @@ namespace faker
 interface llvm_instruction make_use_of llvm_implicit_list_node
 {
 public:
-    llvm_instruction(llvm_instruction* _prev, llvm_instruction* _next);
+    llvm_instruction() = default;
     virtual ~llvm_instruction() = 0;
 };
 

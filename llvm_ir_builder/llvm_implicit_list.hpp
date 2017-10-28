@@ -7,7 +7,7 @@ namespace faker
 class llvm_implicit_list_node
 {
 public:
-    llvm_implicit_list_node() : llvm_implicit_list_node(nullptr, nullptr) {}
+    llvm_implicit_list_node() {}
     ~llvm_implicit_list_node() {}
 
     llvm_implicit_list_node* get_prev() noexcept { return prev; }

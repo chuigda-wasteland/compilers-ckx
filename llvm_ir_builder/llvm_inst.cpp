@@ -22,6 +22,9 @@
 namespace faker
 {
 
+llvm_instruction::~llvm_instruction() {}
+
+
 llvm_func_decl::llvm_func_decl(
         saber_string_view _name,
         saber::vector<llvm_type> &&_param_type_list,
@@ -73,7 +76,7 @@ void llvm_label::set_label_name(saber_string_view _name)
 }
 
 
-saber_string_view llvm_label::get_label_name()
+saber_string_view llvm_label::get_label_name() const
 {
     DEBUG_EXEC( assert(name_set) );
     return name;

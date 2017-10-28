@@ -110,7 +110,7 @@ public:
     explicit llvm_label() = default;
     ~llvm_label() override final = default;
 
-    void set_label_name(saber_string_view _name) = default;
+    void set_label_name(saber_string_view _name);
     saber_string_view get_label_name() const;
 
 private:

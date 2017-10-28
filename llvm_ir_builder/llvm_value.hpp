@@ -29,6 +29,7 @@ namespace faker
 interface llvm_value
 {
 public:
+    llvm_value() = default;
     virtual ~llvm_value() = 0;
     virtual saber_string_view to_string() = 0;
 };
