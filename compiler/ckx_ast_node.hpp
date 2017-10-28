@@ -505,8 +505,7 @@ private:
 class ckx_ast_vi_literal_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_vi_literal_expr(saber_ptr<ckx_token> _at_token,
-                            qint64 _val);
+    ckx_ast_vi_literal_expr(saber_ptr<ckx_token> _at_token, qint64 _val);
     ~ckx_ast_vi_literal_expr() override final = default;
 
     void ast_dump(ckx_file_writer &_writer, quint16 _level) override final;
@@ -518,8 +517,7 @@ private:
 class ckx_ast_vr_literal_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_vr_literal_expr(saber_ptr<ckx_token> _at_token,
-                            qreal _val);
+    ckx_ast_vr_literal_expr(saber_ptr<ckx_token> _at_token, qreal _val);
     ~ckx_ast_vr_literal_expr() override final = default;
 
     void ast_dump(ckx_file_writer &_writer, quint16 _level) override final;

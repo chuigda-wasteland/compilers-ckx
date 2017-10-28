@@ -590,6 +590,82 @@ ckx_parser_impl<CkxTokenStream>::parse_expr()
 
 template <typename CkxTokenStream>
 ckx_ast_expr*
+ckx_parser_impl<CkxTokenStream>::parse_init_expr()
+{
+    switch (current_token()->token_type)
+    {
+    case ckx_token::type::tk_vi8:
+    case ckx_token::type::tk_vi16:
+    case ckx_token::type::tk_vi32:
+    case ckx_token::type::tk_vi64:
+    case ckx_token::type::tk_vu8:
+    case ckx_token::type::tk_vu16:
+    case ckx_token::type::tk_vu32:
+    case ckx_token::type::tk_vu64:
+    case ckx_token::type::tk_vch:
+    case ckx_token::type::tk_vr32:
+    case ckx_token::type::tk_vr64:
+        return parse_array_expr();
+
+    case ckx_token::type::tk_id:
+        if (id_is_typename(current_token()->str))
+            return parse_array_expr();
+        else
+            return parse_expr();
+    }
+}
+
+template <typename CkxTokenStream>
+ckx_ast_expr*
+ckx_parser_impl<CkxTokenStream>::parse_array_expr()
+{
+    saber_ptr<ckx_token> at_token = current_token();
+    saber_ptr<ckx_type> array_type = parse_type();
+    assert(array_type != nullptr);
+
+    ckx_ast_array_expr *ret = new ckx_ast_array_expr(at_token, array_type);
+
+    qint32 array_size = -1;
+    expect_n_eat(ckx_token::type::tk_lbracket);
+    if (current_token()->token_type == ckx_token::type::tk_vi_literal)
+    {
+        ret->set_size(current_token()->v.i64);
+        next_token();
+    }
+    expect_n_eat(ckx_token::type::tk_lbracket);
+
+    if (current_token()->token_type == ckx_token::type::tk_lbrace)
+    {
+        next_token();
+        saber::vector<ckx_ast_expr*> init_list;
+        while (current_token() != ckx_token::type::tk_rbrace)
+        {
+            init_list.push_back(parse_init_expr());
+            expect_n_eat(ckx_token::type::tk_comma);
+        }
+        expect_n_eat(ckx_token::type::tk_rbrace);
+        ret->set_init_list(saber::move(init_list));
+    }
+    else if (current_token()->token_type == ckx_token::type::tk_lparen)
+    {
+        next_token();
+        ckx_ast_expr *start = parse_expr();
+        ckx_ast_expr *finish = nullptr;
+        if (current_token() == ckx_token::type::tk_comma)
+        {
+            next_token();
+            finish = parse_expr();
+        }
+        expect_n_eat(ckx_token::type::tk_rparen);
+        ret->set_range(start, finish);
+    }
+
+    return ret;
+}
+
+
+template <typename CkxTokenStream>
+ckx_ast_expr*
 ckx_parser_impl<CkxTokenStream>::parse_cond_expr()
 {
     saber_ptr<ckx_token> at_token = current_token();
