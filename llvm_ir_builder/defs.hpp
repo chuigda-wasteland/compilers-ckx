@@ -61,7 +61,7 @@ constexpr qsizet countof(const ArrayType& _array)
     return sizeof(_array) / sizeof(_array[0]);
 }
 
-} // namespace ckx
+} // namespace faker
 
 #define interface class
 #define pod_struct struct
@@ -72,5 +72,13 @@ constexpr qsizet countof(const ArrayType& _array)
 #define make_use_of : public
 
 #define Q_ON_HOLD(ANYTHING)
+
+#define LLVM_DEBUG
+
+#ifdef LLVM_DEBUG
+#define DEBUG_EXEC(ANYTHING) ANYTHING
+#else
+#define DEBUG_EXEC(ANYTHING)
+#endif
 
 #endif // DEFS_HPP

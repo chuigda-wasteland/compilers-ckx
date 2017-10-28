@@ -4,7 +4,8 @@ CONFIG -= qt
 
 SOURCES += \
     llvm_value.cpp \
-    ../saber/src/safe_stl_general.cpp
+    ../saber/src/safe_stl_general.cpp \
+    llvm_inst.cpp
 
 HEADERS += \
     llvm_value.hpp \
@@ -28,7 +29,10 @@ HEADERS += \
     ../saber/include/string.hpp \
     ../saber/include/unordered_map.hpp \
     llvm_value_detail.hpp \
-    llvm_inst.hpp
+    llvm_inst.hpp \
+    llvm_inst_detail.hpp \
+    llvm_type.hpp \
+    llvm_implicit_list.hpp
 
 INCLUDEPATH +=\
     ../saber/include/
