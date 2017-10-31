@@ -111,10 +111,10 @@ Unlike in C, an `array` in ckx means a `range`. That is to say, for any array, i
 
 There are four "create array" grammers:
     
-    type[] array = type[](start-point, finish-point);  (1)
-    type[] array = type[n](start-point);               (2)
-    type[] array = type[n];                            (3)
-    type[] array = type[n] {initializer-list};         (4)
+    type[] array = type[]()(start-point, finish-point);           (1)
+    type[] array = type[](array-size)(start-point);               (2)
+    type[] array = type[](array-size);                            (3)
+    type[] array = type[](array-size){initializer-list};          (4)
     
 (1) Create an array according to the given storage, specified by start-point and finish-point.
 
