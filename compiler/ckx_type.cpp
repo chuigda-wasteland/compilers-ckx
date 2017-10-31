@@ -282,6 +282,22 @@ ckx_pointer_type::to_string() const
 }
 
 
+ckx_array_type::ckx_array_type(saber_ptr<ckx_type> _element) :
+    ckx_type(ckx_type::category::type_array),
+    element(_element)
+{}
+
+qsizet ckx_array_type::size() const
+{
+    return 16;
+}
+
+saber_string
+ckx_array_type::to_string() const
+{
+    return element->to_string() + "[]";
+}
+
 
 saber_ptr<ckx_type>
 ckx_type_helper::get_type(ckx_token::type _basic_type_token)
@@ -315,6 +331,12 @@ saber_ptr<ckx_type>
 ckx_type_helper::pointer_to(saber_ptr<ckx_type> _base)
 {
     return saber_ptr<ckx_type>(new ckx_pointer_type(_base));
+}
+
+saber_ptr<ckx_type>
+ckx_type_helper::array_of(saber_ptr<ckx_type> _base)
+{
+    return saber_ptr<ckx_type>(new ckx_array_type(_base));
 }
 
 saber_ptr<ckx_type>

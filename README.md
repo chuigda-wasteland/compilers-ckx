@@ -105,7 +105,25 @@ Pointers in ckx is the same as pointers in C. The powerful low-level operator.
 
 ### Arrays
 
-> Still under work. If you have a good idea about it, contact me and I'll be appreciated.
+> P0001R0 "Array TS"
+
+Unlike in C, an `array` in ckx means a `range`. That is to say, for any array, it is possible to calculate its size according to its start point and finish point.
+
+There are four "create array" grammers:
+    
+    type[] array = type[]()(start-point, finish-point);           (1)
+    type[] array = type[](array-size)(start-point);               (2)
+    type[] array = type[](array-size);                            (3)
+    type[] array = type[](array-size){initializer-list};          (4)
+    
+(1) Create an array according to the given storage, specified by start-point and finish-point.
+
+(2) Create an array according to the given storage, unlike (1), the finishpoint is calculated through n automatically.
+
+(3) Create an array on stack, containing n default-initialized elements.
+
+(4) Create an array on stack, containing n elements, with the first several elements initialized with initializer-list.
+ 
 
 ### Other special features
 

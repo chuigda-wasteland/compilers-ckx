@@ -80,6 +80,8 @@ protected:
     ckx_ast_compound_stmt*  parse_compound_stmt();
 
     ckx_ast_expr*  parse_expr();
+    ckx_ast_expr*  parse_init_expr();
+    ckx_ast_expr*  parse_array_expr();
 
     ckx_ast_expr*  parse_cond_expr();
     ckx_ast_expr*  parse_binary_expr(quint8 _prec);

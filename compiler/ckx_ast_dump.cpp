@@ -498,4 +498,43 @@ void ckx_ast_vr_literal_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
 }
 
 
+void ckx_ast_array_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("Array literal \n"));
+    if (size != -1)
+    {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write(reinterpret_cast<const qchar*>("Of size "));
+        _writer.write(static_cast<qint64>(size));
+        _writer.write(reinterpret_cast<const qchar*>("\n"));
+    }
+
+    if (start != nullptr)
+    {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write(reinterpret_cast<const qchar*>("Starts at\n"));
+        start->ast_dump(_writer, _level+2);
+    }
+
+    if (finish != nullptr)
+    {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write(reinterpret_cast<const qchar*>("Finishes at\n"));
+        finish->ast_dump(_writer, _level+2);
+    }
+
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("Initialized with\n"));
+    if (!init_list.empty())
+    {
+        for (auto &item : init_list) item->ast_dump(_writer, _level+2);
+    }
+    else
+    {
+        _writer.write_whitespace((_level+2)*indent_size);
+        _writer.write(reinterpret_cast<const qchar*>("Nothing\n"));
+    }
+}
+
 } // namespace ckx

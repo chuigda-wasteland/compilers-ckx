@@ -265,7 +265,7 @@ ckx_parser_impl<CkxTokenStream>::parse_decl_stmt()
         if ( current_token()->token_type == ckx_token::type::tk_assign )
         {
             next_token();
-            init = parse_expr();
+            init = parse_init_expr();
         }
 
         ret->add_decl(new ckx_ast_init_decl(token, type, token->str, init));
@@ -590,6 +590,83 @@ ckx_parser_impl<CkxTokenStream>::parse_expr()
 
 template <typename CkxTokenStream>
 ckx_ast_expr*
+ckx_parser_impl<CkxTokenStream>::parse_init_expr()
+{
+    switch (current_token()->token_type)
+    {
+    case ckx_token::type::tk_vi8:
+    case ckx_token::type::tk_vi16:
+    case ckx_token::type::tk_vi32:
+    case ckx_token::type::tk_vi64:
+    case ckx_token::type::tk_vu8:
+    case ckx_token::type::tk_vu16:
+    case ckx_token::type::tk_vu32:
+    case ckx_token::type::tk_vu64:
+    case ckx_token::type::tk_vch:
+    case ckx_token::type::tk_vr32:
+    case ckx_token::type::tk_vr64:
+        return parse_array_expr();
+
+    case ckx_token::type::tk_id:
+        if (id_is_typename(current_token()))
+            return parse_array_expr();
+    default:
+        return parse_expr();
+    }
+}
+
+template <typename CkxTokenStream>
+ckx_ast_expr*
+ckx_parser_impl<CkxTokenStream>::parse_array_expr()
+{
+    saber_ptr<ckx_token> at_token = current_token();
+    saber_ptr<ckx_type> array_type = parse_type();
+    assert(array_type != nullptr);
+
+    ckx_ast_array_expr *ret = new ckx_ast_array_expr(at_token, array_type);
+
+    expect_n_eat(ckx_token::type::tk_lparen);
+    if (current_token()->token_type == ckx_token::type::tk_vi_literal)
+    {
+        ret->set_size(current_token()->v.i64);
+        next_token();
+    }
+    expect_n_eat(ckx_token::type::tk_rparen);
+
+    if (current_token()->token_type == ckx_token::type::tk_lbrace)
+    {
+        next_token();
+        saber::vector<ckx_ast_expr*> init_list;
+        while (1)
+        {
+            init_list.push_back(parse_init_expr());
+            if (current_token()->token_type == ckx_token::type::tk_rbrace)
+                break;
+            expect_n_eat(ckx_token::type::tk_comma);
+        }
+        expect_n_eat(ckx_token::type::tk_rbrace);
+        ret->set_init_list(saber::move(init_list));
+    }
+    else if (current_token()->token_type == ckx_token::type::tk_lparen)
+    {
+        next_token();
+        ckx_ast_expr *start = parse_expr();
+        ckx_ast_expr *finish = nullptr;
+        if (current_token()->token_type == ckx_token::type::tk_comma)
+        {
+            next_token();
+            finish = parse_expr();
+        }
+        expect_n_eat(ckx_token::type::tk_rparen);
+        ret->set_range(start, finish);
+    }
+
+    return ret;
+}
+
+
+template <typename CkxTokenStream>
+ckx_ast_expr*
 ckx_parser_impl<CkxTokenStream>::parse_cond_expr()
 {
     saber_ptr<ckx_token> at_token = current_token();
@@ -732,7 +809,8 @@ ckx_parser_impl<CkxTokenStream>::parse_postfix_expr()
                 {
                     args.push_back(parse_expr());
 
-                    if (current_token()->token_type == ckx_token::type::tk_comma)
+                    if (current_token()->token_type
+                            == ckx_token::type::tk_comma)
                         next_token();
                 }
                 expect_n_eat(ckx_token::type::tk_rparen);
@@ -856,6 +934,12 @@ ckx_parser_impl<CkxTokenStream>::parse_type()
 
         case ckx_token::type::tk_mul:
             type = ckx_type_helper::pointer_to(type); next_token(); break;
+
+        case ckx_token::type::tk_lbracket:
+            type = ckx_type_helper::array_of(type);
+            next_token();
+            expect_n_eat(ckx_token::type::tk_rbracket, true);
+            break;
 
         default:
             return type;
