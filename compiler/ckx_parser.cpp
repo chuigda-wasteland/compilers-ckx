@@ -625,7 +625,6 @@ ckx_parser_impl<CkxTokenStream>::parse_array_expr()
 
     ckx_ast_array_expr *ret = new ckx_ast_array_expr(at_token, array_type);
 
-    qint32 array_size = -1;
     expect_n_eat(ckx_token::type::tk_lbracket);
     if (current_token()->token_type == ckx_token::type::tk_vi_literal)
     {
@@ -808,7 +807,8 @@ ckx_parser_impl<CkxTokenStream>::parse_postfix_expr()
                 {
                     args.push_back(parse_expr());
 
-                    if (current_token()->token_type == ckx_token::type::tk_comma)
+                    if (current_token()->token_type
+                            == ckx_token::type::tk_comma)
                         next_token();
                 }
                 expect_n_eat(ckx_token::type::tk_rparen);
@@ -932,6 +932,11 @@ ckx_parser_impl<CkxTokenStream>::parse_type()
 
         case ckx_token::type::tk_mul:
             type = ckx_type_helper::pointer_to(type); next_token(); break;
+
+        case ckx_token::type::tk_lbracket:
+            type = ckx_type_helper::array_of(type);
+            expect_n_eat(ckx_token::type::tk_rbracket, true);
+            break;
 
         default:
             return type;
