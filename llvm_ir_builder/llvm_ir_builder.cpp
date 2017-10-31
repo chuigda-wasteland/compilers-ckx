@@ -17,41 +17,27 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
   */
 
-#ifndef LLVM_IMPLICIT_LIST_HPP
-#define LLVM_IMPLICIT_LIST_HPP
+#include "llvm_ir_builder.hpp"
 
 namespace faker
 {
 
-class llvm_implicit_list_node
+namespace detail
 {
-public:
-    llvm_implicit_list_node() {}
-    ~llvm_implicit_list_node() {}
+class llvm_ir_builder_impl final
+{
 
-    llvm_implicit_list_node* get_prev() noexcept { return prev; }
-    llvm_implicit_list_node* get_next() noexcept { return next; }
-
-    void insert_self_before(llvm_implicit_list_node *_another) noexcept
-    {
-        this->prev = _another->prev;
-        _another->next = this->next;
-        this->next = _another;
-        _another->prev = this;
-    }
-
-    void insert_self_after(llvm_implicit_list_node* _another) noexcept
-    {
-        this->next = _another->next;
-        _another->prev = this->prev;
-        this->prev = _another;
-        _another->next = this;
-    }
-
-private:
-    llvm_implicit_list_node *prev, *next;
 };
+} // namespace detail
+
+llvm_ir_builder::llvm_ir_builder()
+{
+    impl = new detail::llvm_ir_builder_impl;
+}
+
+llvm_ir_builder::~llvm_ir_builder()
+{
+    delete impl;
+}
 
 } // namespace faker
-
-#endif // LLVM_IMPLICIT_LIST_HPP

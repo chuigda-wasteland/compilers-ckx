@@ -32,6 +32,19 @@ interface llvm_instruction make_use_of llvm_implicit_list_node
 public:
     llvm_instruction() = default;
     virtual ~llvm_instruction() = 0;
+
+    /// @note Yes. We did this on purpose.
+    llvm_instruction* get_prev() noexcept
+    {
+        return static_cast<llvm_instruction*>(
+            llvm_implicit_list_node::get_prev());
+    }
+
+    llvm_instruction* get_next() noexcept
+    {
+        return static_cast<llvm_instruction*>(
+            llvm_implicit_list_node::get_next());
+    }
 };
 
 } // namespace faker

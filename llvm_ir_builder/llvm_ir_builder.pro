@@ -5,7 +5,8 @@ CONFIG -= qt
 SOURCES += \
     llvm_value.cpp \
     ../saber/src/safe_stl_general.cpp \
-    llvm_inst.cpp
+    llvm_inst.cpp \
+    llvm_ir_builder.cpp
 
 HEADERS += \
     llvm_value.hpp \
@@ -32,7 +33,8 @@ HEADERS += \
     llvm_inst.hpp \
     llvm_inst_detail.hpp \
     llvm_type.hpp \
-    llvm_implicit_list.hpp
+    llvm_implicit_list.hpp \
+    llvm_ir_builder.hpp
 
 INCLUDEPATH +=\
     ../saber/include/
