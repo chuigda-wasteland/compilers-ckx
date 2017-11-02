@@ -35,6 +35,7 @@ namespace detail
 class llvm_ir_builder_impl;
 } // namespace detail
 
+
 class llvm_ir_builder final
 {
 public:
@@ -50,7 +51,7 @@ public:
     void leave_func();
 
     llvm_instruction* get_insert_point();
-    void set_insert_point(llvm_instruction* _instruction);
+    void set_insert_after(llvm_instruction* _instruction);
 
     /// @fn control flows
     llvm_instruction* create_return_void();
@@ -65,8 +66,8 @@ public:
     llvm_instruction* create_call(llvm_type _type, llvm_value* _rec,
                                   saber_string_view _callee,
                                   saber::vector<llvm_value*> &&_args);
-    llvm_instruction* create_label(saber_string_view _name);
-    llvm_instruction* create_unnamed_label();
+    llvm_label*       create_label(saber_string_view _name);
+    // llvm_instruction* create_unnamed_label();
 
     /// @fn binary operations, especially calculations
     llvm_instruction* create_add(llvm_type _type, llvm_value *_left,

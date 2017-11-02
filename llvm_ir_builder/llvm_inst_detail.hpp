@@ -147,6 +147,33 @@ private:
 };
 
 
+/// @brief <result> = <op> <origin_type> <value> to <dest_type>
+class llvm_cast_instruction final implements llvm_instruction
+{
+public:
+    enum class operator_type : qchar
+    {
+        ot_trunc, ot_zext, ot_sext,
+        ot_fptoui, ot_uitofp, ot_fptosi, ot_sitofp,
+        ot_inttoptr, ot_ptrtoint,
+        ot_bitcast
+    };
+
+    llvm_cast_instruction(llvm_value *_result,
+                          operator_type _op,
+                          llvm_type _origin_type,
+                          llvm_value *_value,
+                          llvm_type _dest_type);
+    ~llvm_cast_instruction() override final = default;
+
+private:
+    llvm_value *result;
+    operator_type op;
+    llvm_type origin_type;
+    llvm_value *value;
+    llvm_type dest_type;
+};
+
 /// @brief call <yield_type> @<func_name> (<args>)
 class llvm_call_instruction final implements llvm_instruction
 {
@@ -161,6 +188,21 @@ private:
     saber_string_view func_name;
     llvm_type yield_type;
     saber::vector<llvm_value*> args;
+    llvm_value *result;
+};
+
+
+/// @brief
+/// ret void
+/// ret <type> <value>
+class llvm_ret_instruction final implements llvm_instruction
+{
+public:
+    llvm_ret_instruction(llvm_type _type, llvm_value* _value);
+    ~llvm_ret_instruction() override final = default;
+
+private:
+    llvm_type yield_type;
     llvm_value *result;
 };
 
@@ -191,6 +233,22 @@ private:
     llvm_label *true_label, *false_label;
 };
 
+/// @brief <result> = phi <yield_type> <label1> <val1> <label2> <val2>
+class llvm_phi_instruction final implements llvm_instruction
+{
+public:
+    llvm_phi_instruction(llvm_value *_result,
+                         llvm_type _yield_type,
+                         llvm_label *_label1, llvm_value* _val1,
+                         llvm_label *_label2, llvm_value* _val2);
+    ~llvm_phi_instruction() override final = default;
+
+private:
+    llvm_value *result;
+    llvm_type yield_type;
+    llvm_label *label1, &label2;
+    llvm_value *val1, *val2;
+};
 
 /// @brief <result> = alloca <yield_type> <num_elems>
 class llvm_alloca_instruction final implements llvm_instruction

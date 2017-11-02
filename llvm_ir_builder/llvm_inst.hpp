@@ -45,7 +45,27 @@ public:
         return static_cast<llvm_instruction*>(
             llvm_implicit_list_node::get_next());
     }
+
+DEBUG_EXEC( private: )
+DEBUG_EXEC(     const quint8 nocopy_flag = std::numeric_limits<quint8>::max(); )
 };
+
+class llvm_func_decl;
+class llvm_func_def;
+class llvm_global_constant;
+class llvm_global_variable;
+class llvm_new_type;
+
+class llvm_label;
+class llvm_binary_instruction;
+class llvm_call_instruction;
+class llvm_br_instruction;
+class llvm_condbr_instruction;
+class llvm_alloca_instruction;
+class llvm_load_instruction;
+class llvm_store_instruction;
+class llvm_getelementptr_instruction;
+
 
 } // namespace faker
 
