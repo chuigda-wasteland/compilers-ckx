@@ -129,7 +129,7 @@ public:
         ot_add, ot_sub, ot_mul, ot_sdiv, ot_udiv,
         ot_srem, ot_urem, ot_smod, ot_umod,
         ot_fadd, ot_fsub, ot_fmul, ot_fdiv,
-        ot_and, ot_or, ot_not, ot_shl, ot_lshr, ot_ashr
+        ot_and, ot_or, ot_xor, ot_shl, ot_lshr, ot_ashr
     };
 
     llvm_binary_instruction(llvm_value *_result,
@@ -173,6 +173,54 @@ private:
     llvm_value *value;
     llvm_type dest_type;
 };
+
+
+/// @brief <result> = <cmp> <type> <val1> <val2>
+class llvm_cmp_instruction final implements llvm_instruction
+{
+public:
+    /// @authors Thanks to LLVM! Clever this is!
+    enum class comparsion_type : qchar
+    {
+        /// OPERCODE        =        U  L  G  E
+        icmp_sne  =  0,     ///      0  0  0  0
+        icmp_seq  =  1,     ///      0  0  0  1
+        icmp_sgt  =  2,     ///      0  0  1  0
+        icmp_sge  =  3,     ///      0  0  1  1
+        icmp_slt  =  4,     ///      0  1  0  0
+        icmp_sge  =  5,     ///      0  1  0  1
+        __UUSED0  =  6,     ///      0  X  X  0
+        __UUSED1  =  7,     ///      0  X  X  X
+        icmp_une  =  8,     ///      1  0  0  0
+        icmp_ueq  =  9,     ///      1  0  0  1
+        icmp_ugt  = 10,     ///      1  0  1  0
+        icmp_uge  = 11,     ///      1  0  1  1
+        icmp_ult  = 12,     ///      1  1  0  0
+        icmp_ule  = 13,     ///      1  1  0  1
+        __UUSED2  = 14,     ///      1  X  X  0
+        __UUSED3  = 15,     ///      1  X  X  X
+
+        /// OPERCODE        =     F  _  L  G  E
+        fcmp_ne   = 32,     ///   1  0  0  0  0
+        fcmp_eq   = 33,     ///   1  0  0  0  1
+        fcmp_gt   = 34,     ///   1  0  0  1  0
+        fcmp_ge   = 35,     ///   1  0  0  1  1
+        fcmp_lt   = 36,     ///   1  0  1  0  0
+        fcmp_le   = 37,     ///   1  0  1  0  1
+    };
+
+    llvm_comp_instruction(
+            llvm_value *_result, comparsion_type _op, llvm_type _compared_type,
+            llvm_value *_val1, llvm_value *_val2);
+    ~llvm_comp_instruction() override final = delete;
+
+private:
+    llvm_value *result;
+    comparsion_type op;
+    llvm_type compared_type;
+    llvm_value *val1, *val2;
+};
+
 
 /// @brief call <yield_type> @<func_name> (<args>)
 class llvm_call_instruction final implements llvm_instruction

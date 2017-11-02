@@ -67,7 +67,8 @@ public:
                                   saber_string_view _callee,
                                   saber::vector<llvm_value*> &&_args);
     llvm_label*       create_label(saber_string_view _name);
-    // llvm_instruction* create_unnamed_label();
+    /// @todo we are not certain about how this function will be used.
+    /// llvm_instruction* create_unnamed_label();
 
     /// @fn binary operations, especially calculations
     llvm_instruction* create_add(llvm_type _type, llvm_value *_left,
@@ -127,17 +128,6 @@ public:
     llvm_instruction* create_bitcast(llvm_type _src_type, llvm_value *_src,
                                      llvm_type _desired, llvm_value *_rec);
 
-    /// @fn memory accessing operations
-    llvm_instruction* create_alloca(llvm_type *_type, quint32 _array_size,
-                                    llvm_value *_receiver);
-    llvm_instruction* create_load(llvm_type *_type, llvm_value *_ptr,
-                                  llvm_value *_rec);
-    llvm_instruction* create_store(llvm_type _type,
-                                   llvm_value *_ptr, llvm_value *_val);
-    llvm_instruction* create_getelementptr(llvm_type _type, llvm_value *_ptr,
-                                           llvm_type _ty, llvm_value *_idx,
-                                           llvm_value *_rec);
-
     /// @fn comparsions
     llvm_instruction* create_icmp_eq(llvm_type _type, llvm_value *_left,
                                      llvm_value *_right, llvm_value *_rec);
@@ -171,6 +161,18 @@ public:
                                       llvm_value *_right, llvm_value *_rec);
     llvm_instruction* create_fcmp_ole(llvm_type _type, llvm_value *_left,
                                       llvm_value *_right, llvm_value *_rec);
+
+
+    /// @fn memory accessing operations
+    llvm_instruction* create_alloca(llvm_type *_type, quint32 _array_size,
+                                    llvm_value *_receiver);
+    llvm_instruction* create_load(llvm_type *_type, llvm_value *_ptr,
+                                  llvm_value *_rec);
+    llvm_instruction* create_store(llvm_type _type,
+                                   llvm_value *_ptr, llvm_value *_val);
+    llvm_instruction* create_getelementptr(llvm_type _type, llvm_value *_ptr,
+                                           llvm_type _ty, llvm_value *_idx,
+                                           llvm_value *_rec);
 
     /// @fn functions dealing with values
     llvm_value *create_string_constant(saber_string_view _str);
