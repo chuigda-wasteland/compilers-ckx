@@ -182,37 +182,37 @@ public:
     /// @authors Thanks to LLVM! Clever this is!
     enum class comparsion_type : qchar
     {
-        /// OPERCODE        =        U  L  G  E
-        icmp_sne  =  0,     ///      0  0  0  0
-        icmp_seq  =  1,     ///      0  0  0  1
-        icmp_sgt  =  2,     ///      0  0  1  0
-        icmp_sge  =  3,     ///      0  0  1  1
-        icmp_slt  =  4,     ///      0  1  0  0
-        icmp_sge  =  5,     ///      0  1  0  1
-        __UUSED0  =  6,     ///      0  X  X  0
-        __UUSED1  =  7,     ///      0  X  X  X
-        icmp_une  =  8,     ///      1  0  0  0
-        icmp_ueq  =  9,     ///      1  0  0  1
-        icmp_ugt  = 10,     ///      1  0  1  0
-        icmp_uge  = 11,     ///      1  0  1  1
-        icmp_ult  = 12,     ///      1  1  0  0
-        icmp_ule  = 13,     ///      1  1  0  1
-        __UUSED2  = 14,     ///      1  X  X  0
-        __UUSED3  = 15,     ///      1  X  X  X
+        /// OPERCODE        =           U  L  G  E
+        ot_icmp_sne  =  0,     ///      0  0  0  0
+        ot_icmp_seq  =  1,     ///      0  0  0  1
+        ot_icmp_sgt  =  2,     ///      0  0  1  0
+        ot_icmp_sge  =  3,     ///      0  0  1  1
+        ot_icmp_slt  =  4,     ///      0  1  0  0
+        ot_icmp_sle  =  5,     ///      0  1  0  1
+        __UUSED0  =  6,        ///      0  X  X  0
+        __UUSED1  =  7,        ///      0  X  X  X
+        ot_icmp_une  =  8,     ///      1  0  0  0
+        ot_icmp_ueq  =  9,     ///      1  0  0  1
+        ot_icmp_ugt  = 10,     ///      1  0  1  0
+        ot_icmp_uge  = 11,     ///      1  0  1  1
+        ot_icmp_ult  = 12,     ///      1  1  0  0
+        ot_icmp_ule  = 13,     ///      1  1  0  1
+        __UUSED2  = 14,        ///      1  X  X  0
+        __UUSED3  = 15,        ///      1  X  X  X
 
-        /// OPERCODE        =     F  _  L  G  E
-        fcmp_ne   = 32,     ///   1  0  0  0  0
-        fcmp_eq   = 33,     ///   1  0  0  0  1
-        fcmp_gt   = 34,     ///   1  0  0  1  0
-        fcmp_ge   = 35,     ///   1  0  0  1  1
-        fcmp_lt   = 36,     ///   1  0  1  0  0
-        fcmp_le   = 37,     ///   1  0  1  0  1
+        /// OPERCODE        =        F  _  L  G  E
+        ot_fcmp_one   = 32,    ///   1  0  0  0  0
+        ot_fcmp_oeq   = 33,    ///   1  0  0  0  1
+        ot_fcmp_ogt   = 34,    ///   1  0  0  1  0
+        ot_fcmp_oge   = 35,    ///   1  0  0  1  1
+        ot_fcmp_olt   = 36,    ///   1  0  1  0  0
+        ot_fcmp_ole   = 37,    ///   1  0  1  0  1
     };
 
-    llvm_comp_instruction(
+    llvm_cmp_instruction(
             llvm_value *_result, comparsion_type _op, llvm_type _compared_type,
             llvm_value *_val1, llvm_value *_val2);
-    ~llvm_comp_instruction() override final = delete;
+    ~llvm_cmp_instruction() override final = default;
 
 private:
     llvm_value *result;

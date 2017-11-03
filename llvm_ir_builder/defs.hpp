@@ -81,4 +81,6 @@ constexpr qsizet countof(const ArrayType& _array)
 #define DEBUG_EXEC(ANYTHING)
 #endif
 
+#define COMMENT(X)
+
 #endif // DEFS_HPP

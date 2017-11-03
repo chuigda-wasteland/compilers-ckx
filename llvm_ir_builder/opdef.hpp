@@ -1,0 +1,63 @@
+﻿
+#ifndef BINOP
+#define BINOP(OP_NAME)
+#endif
+
+
+#ifndef CASTOP
+#define CASTOP(OP_NAME)
+#endif
+
+
+#ifndef CMPOP
+#define CMPOP(OP_NAME)
+#endif
+
+
+BINOP(add)
+BINOP(sub)
+BINOP(mul)
+BINOP(sdiv)
+BINOP(udiv)
+BINOP(srem)
+BINOP(urem)
+BINOP(fadd)
+BINOP(fsub)
+BINOP(fmul)
+BINOP(fdiv)
+BINOP(shl)
+BINOP(lshr)
+BINOP(ashr)
+BINOP(and)
+BINOP(or)
+BINOP(xor)
+
+
+CASTOP(trunc)
+CASTOP(zext)
+CASTOP(sext)
+CASTOP(fptoui)
+CASTOP(uitofp)
+CASTOP(inttoptr)
+CASTOP(ptrtoint)
+CASTOP(bitcast)
+
+
+CMPOP(icmp_sne)
+CMPOP(icmp_seq)
+CMPOP(icmp_sgt)
+CMPOP(icmp_sge)
+CMPOP(icmp_slt)
+CMPOP(icmp_sle)
+CMPOP(icmp_une)
+CMPOP(icmp_ueq)
+CMPOP(icmp_ugt)
+CMPOP(icmp_uge)
+CMPOP(icmp_ult)
+CMPOP(icmp_ule)
+CMPOP(fcmp_oeq)
+CMPOP(fcmp_one)
+CMPOP(fcmp_ogt)
+CMPOP(fcmp_oge)
+CMPOP(fcmp_olt)
+CMPOP(fcmp_ole)

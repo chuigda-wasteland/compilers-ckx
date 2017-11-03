@@ -56,13 +56,13 @@ public:
     /// @fn control flows
     llvm_instruction* create_return_void();
     llvm_instruction* create_return(llvm_type _type, llvm_value* _value);
-    llvm_instruction* create_branch(llvm_instruction* _label);
+    llvm_instruction* create_branch(llvm_label *_label);
     llvm_instruction* create_cond_branch(llvm_value *_cond,
                                          llvm_instruction* _true_label,
                                          llvm_instruction* _false_label);
     llvm_instruction* create_phi(llvm_type _type, llvm_value* _rec,
-                                 llvm_instruction* _label1, llvm_value *_val1,
-                                 llvm_instruction* _label2, llvm_value *_val2);
+                                 llvm_label *_label1, llvm_value *_val1,
+                                 llvm_label *_label2, llvm_value *_val2);
     llvm_instruction* create_call(llvm_type _type, llvm_value* _rec,
                                   saber_string_view _callee,
                                   saber::vector<llvm_value*> &&_args);
@@ -70,98 +70,30 @@ public:
     /// @todo we are not certain about how this function will be used.
     /// llvm_instruction* create_unnamed_label();
 
-    /// @fn binary operations, especially calculations
-    llvm_instruction* create_add(llvm_type _type, llvm_value *_left,
-                                 llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_sub(llvm_type _type, llvm_value *_left,
-                                 llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_mul(llvm_type _type, llvm_value *_left,
-                                 llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_sdiv(llvm_type _type, llvm_value *_left,
-                                  llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_udiv(llvm_type _type, llvm_value *_left,
-                                  llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_srem(llvm_type _type, llvm_value *_left,
-                                  llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_urem(llvm_type _type, llvm_value *_left,
-                                  llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_fadd(llvm_type _type, llvm_value *_left,
-                                  llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_fsub(llvm_type _type, llvm_value *_left,
-                                  llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_fmul(llvm_type _type, llvm_value *_left,
-                                  llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_fdiv(llvm_type _type, llvm_value *_left,
-                                  llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_shl(llvm_type _type, llvm_value *_left,
-                                 llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_lshr(llvm_type _type, llvm_value *_left,
-                                  llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_ashr(llvm_type _type, llvm_value *_left,
-                                  llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_and(llvm_type _type, llvm_value *_left,
-                                 llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_or(llvm_type _type, llvm_value *_left,
-                                llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_xor(llvm_type _type, llvm_value *_left,
-                                 llvm_value *_right, llvm_value *_rec);
 
+COMMENT(BEGIN_BLOCK)
+
+    /// @attention We are using macro to write function declarations!
+    /// @fn binary operations, especially calculations
+#   define BINOP(OPCODE) \
+    llvm_instruction* create_##OPCODE (llvm_type _type, llvm_value* _left, \
+                                       llvm_value *_right, llvm_value *_rec);
     /// @fn cast operations
-    llvm_instruction* create_trunc(llvm_type _src_type, llvm_value *_src,
-                                   llvm_type _desired, llvm_value *_rec);
-    llvm_instruction* create_zext(llvm_type _src_type, llvm_value *_src,
-                                   llvm_type _desired, llvm_value *_rec);
-    llvm_instruction* create_sext(llvm_type _src_type, llvm_value *_src,
-                                  llvm_type _desired, llvm_value *_rec);
-    llvm_instruction* create_fptoui(llvm_type _src_type, llvm_value *_src,
-                                    llvm_type _desired, llvm_value *_rec);
-    llvm_instruction* create_uitofp(llvm_type _src_type, llvm_value *_src,
-                                    llvm_type _desired, llvm_value *_rec);
-    llvm_instruction* create_fptosi(llvm_type _src_type, llvm_value *_src,
-                                    llvm_type _desired, llvm_value *_rec);
-    llvm_instruction* create_sitofp(llvm_type _src_type, llvm_value *_src,
-                                    llvm_type _desired, llvm_value *_rec);
-    llvm_instruction* create_inttoptr(llvm_type _src_type, llvm_value *_src,
+#   define CASTOP(OPCODE) \
+    llvm_instruction* create_##OPCODE (llvm_type _src_type, llvm_value *_src, \
                                       llvm_type _desired, llvm_value *_rec);
-    llvm_instruction* create_ptrtoint(llvm_type _src_type, llvm_value *_src,
-                                      llvm_type _desired, llvm_value *_rec);
-    llvm_instruction* create_bitcast(llvm_type _src_type, llvm_value *_src,
-                                     llvm_type _desired, llvm_value *_rec);
 
     /// @fn comparsions
-    llvm_instruction* create_icmp_eq(llvm_type _type, llvm_value *_left,
-                                     llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_icmp_ne(llvm_type _type, llvm_value *_left,
-                                     llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_icmp_ugt(llvm_type _type, llvm_value *_left,
-                                      llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_icmp_uge(llvm_type _type, llvm_value *_left,
-                                      llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_icmp_ult(llvm_type _type, llvm_value *_left,
-                                      llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_icmp_ule(llvm_type _type, llvm_value *_left,
-                                      llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_icmp_sgt(llvm_type _type, llvm_value *_left,
-                                      llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_icmp_sge(llvm_type _type, llvm_value *_left,
-                                      llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_icmp_slt(llvm_type _type, llvm_value *_left,
-                                      llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_icmp_sle(llvm_type _type, llvm_value *_left,
-                                      llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_fcmp_oeq(llvm_type _type, llvm_value *_left,
-                                      llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_fcmp_one(llvm_type _type, llvm_value *_left,
-                                      llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_fcmp_ogt(llvm_type _type, llvm_value *_left,
-                                      llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_fcmp_oge(llvm_type _type, llvm_value *_left,
-                                      llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_fcmp_olt(llvm_type _type, llvm_value *_left,
-                                      llvm_value *_right, llvm_value *_rec);
-    llvm_instruction* create_fcmp_ole(llvm_type _type, llvm_value *_left,
-                                      llvm_value *_right, llvm_value *_rec);
+#   define CMPOP(OPCODE) \
+    llvm_instruction* create_##OPCODE (llvm_type _type, llvm_value *_left, \
+                                       llvm_value *_right, llvm_value *_rec);
 
+#   include "opdef.hpp"
+#   undef BINOP
+#   undef CASTOP
+#   undef CMPOP
+
+COMMENT(END_BLOCK)
 
     /// @fn memory accessing operations
     llvm_instruction* create_alloca(llvm_type *_type, quint32 _array_size,

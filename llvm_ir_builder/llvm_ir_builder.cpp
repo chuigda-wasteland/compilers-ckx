@@ -120,11 +120,11 @@ llvm_ir_builder::create_return(llvm_type _type, llvm_value *_value)
 llvm_instruction*
 llvm_ir_builder::create_return_void()
 {
-    return impl->create_return("void", nullptr);
+    return impl->create_return(saber_string_pool::create_view("void"), nullptr);
 }
 
 llvm_instruction*
-llvm_ir_builder::create_branch(llvm_instruction *_label)
+llvm_ir_builder::create_branch(llvm_label *_label)
 {
     return impl->create_branch(_label);
 }
@@ -139,8 +139,8 @@ llvm_ir_builder::create_cond_branch(llvm_value *_cond,
 
 llvm_instruction*
 llvm_ir_builder::create_phi(llvm_type _type, llvm_value *_rec,
-                            llvm_instruction *_label1, llvm_value *_val1,
-                            llvm_instruction *_label2, llvm_value *_val2)
+                            llvm_label *_label1, llvm_value *_val1,
+                            llvm_label *_label2, llvm_value *_val2)
 {
     return impl->create_phi(_type, _rec, _label1, _val1, _label2, _val2);
 }
@@ -160,176 +160,43 @@ llvm_ir_builder::create_label(saber_string_view _name)
 }
 
 
-/// @todo ugly, rewrite with macros tomorrow, like what LLVM did.
-llvm_instruction*
-llvm_ir_builder::create_add(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_add,
-        _rec, _left, _right);
-}
+COMMENT(BEGIN_BLOCK)
+#   define BINOP(OPCODE) \
+    llvm_instruction* \
+    llvm_ir_builder::create_##OPCODE(llvm_type _type, \
+                                llvm_value *_left, llvm_value *_right, \
+                                llvm_value *_rec) \
+    { \
+        return impl->create_binary_instruction( \
+            _type, llvm_binary_instruction::operator_type::ot_##OPCODE, \
+            _rec, _left, _right); \
+    }
 
-llvm_instruction*
-llvm_ir_builder::create_sub(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_sub,
-        _rec, _left, _right);
-}
+#   define CASTOP(OPCODE) \
+    llvm_instruction* \
+    llvm_ir_builder::create_##OPCODE(llvm_type _src_type, llvm_value *_src, \
+                                     llvm_type _desired, llvm_value *_rec) \
+    { \
+        return impl->create_cast_instruction( \
+            llvm_cast_instruction::operator_type::ot_##OPCODE, _rec, \
+            _src_type, _src, _desired); \
+    }
 
-llvm_instruction*
-llvm_ir_builder::create_mul(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_mul,
-        _rec, _left, _right);
-}
+#   define CMPOP(OPCODE) \
+    llvm_instruction* \
+    llvm_ir_builder::create_##OPCODE(llvm_type _type, llvm_value *_left, \
+                                     llvm_value *_right, llvm_value *_rec) \
+    { \
+        return impl->create_cmp_instruction(_type, \
+            llvm_cmp_instruction::comparsion_type::ot_##OPCODE, _rec, \
+            _left, _right); \
+    }
 
-llvm_instruction*
-llvm_ir_builder::create_sdiv(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_sdiv,
-        _rec, _left, _right);
-}
-
-llvm_instruction*
-llvm_ir_builder::create_udiv(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_udiv,
-        _rec, _left, _right);
-}
-
-llvm_instruction*
-llvm_ir_builder::create_srem(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_srem,
-        _rec, _left, _right);
-}
-
-llvm_instruction*
-llvm_ir_builder::create_urem(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_urem,
-        _rec, _left, _right);
-}
-
-llvm_instruction*
-llvm_ir_builder::create_fadd(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_fadd,
-        _rec, _left, _right);
-}
-
-llvm_instruction*
-llvm_ir_builder::create_fsub(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_fsub,
-        _rec, _left, _right);
-}
-
-llvm_instruction*
-llvm_ir_builder::create_fmul(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_fmul,
-        _rec, _left, _right);
-}
-
-llvm_instruction*
-llvm_ir_builder::create_fdiv(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_fdiv,
-        _rec, _left, _right);
-}
-
-llvm_instruction*
-llvm_ir_builder::create_shl(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_shl,
-        _rec, _left, _right);
-}
-
-llvm_instruction*
-llvm_ir_builder::create_lshr(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_lshr,
-        _rec, _left, _right);
-}
-
-llvm_instruction*
-llvm_ir_builder::create_ashr(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_ashr,
-        _rec, _left, _right);
-}
-
-llvm_instruction*
-llvm_ir_builder::create_and(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_and,
-        _rec, _left, _right);
-}
-
-llvm_instruction*
-llvm_ir_builder::create_or(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_or,
-        _rec, _left, _right);
-}
-
-llvm_instruction*
-llvm_ir_builder::create_xor(llvm_type _type,
-                            llvm_value *_left, llvm_value *_right,
-                            llvm_value *_rec)
-{
-    return impl->create_binary_instruction(
-        _type, llvm_binary_instruction::operator_type::ot_xor,
-        _rec, _left, _right);
-}
+#   include "opdef.hpp"
+#   undef BINOP
+#   undef CASTOP
+#   undef CMPOP
+COMMENT(END_BLOCK)
 
 } // namespace faker
 
