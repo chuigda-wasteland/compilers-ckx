@@ -144,6 +144,7 @@ R"noip(
         ckx_ast_enum_stmt *stmt = base::parse_enum_stmt();
         stmt->ast_dump(writer, 0);
         delete stmt;
+
         assert(base::error_list->empty());
         assert(base::warn_list->empty());
         cleanup_test();

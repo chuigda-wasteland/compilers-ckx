@@ -195,10 +195,10 @@ class ckx_ast_decl_stmt final implements ckx_ast_stmt
 {
 public:
     explicit ckx_ast_decl_stmt(saber_ptr<ckx_token> _at_token,
-                               saber_ptr<ckx_type> _type);
+                               saber_ptr<ckx_type> _type,
+                               saber::vector<ckx_ast_init_decl*>&& _decls);
     ~ckx_ast_decl_stmt() override final;
 
-    void add_decl(ckx_ast_init_decl* _decl);
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
 private:
@@ -265,10 +265,11 @@ public:
         saber_string_view name;
     };
 
-    ckx_ast_struct_stmt(saber_ptr<ckx_token> _at_token, saber_string_view _name);
+    ckx_ast_struct_stmt(saber_ptr<ckx_token> _at_token,
+                        saber_string_view _name,
+                        saber::vector<field>&& _fields);
     ~ckx_ast_struct_stmt() override final;
 
-    void add_field(saber_ptr<ckx_type> _type, saber_string_view _name);
     const saber::vector<field>& get_fields() const;
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
@@ -289,10 +290,10 @@ public:
     };
 
     ckx_ast_variant_stmt(saber_ptr<ckx_token> _at_token,
-                         saber_string_view _name);
+                         saber_string_view _name,
+                         saber::vector<field>&& _fields);
     ~ckx_ast_variant_stmt() override final;
 
-    void add_field(saber_ptr<ckx_type> _type, saber_string_view _name);
     const saber::vector<field>& get_fields() const;
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
@@ -312,10 +313,11 @@ public:
         qint64 value;
     };
 
-    ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token, saber_string_view _name);
+    ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token,
+                      saber_string_view _name,
+                      saber::vector<enumerator>&& _enumerators);
     ~ckx_ast_enum_stmt() override final;
 
-    void add_enumerator(saber_string_view _name, qint64 _value = 0);
     const saber::vector<enumerator>& get_enumerators() const;
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
