@@ -23,6 +23,7 @@
 #include <cstddef>
 
 #include <utility>
+#include <string.hpp>
 
 namespace ckx
 {
@@ -58,6 +59,12 @@ template <typename ArrayType>
 constexpr qsizet countof(const ArrayType& _array)
 {
     return sizeof(_array) / sizeof(_array[0]);
+}
+
+inline saber::string to_string_helper(const qcoord& _coord)
+{
+    return saber::to_string_helper(quint64(_coord.first))
+           + saber::to_string_helper(quint64(_coord.second));
 }
 
 } // namespace ckx
