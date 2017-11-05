@@ -174,7 +174,14 @@ void ckx_ast_func_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
     _writer.write_whitespace((_level+1)*indent_size);
     _writer.write("Takes\n");
     for (auto &param_decl : param_decls)
-        param_decl->ast_dump(_writer, _level+2);
+    {
+        _writer.write_whitespace((_level+2)*indent_size);
+        _writer.write("\"");
+        _writer.write(param_decl.name);
+        _writer.write("\" Of type [[");
+        _writer.write(param_decl.type->to_string());
+        _writer.write("]] \n");
+    }
     _writer.write_whitespace((_level+1)*indent_size);
     _writer.write("Returns [[");
     _writer.write(ret_type->to_string());

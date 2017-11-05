@@ -278,21 +278,14 @@ ckx_parser_impl<CkxTokenStream>::parse_func_stmt()
     next_token();
 
     expect_n_eat(ckx_token::type::tk_lparen);
-    saber::vector<saber_ptr<ckx_type>> param_type_list;
-    saber::vector<ckx_ast_init_decl*> param_decl_list;
+    saber::vector<ckx_ast_func_stmt::param_decl> param_decl_list;
 
-    /// @todo this part must be fixed.
-    /// paramater declarations are not initialize declarations.
     while (1)
     {
-        saber_ptr<ckx_token> param_at_token = current_token();
         saber_ptr<ckx_type> param_type = parse_type();
         saber_string_view param_name = current_token()->str;
         next_token();
-        param_type_list.push_back(param_type);
-        param_decl_list.push_back(
-            new ckx_ast_init_decl(
-                param_at_token, param_type, param_name, nullptr));
+        param_decl_list.emplace_back(param_type, param_name);
 
         if (current_token()->token_type == ckx_token::type::tk_comma)
         {
@@ -303,7 +296,6 @@ ckx_parser_impl<CkxTokenStream>::parse_func_stmt()
         if (current_token()->token_type == ckx_token::type::tk_rparen)
             break;
     }
-
     expect_n_eat(ckx_token::type::tk_rparen);
     expect_n_eat(ckx_token::type::tk_colon);
     saber_ptr<ckx_type> ret_type = parse_type();
@@ -396,7 +388,7 @@ ckx_ast_func_stmt *ckx_parser_impl<CkxTokenStream>::parse_ckx_block()
 
     return new ckx_ast_func_stmt(at_token,
                                  saber_string_pool::create_view("main"),
-                                 saber::vector<ckx_ast_init_decl*>(),
+                                 saber::vector<ckx_ast_func_stmt::param_decl>(),
                                  ckx_type_helper::get_vi16_type(),
                                  fnbody);
 }

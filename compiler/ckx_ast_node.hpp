@@ -221,9 +221,17 @@ private:
 class ckx_ast_func_stmt implements ckx_ast_stmt
 {
 public:
+    open_class param_decl
+    {
+        param_decl(saber_ptr<ckx_type> _type, saber_string_view _name) :
+            type(_type), name(_name) {}
+        saber_ptr<ckx_type> type;
+        saber_string_view name;
+    };
+
     ckx_ast_func_stmt(saber_ptr<ckx_token> _at_token,
                       saber_string_view _name,
-                      saber::vector<ckx_ast_init_decl*>&& _param_decls,
+                      saber::vector<param_decl>&& _param_decls,
                       saber_ptr<ckx_type> _ret_type,
                       ckx_ast_compound_stmt *_fnbody = nullptr);
     ~ckx_ast_func_stmt();
@@ -232,7 +240,7 @@ public:
 
 private:
     saber_string_view name;
-    saber::vector<ckx_ast_init_decl*> param_decls;
+    saber::vector<param_decl> param_decls;
     saber_ptr<ckx_type> ret_type;
     ckx_ast_compound_stmt *fnbody;
 };

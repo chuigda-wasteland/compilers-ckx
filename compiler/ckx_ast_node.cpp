@@ -192,7 +192,7 @@ ckx_ast_expr_stmt::~ckx_ast_expr_stmt()
 ckx_ast_func_stmt::ckx_ast_func_stmt(
         saber_ptr<ckx_token> _at_token,
         saber_string_view _name,
-        saber::vector<ckx_ast_init_decl *> &&_param_decls,
+        saber::vector<ckx_ast_func_stmt::param_decl> &&_param_decls,
         saber_ptr<ckx_type> _ret_type,
         ckx_ast_compound_stmt *_fnbody) :
     ckx_ast_stmt(_at_token),
@@ -204,8 +204,6 @@ ckx_ast_func_stmt::ckx_ast_func_stmt(
 
 ckx_ast_func_stmt::~ckx_ast_func_stmt()
 {
-    for (auto& param_decl : param_decls)
-        delete param_decl;
     delete fnbody;
 }
 
