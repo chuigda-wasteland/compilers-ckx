@@ -73,7 +73,7 @@ void paste_impl(string& _str, T&& _value, Args&& ..._args)
 }
 
 template <typename... Args>
-string paste(Args&& ..._args)
+string string_paste(Args&& ..._args)
 {
     string ret = "";
     paste_impl(ret, saber::forward<Args>(_args)...);

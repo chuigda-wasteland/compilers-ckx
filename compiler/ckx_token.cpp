@@ -19,6 +19,7 @@
 
 #include "ckx_token.hpp"
 #include "memory.hpp"
+#include "string.hpp"
 
 namespace ckx
 {
@@ -72,5 +73,34 @@ ckx_token::ckx_token(const qcoord &_coord) :
     position(_coord),
     str(saber_string_pool::create_view(""))
 {}
+
+
+saber_string to_string_helper(saber_ptr<ckx_token> _token)
+{
+    switch (_token->token_type)
+    {
+#   define GG2LEX(X, Y) \
+    case ckx_token::type::tk_##Y: return X;
+#   define GGLEX(X, Y) \
+    case ckx_token::type::tk_##Y: return X;
+#   include "gg.h"
+#   undef GG2LEX
+#   undef GGLEX
+    case ckx_token::type::tk_vi_literal:
+        return saber::to_string_helper(_token->v.i64);
+    case ckx_token::type::tk_vr_literal:
+        return saber::to_string_helper(_token->v.r);
+    case ckx_token::type::tk_vu_literal:
+        return saber::to_string_helper(_token->v.u64);
+    case ckx_token::type::tk_vchar_literal:
+        return saber::to_string_helper(char(_token->v.ch));
+    case ckx_token::type::tk_string_literal:
+    case ckx_token::type::tk_id:
+        return saber::to_string_helper(_token->str);
+    case ckx_token::type::tk_eoi:
+        return "EOI";
+    }
+    assert(false);
+}
 
 } // namespace ckx;

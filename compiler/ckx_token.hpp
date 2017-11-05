@@ -22,9 +22,12 @@
 
 #include "defs.hpp"
 #include "string_pool.hpp"
+#include "memory.hpp"
 
 namespace ckx
 {
+
+using saber::saber_ptr;
 
 open_class ckx_token
 {
@@ -179,6 +182,8 @@ struct ckx_token_type_hash
     }
 };
 
-}
+saber_string to_string_helper(saber_ptr<ckx_token> _token);
+
+} // namespace ckx
 
 #endif // CKX_TOKEN_HPP
