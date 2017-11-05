@@ -157,6 +157,14 @@ string_pool<StringType>::create_view_impl(StringType &&_string)
     return string_view<StringType>(&(it->first), &(it->second));
 }
 
+
+
+template <typename StringType>
+StringType to_string_helper(string_view<StringType> _view)
+{
+    return _view.get();
+}
+
 } // namespace saber
 
 using saber_string = saber::string;
