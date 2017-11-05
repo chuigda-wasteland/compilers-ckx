@@ -95,13 +95,6 @@ protected:
 
     template <typename CkxAstRecordStmt> CkxAstRecordStmt* parse_record_stmt();
 
-    /// @brief Functions that suppors parsing special structures.
-    saber::vector<ckx_ast_decl_stmt::init_decl>
-    parse_init_decl_list();
-    template <typename CkxRecordField>
-    saber::vector<CkxRecordField> parse_record_fields();
-    saber::vector<ckx_ast_enum_stmt::enumerator> parse_enumerators();
-
 protected:
 
     /// @fn we need this function to ease the type resolving.

@@ -259,7 +259,22 @@ ckx_ast_decl_stmt*
 ckx_parser_impl<CkxTokenStream>::parse_decl_stmt()
 {
     saber_ptr<ckx_type> type = parse_type();
-    saber::vector<ckx_ast_decl_stmt::init_decl> decls = parse_init_decl_list();
+    saber::vector<ckx_ast_decl_stmt::init_decl> decls;
+    while (1)
+    {
+        saber_ptr<ckx_token> token = current_token();
+        ckx_ast_expr *init = nullptr;
+        next_token();
+        if ( current_token()->token_type == ckx_token::type::tk_assign )
+        {
+            next_token();
+            init = parse_init_expr();
+        }
+        decls.emplace_back(token->str, init);
+        if ( current_token()->token_type == ckx_token::type::tk_semicolon )
+            break;
+        expect_n_eat(ckx_token::type::tk_comma);
+    }
     expect_n_eat(ckx_token::type::tk_semicolon);
     return new ckx_ast_decl_stmt(current_token(), type, saber::move(decls));
 }
@@ -332,8 +347,25 @@ ckx_parser_impl<CkxTokenStream>::parse_record_stmt()
     typename_table->add_typename(record_name);
     next_token();
     expect_n_eat(ckx_token::type::tk_lbrace);
-    saber::vector<typename CkxAstRecordStmt::field> fields =
-        parse_record_fields<typename CkxAstRecordStmt::field>();
+    saber::vector<typename CkxAstRecordStmt::field> fields;
+    while (1)
+    {
+        saber_ptr<ckx_type> decl_type = parse_type();
+        while (1)
+        {
+            saber_string_view dclr_name = current_token()->str;
+            fields.emplace_back(decl_type, dclr_name);
+            next_token();
+            if (current_token()->token_type == ckx_token::type::tk_comma)
+                { next_token(); }
+            else
+            if (current_token()->token_type == ckx_token::type::tk_semicolon)
+                { next_token(); break; }
+        }
+
+        if ( current_token()->token_type == ckx_token::type::tk_rbrace )
+            break;
+    }
     expect_n_eat(ckx_token::type::tk_rbrace);
     return new CkxAstRecordStmt(at_token, record_name, saber::move(fields));
 }
@@ -351,8 +383,22 @@ ckx_parser_impl<CkxTokenStream>::parse_enum_stmt()
 
     next_token();
     expect_n_eat(ckx_token::type::tk_lbrace);
-    saber::vector<ckx_ast_enum_stmt::enumerator> enumerators =
-            parse_enumerators();
+    saber::vector<ckx_ast_enum_stmt::enumerator> enumerators;
+    while (1)
+    {
+        saber_string_view enumerator_name = current_token()->str;
+        next_token();
+        expect_n_eat(ckx_token::type::tk_assign);
+        qint64 enumerator_value = current_token()->v.i64;
+        enumerators.emplace_back(enumerator_name, enumerator_value);
+        next_token();
+
+        if (current_token()->token_type == ckx_token::type::tk_comma)
+            next_token();
+
+        if (current_token()->token_type == ckx_token::type::tk_rbrace)
+            break;
+    }
     expect_n_eat(ckx_token::type::tk_rbrace);
     return new ckx_ast_enum_stmt(at_token, enum_name, saber::move(enumerators));
 }
@@ -375,6 +421,7 @@ ckx_ast_alias_stmt *ckx_parser_impl<CkxTokenStream>::parse_alias_stmt()
     typename_table->add_typename(name);
     return new ckx_ast_alias_stmt(at_token, name, type);
 }
+
 
 template <typename CkxTokenStream>
 ckx_ast_func_stmt *ckx_parser_impl<CkxTokenStream>::parse_ckx_block()
@@ -915,87 +962,6 @@ ckx_parser_impl<CkxTokenStream>::parse_type()
         }
     }
 }
-
-template <typename CkxTokenStream>
-saber::vector<ckx_ast_decl_stmt::init_decl>
-ckx_parser_impl<CkxTokenStream>::parse_init_decl_list()
-{
-    saber::vector<ckx_ast_decl_stmt::init_decl> ret;
-    while (1)
-    {
-        saber_ptr<ckx_token> token = current_token();
-        ckx_ast_expr *init = nullptr;
-        next_token();
-        if ( current_token()->token_type == ckx_token::type::tk_assign )
-        {
-            next_token();
-            init = parse_init_expr();
-        }
-        ret.emplace_back(token->str, init);
-        if ( current_token()->token_type == ckx_token::type::tk_semicolon )
-            break;
-        expect_n_eat(ckx_token::type::tk_comma);
-    }
-    return ret;
-}
-
-
-template <typename CkxTokenStream>
-template <typename CkxRecordField>
-saber::vector<CkxRecordField>
-ckx_parser_impl<CkxTokenStream>::parse_record_fields()
-{
-    saber::vector<CkxRecordField> ret;
-    while (1)
-    {
-        saber_ptr<ckx_type> decl_type = parse_type();
-        while (1)
-        {
-            saber_string_view dclr_name = current_token()->str;
-            ret.emplace_back(decl_type, dclr_name);
-            next_token();
-
-            if (current_token()->token_type == ckx_token::type::tk_comma)
-                next_token();
-
-            else if (current_token()->token_type
-                     == ckx_token::type::tk_semicolon)
-            {
-                next_token();
-                break;
-            }
-        }
-
-        if ( current_token()->token_type == ckx_token::type::tk_rbrace )
-            break;
-    }
-    return ret;
-}
-
-
-template <typename CkxTokenStream>
-saber::vector<ckx_ast_enum_stmt::enumerator>
-ckx_parser_impl<CkxTokenStream>::parse_enumerators()
-{
-    saber::vector<ckx_ast_enum_stmt::enumerator> ret;
-    while (1)
-    {
-        saber_string_view enumerator_name = current_token()->str;
-        next_token();
-        expect_n_eat(ckx_token::type::tk_assign);
-        qint64 enumerator_value = current_token()->v.i64;
-        ret.emplace_back(enumerator_name, enumerator_value);
-        next_token();
-
-        if (current_token()->token_type == ckx_token::type::tk_comma)
-            next_token();
-
-        if (current_token()->token_type == ckx_token::type::tk_rbrace)
-            break;
-    }
-    return ret;
-}
-
 
 
 template <typename CkxTokenStream>
