@@ -259,7 +259,7 @@ ckx_ast_decl_stmt*
 ckx_parser_impl<CkxTokenStream>::parse_decl_stmt()
 {
     saber_ptr<ckx_type> type = parse_type();
-    saber::vector<ckx_ast_init_decl*> decls = parse_init_decl_list(type);
+    saber::vector<ckx_ast_decl_stmt::init_decl> decls = parse_init_decl_list();
     expect_n_eat(ckx_token::type::tk_semicolon);
     return new ckx_ast_decl_stmt(current_token(), type, saber::move(decls));
 }
@@ -917,10 +917,10 @@ ckx_parser_impl<CkxTokenStream>::parse_type()
 }
 
 template <typename CkxTokenStream>
-saber::vector<ckx_ast_init_decl*>
-ckx_parser_impl<CkxTokenStream>::parse_init_decl_list(saber_ptr<ckx_type> _type)
+saber::vector<ckx_ast_decl_stmt::init_decl>
+ckx_parser_impl<CkxTokenStream>::parse_init_decl_list()
 {
-    saber::vector<ckx_ast_init_decl*> ret;
+    saber::vector<ckx_ast_decl_stmt::init_decl> ret;
     while (1)
     {
         saber_ptr<ckx_token> token = current_token();
@@ -931,9 +931,7 @@ ckx_parser_impl<CkxTokenStream>::parse_init_decl_list(saber_ptr<ckx_type> _type)
             next_token();
             init = parse_init_expr();
         }
-
-        ret.emplace_back(new ckx_ast_init_decl(token, _type, token->str, init));
-
+        ret.emplace_back(token->str, init);
         if ( current_token()->token_type == ckx_token::type::tk_semicolon )
             break;
         expect_n_eat(ckx_token::type::tk_comma);

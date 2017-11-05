@@ -1351,6 +1351,7 @@ namespace saber
 {
 using std::vector;
 } // namespace saber
+
 #endif
 
 #endif // VECTOR_HPP

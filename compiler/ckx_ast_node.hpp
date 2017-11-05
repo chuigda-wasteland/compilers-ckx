@@ -194,16 +194,31 @@ private:
 class ckx_ast_decl_stmt final implements ckx_ast_stmt
 {
 public:
+    open_class init_decl
+    {
+        init_decl(saber_string_view _name, ckx_ast_expr* _init) :
+            name(_name), init(_init) {}
+        ~init_decl();
+
+        init_decl(const init_decl& _another) = delete;
+        init_decl(init_decl&& _another) :
+            name(_another.name), init(_another.init)
+        { _another.init = nullptr; }
+
+        saber_string_view name;
+        ckx_ast_expr* init;
+    };
+
     explicit ckx_ast_decl_stmt(saber_ptr<ckx_token> _at_token,
                                saber_ptr<ckx_type> _type,
-                               saber::vector<ckx_ast_init_decl*>&& _decls);
-    ~ckx_ast_decl_stmt() override final;
+                               saber::vector<init_decl>&& _decls);
+    ~ckx_ast_decl_stmt() override final = default;
 
     void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
 
 private:
     saber_ptr<ckx_type> type;
-    saber::vector<ckx_ast_init_decl*> decls;
+    saber::vector<init_decl> decls;
 };
 
 class ckx_ast_expr_stmt final implements ckx_ast_stmt
@@ -243,23 +258,6 @@ private:
     saber::vector<param_decl> param_decls;
     saber_ptr<ckx_type> ret_type;
     ckx_ast_compound_stmt *fnbody;
-};
-
-class ckx_ast_init_decl final implements ckx_ast_node
-{
-public:
-    ckx_ast_init_decl(saber_ptr<ckx_token> _at_token,
-                      saber_ptr<ckx_type> _type,
-                      saber_string_view _name,
-                      ckx_ast_expr* _init);
-    virtual ~ckx_ast_init_decl() final;
-
-    void ast_dump(ckx_file_writer& _writer, quint16 _level) override final;
-
-private:
-    saber_ptr<ckx_type> type;
-    saber_string_view name;
-    ckx_ast_expr *init;
 };
 
 class ckx_ast_struct_stmt final implements ckx_ast_stmt

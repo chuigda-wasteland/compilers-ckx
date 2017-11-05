@@ -160,20 +160,15 @@ ckx_ast_return_stmt::~ckx_ast_return_stmt()
     delete return_expr;
 }
 
+ckx_ast_decl_stmt::init_decl::~init_decl() { delete init; }
 
 ckx_ast_decl_stmt::ckx_ast_decl_stmt(saber_ptr<ckx_token> _at_token,
         saber_ptr<ckx_type> _type,
-        saber::vector<ckx_ast_init_decl *> &&_decls) :
+        saber::vector<init_decl> &&_decls) :
     ckx_ast_stmt(_at_token),
     type(_type),
     decls(saber::move(_decls))
 {}
-
-ckx_ast_decl_stmt::~ckx_ast_decl_stmt()
-{
-    for (auto it = decls.begin(); it != decls.end(); ++it)
-        delete *it;
-}
 
 
 ckx_ast_expr_stmt::ckx_ast_expr_stmt(saber_ptr<ckx_token> _at_token,
@@ -209,20 +204,6 @@ ckx_ast_func_stmt::~ckx_ast_func_stmt()
 
 
 
-ckx_ast_init_decl::ckx_ast_init_decl(saber_ptr<ckx_token> _at_token,
-                                     saber_ptr<ckx_type> _type,
-                                     saber_string_view _name,
-                                     ckx_ast_expr *_init) :
-    ckx_ast_node(_at_token), type(_type), name(_name), init(_init)
-{}
-
-ckx_ast_init_decl::~ckx_ast_init_decl()
-{
-    delete init;
-}
-
-
-
 ckx_ast_struct_stmt::ckx_ast_struct_stmt(saber_ptr<ckx_token> _at_token,
                                          saber_string_view _name,
                                          saber::vector<field> &&_fields) :
@@ -241,7 +222,8 @@ ckx_ast_struct_stmt::get_fields() const
 
 
 ckx_ast_variant_stmt::ckx_ast_variant_stmt(saber_ptr<ckx_token> _at_token,
-                                           saber_string_view _name, saber::vector<field> &&_fields) :
+                                           saber_string_view _name,
+                                           saber::vector<field> &&_fields) :
     ckx_ast_stmt(_at_token),
     name(_name),
     fields(saber::move(_fields))
