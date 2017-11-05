@@ -57,10 +57,14 @@ class llvm_global_variable;
 class llvm_new_type;
 
 class llvm_label;
-class llvm_binary_instruction;
+class llvm_ret_instruction;
 class llvm_call_instruction;
 class llvm_br_instruction;
 class llvm_condbr_instruction;
+class llvm_phi_instruction;
+class llvm_binary_instruction;
+class llvm_cast_instruction;
+class llvm_cmp_instruction;
 class llvm_alloca_instruction;
 class llvm_load_instruction;
 class llvm_store_instruction;

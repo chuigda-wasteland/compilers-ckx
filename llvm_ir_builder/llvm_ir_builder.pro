@@ -35,7 +35,8 @@ HEADERS += \
     llvm_type.hpp \
     llvm_implicit_list.hpp \
     llvm_ir_builder.hpp \
-    opdef.hpp
+    opdef.hpp \
+    llvm_ir_builder_impl.hpp
 
 INCLUDEPATH +=\
     ../saber/include/
