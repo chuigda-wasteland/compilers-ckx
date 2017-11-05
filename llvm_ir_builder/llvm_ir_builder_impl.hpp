@@ -28,6 +28,12 @@ namespace faker
 namespace detail
 {
 
+class llvm_function final
+{
+public:
+    llvm_function();
+};
+
 class llvm_ir_builder_impl final
 {
 public:
@@ -38,7 +44,7 @@ public:
     llvm_ir_builder_impl& operator= (const llvm_ir_builder_impl&) = delete;
     llvm_ir_builder_impl& operator= (llvm_ir_builder_impl&&) = delete;
 
-    void create_n_enter_func(saber_string_view );
+    void create_n_enter_func(saber_string_view _func_name);
     void leave_func();
 
     llvm_instruction* get_insert_point();
