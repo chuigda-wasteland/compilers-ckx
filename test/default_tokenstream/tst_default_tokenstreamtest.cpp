@@ -41,7 +41,7 @@ static bool do_test_ckx_token_stream_1(void)
     };
 
     ckx_test_filereader reader(saber::move(str));
-    ckx_default_token_stream stream = ckx_default_token_stream(reader);
+    ckx_token_stream stream = ckx_token_stream(reader);
 
     for (qsizet i = 0;
          stream[0].get()->token_type != ckx_token::type::tk_eoi;
@@ -66,7 +66,7 @@ static bool do_test_ckx_token_stream_2(void)
     ;
 
     ckx_test_filereader reader(saber::move(str));
-    ckx_default_token_stream stream = ckx_default_token_stream(reader);
+    ckx_token_stream stream = ckx_token_stream(reader);
 
     saber::vector<saber_string> comparsion =
     {
@@ -112,7 +112,7 @@ static bool do_test_ckx_token_stream_3()
     };
 
     ckx_test_filereader reader(saber::move(str));
-    ckx_default_token_stream stream = ckx_default_token_stream(reader);
+    ckx_token_stream stream = ckx_token_stream(reader);
 
     for (qsizet i = 0;
          stream[0].get()->token_type != ckx_token::type::tk_eoi;
@@ -147,7 +147,7 @@ static bool do_test_ckx_token_stream_4()
     };
 
     ckx_test_filereader reader(saber::move(str));
-    ckx_default_token_stream stream = ckx_default_token_stream(reader);
+    ckx_token_stream stream = ckx_token_stream(reader);
 
     for (qsizet i = 0;
          stream[0].get()->token_type != ckx_token::type::tk_eoi;
@@ -182,7 +182,7 @@ static bool do_test_ckx_token_stream_5()
     };
 
     ckx_test_filereader reader(saber::move(str));
-    ckx_default_token_stream stream = ckx_default_token_stream(reader);
+    ckx_token_stream stream = ckx_token_stream(reader);
 
     for (qsizet i = 0;
          stream[0].get()->token_type != ckx_token::type::tk_eoi;

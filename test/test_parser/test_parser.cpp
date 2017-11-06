@@ -41,10 +41,10 @@ int main(int argc, const char* argv[])
 
     ckx_fp_reader reader(fp);
     ckx_fp_writer writer(stdout);
-    saber_ptr<ckx_default_token_stream> stream =
-        new ckx_default_token_stream(reader);
+    saber_ptr<ckx_token_stream> stream =
+        new ckx_token_stream(reader);
 
-    ckx_parser<ckx_default_token_stream> parser;
+    ckx_parser<ckx_token_stream> parser;
     auto parse_result = parser.parse(stream);
     parse_result.trans_unit->ast_dump(writer, 0);
 

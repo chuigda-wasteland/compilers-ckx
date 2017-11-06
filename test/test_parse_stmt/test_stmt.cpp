@@ -69,7 +69,7 @@ private:
 
 int main()
 {
-    ckx_parser_impl_test<ckx_default_token_stream> test;
+    ckx_parser_impl_test<ckx_token_stream> test;
     test.test_parse_expr_stmt();
     test.test_parse_if_stmt();
     test.test_parse_while_stmt();

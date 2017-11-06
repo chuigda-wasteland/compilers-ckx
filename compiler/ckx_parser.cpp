@@ -75,7 +75,7 @@ ckx_parser<CkxTokenStream>::parse(saber_ptr<CkxTokenStream> _token_stream)
     return p_impl->parse_impl(_token_stream);
 }
 
-template class ckx_parser<ckx_default_token_stream>;
+template class ckx_parser<ckx_token_stream>;
 
 namespace detail
 {
