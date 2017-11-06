@@ -35,7 +35,6 @@ GGLEX("static_cast", static_cast)
 GGLEX("reinterpret_cast", reinterpret_cast)
 GGLEX("const_cast", const_cast)
 GGLEX("ckx_cast", ckx_cast)
-GGLEX("ckx", ckx)
 GGLEX("sizeof", sizeof)
 
 #ifndef GG2LEX

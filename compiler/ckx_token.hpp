@@ -138,7 +138,6 @@ open_class ckx_token
 
         tk_sizeof,             // sizeof
 
-        tk_ckx,                // ckx
         tk_eoi                 // EOI
     };
 

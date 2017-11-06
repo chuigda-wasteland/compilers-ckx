@@ -151,9 +151,6 @@ ckx_parser_impl<CkxTokenStream>::parse_global_stmt()
     case ckx_token::type::tk_alias:
         return parse_alias_stmt();
 
-    case ckx_token::type::tk_ckx:
-        return parse_ckx_block();
-
     /// @todo Module manage system still designing.
     /// We will have C-like preprocessors before creating a powerful
     /// module manage system.
@@ -420,24 +417,6 @@ ckx_ast_alias_stmt *ckx_parser_impl<CkxTokenStream>::parse_alias_stmt()
 
     typename_table->add_typename(name);
     return new ckx_ast_alias_stmt(at_token, name, type);
-}
-
-
-template <typename CkxTokenStream>
-ckx_ast_func_stmt *ckx_parser_impl<CkxTokenStream>::parse_ckx_block()
-{
-    assert(current_token()->token_type == ckx_token::type::tk_ckx);
-    saber_ptr<ckx_token> at_token = current_token();
-    next_token();
-
-    expect(ckx_token::type::tk_lbrace);
-    ckx_ast_compound_stmt *fnbody = parse_compound_stmt();
-
-    return new ckx_ast_func_stmt(at_token,
-                                 saber_string_pool::create_view("main"),
-                                 saber::vector<ckx_ast_func_stmt::param_decl>(),
-                                 ckx_type_helper::get_vi16_type(),
-                                 fnbody);
 }
 
 

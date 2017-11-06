@@ -19,7 +19,7 @@
 
 #include "ckx_token.hpp"
 #include "memory.hpp"
-#include "string.hpp"
+#include "string_pool.hpp"
 
 namespace ckx
 {

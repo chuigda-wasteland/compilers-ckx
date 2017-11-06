@@ -31,7 +31,7 @@ And finally I designed ckx which is absolutely not C.
 
 	1)  import std.io;
 	2)  
-	3)  ckx
+	3)  fn main() : i32
 	4)  {
 	5)  	vi16 a, b;
 	6)  	input(a);
@@ -44,7 +44,7 @@ And finally I designed ckx which is absolutely not C.
 
 The first line `import std.io` uses ckx keyword `import` to import `io` utility module from package `std`. As you can see, ckx will have a very powerful module manage system, and we will use this package manage system in the future. But currently I ~~the programmer~~ does not know how to implement this module system. So in the early versions, ckx will include a preprocessor system, importing functions still uses `#include`.
 
-the `ckx block` is equivalent to the `main` function in C or C++. it returns an integer of type `vi16`.
+the `function main` is equivalent to the `main` function in C or C++. it shall returns an integer..
 
 ### Basic data types
 
