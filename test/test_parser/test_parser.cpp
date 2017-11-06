@@ -44,7 +44,7 @@ int main(int argc, const char* argv[])
     saber_ptr<ckx_token_stream> stream =
         new ckx_token_stream(reader);
 
-    ckx_parser<ckx_token_stream> parser;
+    ckx_parser parser;
     auto parse_result = parser.parse(stream);
     parse_result.trans_unit->ast_dump(writer, 0);
 

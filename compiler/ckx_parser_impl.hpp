@@ -46,16 +46,14 @@ private:
 };
 
 
-
-template <typename CkxTokenStream>
 class ckx_parser_impl
 {
 public:
     explicit ckx_parser_impl() = default;
     ~ckx_parser_impl() = default;
 
-    typename ckx_parser<CkxTokenStream>::parse_result
-    parse_impl(saber_ptr<CkxTokenStream> _token_stream);
+    typename ckx_parser::parse_result
+    parse_impl(saber_ptr<ckx_token_stream> _token_stream);
 
 protected:
     /// @brief General parsing functions
@@ -120,7 +118,7 @@ protected:
     void skip2_token(const ckx_token_set& _token_set);
 
 protected:
-    saber_ptr<CkxTokenStream> token_stream;
+    saber_ptr<ckx_token_stream> token_stream;
 
     saber::list<ckx_error> *error_list = nullptr;
     saber::list<ckx_error> *warn_list = nullptr;

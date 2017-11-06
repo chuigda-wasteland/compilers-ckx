@@ -28,13 +28,9 @@ namespace ckx
 
 namespace detail
 {
-
-template <typename CkxTokenStream>
 class ckx_parser_impl;
-
 } // namespace detail
 
-template <typename CkxTokenStream>
 class ckx_parser
 {
 public:
@@ -56,16 +52,12 @@ public:
     ckx_parser();
     ~ckx_parser();
 
-    parse_result parse(saber_ptr<CkxTokenStream> _token_stream);
+    parse_result parse(saber_ptr<ckx_token_stream> _token_stream);
 
 private:
-    detail::ckx_parser_impl<CkxTokenStream>* p_impl;
+    detail::ckx_parser_impl* p_impl;
 };
 
 } // namespace ckx
-
-
-
-
 
 #endif // CKX_PARSER_HPP
