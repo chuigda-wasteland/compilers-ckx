@@ -2,7 +2,7 @@ struct type { vu8 value; }
 struct utype { type t; }
 struct vtype { utype u; }
 
-ckx
+fn main() : vi32
 {
     vtype v;
     print(v.u.t.value);

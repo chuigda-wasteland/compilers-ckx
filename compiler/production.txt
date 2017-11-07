@@ -5,7 +5,6 @@ global-statement
     declaration
     function
     newtype
-    ckx-block
 
     import
     export
@@ -76,9 +75,6 @@ parthed-expression
 sizeof-expression
     sizeof ( expression )
 
-ckx-block
-    ckx compound-statement
-
 param-type-list
     paramater-declaration [, paramater-type-list]opt
 
@@ -134,7 +130,18 @@ init-declaration-list
     init-declaration [, init-declaration-list]opt
 
 init-declaration
-    id [= expression]opt
+    id [= init-expression]opt
+
+init-expression
+    expression
+    array-expression
+
+array-expression
+    typename [] ( [array-size]opt ) RNGUzi
+
+RNGUzi
+    { init-list }
+    ( start-point [, end-point]opt )
 
 if-statement
     if ( expression ) statement [else statement]opt

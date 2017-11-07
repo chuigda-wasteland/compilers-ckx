@@ -4,7 +4,7 @@ fn printstr(vi8 const* _from) : void;
 fn heap_alloc(vu64 size) : void*;
 fn heap_free(void* address) : void;
 
-ckx
+fn main() : vi32
 {
   vi8* stra = reinterpret_cast<vi8*>(heap_alloc(256*sizeof(vi8))),
        strb = reinterpret_cast<vi8*>(heap_alloc(256*sizeof(vi8)));
