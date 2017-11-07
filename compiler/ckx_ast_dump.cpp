@@ -23,7 +23,7 @@ namespace ckx
 
 constexpr quint16 indent_size = 4;
 
-void ckx_ast_translation_unit::ast_dump(ckx_file_writer& _writer,
+void ckx_ast_translation_unit::ast_dump(we::we_file_writer& _writer,
                                         quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
@@ -34,7 +34,7 @@ void ckx_ast_translation_unit::ast_dump(ckx_file_writer& _writer,
 }
 
 
-void ckx_ast_compound_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_compound_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Compound-statement\n");
@@ -44,7 +44,7 @@ void ckx_ast_compound_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_if_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_if_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("If-statement\n");
@@ -63,7 +63,7 @@ void ckx_ast_if_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_while_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_while_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("While-statement\n");
@@ -76,7 +76,7 @@ void ckx_ast_while_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_do_while_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_do_while_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Do-while-statement\n");
@@ -89,7 +89,7 @@ void ckx_ast_do_while_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_for_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_for_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("For-statement\n");
@@ -117,21 +117,21 @@ void ckx_ast_for_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_break_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_break_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Break-statement\n");
 }
 
 
-void ckx_ast_continue_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_continue_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Continue-statement\n");
 }
 
 
-void ckx_ast_return_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_return_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Return-statement\n");
@@ -144,7 +144,7 @@ void ckx_ast_return_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_decl_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_decl_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Declaration\n");
@@ -153,11 +153,25 @@ void ckx_ast_decl_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
     _writer.write(type->to_string());
     _writer.write("]]\n");
     for (auto &decl : decls)
-        decl->ast_dump(_writer, _level+1);
+    {
+        _writer.write_whitespace((_level+2)*indent_size);
+        _writer.write("\"");
+        _writer.write(decl.name);
+        _writer.write("\"");
+        if (decl.init)
+        {
+            _writer.write("Initialized with \n");
+            decl.init->ast_dump(_writer, _level+3);
+        }
+        else
+        {
+            _writer.write("\n");
+        }
+    }
 }
 
 
-void ckx_ast_expr_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_expr_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Expression-statement\n");
@@ -165,7 +179,7 @@ void ckx_ast_expr_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_func_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_func_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Function \"");
@@ -174,7 +188,14 @@ void ckx_ast_func_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
     _writer.write_whitespace((_level+1)*indent_size);
     _writer.write("Takes\n");
     for (auto &param_decl : param_decls)
-        param_decl->ast_dump(_writer, _level+2);
+    {
+        _writer.write_whitespace((_level+2)*indent_size);
+        _writer.write("\"");
+        _writer.write(param_decl.name);
+        _writer.write("\" Of type [[");
+        _writer.write(param_decl.type->to_string());
+        _writer.write("]] \n");
+    }
     _writer.write_whitespace((_level+1)*indent_size);
     _writer.write("Returns [[");
     _writer.write(ret_type->to_string());
@@ -188,29 +209,7 @@ void ckx_ast_func_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_init_decl::ast_dump(ckx_file_writer& _writer, quint16 _level)
-{
-    _writer.write_whitespace(_level*indent_size);
-    _writer.write("Init-decl\n");
-    _writer.write_whitespace((_level+1)*indent_size);
-    _writer.write("\"");
-    _writer.write(name);
-    _writer.write("\" Of type [[");
-    _writer.write(type->to_string());
-    _writer.write("]] initialized with ");
-    if (init == nullptr)
-    {
-        _writer.write("{Nothing}\n");
-    }
-    else
-    {
-        _writer.write("\n");
-        init->ast_dump(_writer, _level+2);
-    }
-}
-
-
-void ckx_ast_struct_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_struct_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Struct \"");
@@ -228,7 +227,7 @@ void ckx_ast_struct_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_variant_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_variant_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Variant \"");
@@ -246,7 +245,7 @@ void ckx_ast_variant_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_alias_stmt::ast_dump(ckx_file_writer &_writer, quint16 _level)
+void ckx_ast_alias_stmt::ast_dump(we::we_file_writer &_writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Alias \"");
@@ -257,7 +256,7 @@ void ckx_ast_alias_stmt::ast_dump(ckx_file_writer &_writer, quint16 _level)
 }
 
 
-void ckx_ast_enum_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_enum_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Enumeration \"");
@@ -275,7 +274,7 @@ void ckx_ast_enum_stmt::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_binary_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_binary_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Operator "));
@@ -335,7 +334,7 @@ void ckx_ast_binary_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_unary_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_unary_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     switch (opercode)
@@ -364,7 +363,7 @@ void ckx_ast_unary_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_subscript_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_subscript_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Array Subscript Operator\n"));
@@ -373,7 +372,7 @@ void ckx_ast_subscript_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_invoke_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_invoke_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Function Invokation\n"));
@@ -394,7 +393,7 @@ void ckx_ast_invoke_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_extract_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
+void ckx_ast_extract_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Extraction\n"));
@@ -406,7 +405,7 @@ void ckx_ast_extract_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
 }
 
 
-void ckx_ast_enumerator_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
+void ckx_ast_enumerator_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Enumerator\n"));
@@ -418,7 +417,7 @@ void ckx_ast_enumerator_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
 }
 
 
-void ckx_ast_cond_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_cond_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Conditional Operator\n"));
@@ -434,7 +433,7 @@ void ckx_ast_cond_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_id_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
+void ckx_ast_id_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Identifier \""));
@@ -443,7 +442,7 @@ void ckx_ast_id_expr::ast_dump(ckx_file_writer& _writer, quint16 _level)
 }
 
 
-void ckx_ast_cast_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
+void ckx_ast_cast_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     switch (op)
@@ -471,7 +470,7 @@ void ckx_ast_cast_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
 }
 
 
-void ckx_ast_sizeof_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
+void ckx_ast_sizeof_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Sizeof [["));
@@ -480,7 +479,7 @@ void ckx_ast_sizeof_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
 }
 
 
-void ckx_ast_vi_literal_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
+void ckx_ast_vi_literal_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Integral literal "));
@@ -489,7 +488,7 @@ void ckx_ast_vi_literal_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
 }
 
 
-void ckx_ast_vr_literal_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
+void ckx_ast_vr_literal_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Real literal "));
@@ -497,5 +496,44 @@ void ckx_ast_vr_literal_expr::ast_dump(ckx_file_writer &_writer, quint16 _level)
     _writer.write(reinterpret_cast<const qchar*>("\n"));
 }
 
+
+void ckx_ast_array_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("Array literal \n"));
+    if (size != -1)
+    {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write(reinterpret_cast<const qchar*>("Of size "));
+        _writer.write(static_cast<qint64>(size));
+        _writer.write(reinterpret_cast<const qchar*>("\n"));
+    }
+
+    if (start != nullptr)
+    {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write(reinterpret_cast<const qchar*>("Starts at\n"));
+        start->ast_dump(_writer, _level+2);
+    }
+
+    if (finish != nullptr)
+    {
+        _writer.write_whitespace((_level+1)*indent_size);
+        _writer.write(reinterpret_cast<const qchar*>("Finishes at\n"));
+        finish->ast_dump(_writer, _level+2);
+    }
+
+    _writer.write_whitespace((_level+1)*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("Initialized with\n"));
+    if (!init_list.empty())
+    {
+        for (auto &item : init_list) item->ast_dump(_writer, _level+2);
+    }
+    else
+    {
+        _writer.write_whitespace((_level+2)*indent_size);
+        _writer.write(reinterpret_cast<const qchar*>("Nothing\n"));
+    }
+}
 
 } // namespace ckx

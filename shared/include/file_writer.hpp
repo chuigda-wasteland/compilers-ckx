@@ -26,20 +26,20 @@
 #include "string_pool.hpp"
 #include "defs.hpp"
 
-namespace ckx
+namespace we
 {
 namespace detail
 {
-    class ckx_fp_writer_impl;
-    class ckx_ostream_writer_impl;
+    class we_fp_writer_impl;
+    class we_ostream_writer_impl;
 } // namespace detail
 
 
-interface ckx_file_writer
+interface we_file_writer
 {
 public:
-    ckx_file_writer() = default;
-    virtual ~ckx_file_writer() = 0;
+    we_file_writer() = default;
+    virtual ~we_file_writer() = 0;
 
     virtual void write(qint64 _value) = 0;
     virtual void write(quint64 _value) = 0;
@@ -49,15 +49,15 @@ public:
     virtual void write(saber_string_view _str_view) = 0;
     virtual void write_whitespace(qsizet _count) = 0;
 
-    ckx_file_writer(const ckx_file_writer& _another) = delete;
-    ckx_file_writer& operator= (const ckx_file_writer& _another) = delete;
+    we_file_writer(const we::we_file_writer& _another) = delete;
+    we_file_writer& operator= (const we::we_file_writer& _another) = delete;
 };
 
-class ckx_fp_writer final implements ckx_file_writer
+class we_fp_writer final implements we::we_file_writer
 {
 public:
-    explicit ckx_fp_writer(std::FILE* _fp);
-    ~ckx_fp_writer() override final;
+    explicit we_fp_writer(std::FILE* _fp);
+    ~we_fp_writer() override final;
 
     void write(qint64 _value) override final;
     void write(quint64 _value) override final;
@@ -67,18 +67,18 @@ public:
     void write(saber_string_view _str_view) override final;
     void write_whitespace(qsizet _count) override final;
 
-    ckx_fp_writer(const ckx_fp_writer& _another) = delete;
-    ckx_fp_writer& operator= (const ckx_fp_writer& _another) = delete;
+    we_fp_writer(const we::we_fp_writer& _another) = delete;
+    we_fp_writer& operator= (const we::we_fp_writer& _another) = delete;
 
 private:
-    detail::ckx_fp_writer_impl *impl;
+    detail::we_fp_writer_impl *impl;
 };
 
-class ckx_ostream_writer final implements ckx_file_writer
+class we_ostream_writer final implements we::we_file_writer
 {
 public:
-    explicit ckx_ostream_writer(std::ostream& _stream);
-    ~ckx_ostream_writer();
+    explicit we_ostream_writer(std::ostream& _stream);
+    ~we_ostream_writer();
 
     void write(qint64 _value) override final;
     void write(quint64 _value) override final;
@@ -88,11 +88,11 @@ public:
     void write(saber_string_view _str_view) override final;
     void write_whitespace(qsizet _count) override final;
 
-    ckx_ostream_writer(const ckx_ostream_writer& _another) = delete;
-    ckx_ostream_writer& operator= (const ckx_ostream_writer& _another) = delete;
+    we_ostream_writer(const we_ostream_writer& _another) = delete;
+    we_ostream_writer& operator= (const we_ostream_writer& _another) = delete;
 
 private:
-    detail::ckx_ostream_writer_impl *impl;
+    detail::we_ostream_writer_impl *impl;
 };
 
 } // namespace ckx

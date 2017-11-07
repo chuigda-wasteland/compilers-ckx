@@ -23,9 +23,7 @@
 #include <cstddef>
 
 #include <utility>
-
-namespace ckx
-{
+#include <string.hpp>
 
 using qint64 = std::int64_t;
 using qint32 = std::int32_t;
@@ -37,10 +35,11 @@ using quint32 = std::uint32_t;
 using quint16 = std::uint16_t;
 using quint8  = std::uint8_t;
 
+using qptrdiff = std::ptrdiff_t;
+
 using qchar = signed char;
 
 using qsizet = size_t;
-using qptrdiff = std::ptrdiff_t;
 
 using qreal = double;
 
@@ -60,7 +59,11 @@ constexpr qsizet countof(const ArrayType& _array)
     return sizeof(_array) / sizeof(_array[0]);
 }
 
-} // namespace ckx
+inline saber::string to_string_helper(const qcoord& _coord)
+{
+    return saber::to_string_helper(quint64(_coord.first))
+           + saber::to_string_helper(quint64(_coord.second));
+}
 
 #define interface class
 #define pod_struct struct

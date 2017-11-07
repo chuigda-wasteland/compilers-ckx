@@ -23,7 +23,7 @@
 
 using namespace ckx;
 
-class ckx_test_filereader final implements ckx_file_reader
+class ckx_test_filereader final implements we::we_file_reader
 {
 public:
     ckx_test_filereader(saber_string&& _str) : str(saber::move(_str)) {}
@@ -42,11 +42,11 @@ private:
 
 
 
-template <typename CkxTokenStream>
+
 class ckx_parser_impl_test final :
-        public detail::ckx_parser_impl<CkxTokenStream>
+        public detail::ckx_parser_impl
 {
-    using base = detail::ckx_parser_impl<CkxTokenStream>;
+    using base = detail::ckx_parser_impl;
 
 public:
     void test_parse_basic_expr();
@@ -67,7 +67,7 @@ private:
 
 int main()
 {
-    ckx_parser_impl_test<ckx_default_token_stream> test;
+    ckx_parser_impl_test test;
     test.test_parse_basic_expr();
     test.test_parse_type();
     test.test_parse_postfix_expr();
@@ -81,15 +81,14 @@ int main()
 
 
 
-template <typename CkxTokenStream>
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_basic_expr()
+ckx_parser_impl_test::test_parse_basic_expr()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         ckx_test_filereader reader {"123 literal number   39.5 array"};
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
         for (int i = 0; i < 5; i++)
         {
@@ -106,7 +105,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_basic_expr()
 
     {
         ckx_test_filereader reader {"etype::ename"};
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
         base::typename_table->add_typename(
         saber_string_pool::create_view("etype"));
@@ -121,15 +120,14 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_basic_expr()
     }
 }
 
-template <typename CkxTokenStream>
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_type()
+ckx_parser_impl_test::test_parse_type()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         ckx_test_filereader reader { "vi8 const * const * const" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         saber_ptr<ckx_type> type = base::parse_type();
@@ -144,7 +142,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_type()
 
     {
         ckx_test_filereader reader { "vi8 *" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         assert(base::error_list->empty());
@@ -159,7 +157,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_type()
 
     {
         ckx_test_filereader reader { "vr32 const" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         assert(base::error_list->empty());
@@ -174,7 +172,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_type()
 
     {
         ckx_test_filereader reader { "st" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
         base::typename_table->add_typename(
             saber_string_pool::create_view("st"));
@@ -190,15 +188,14 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_type()
     }
 }
 
-template <typename CkxTokenStream>
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_postfix_expr()
+ckx_parser_impl_test::test_parse_postfix_expr()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         ckx_test_filereader reader { "a[5]" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr* expr = base::parse_postfix_expr();
@@ -213,7 +210,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_postfix_expr()
 
     {
         ckx_test_filereader reader { "sum(a, 2, sum(5, 6), 4, number)" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr* expr = base::parse_postfix_expr();
@@ -228,7 +225,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_postfix_expr()
 
     {
         ckx_test_filereader reader { "a.b" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr* expr = base::parse_postfix_expr();
@@ -243,7 +240,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_postfix_expr()
 
     {
         ckx_test_filereader reader { "a.b.c" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr* expr = base::parse_postfix_expr();
@@ -257,15 +254,15 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_postfix_expr()
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
+ckx_parser_impl_test::test_parse_unary_expr()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         ckx_test_filereader reader { "++number" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr* expr = base::parse_unary_expr();
@@ -280,7 +277,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
 
     {
         ckx_test_filereader reader { "--number" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr* expr = base::parse_unary_expr();
@@ -295,7 +292,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
 
     {
         ckx_test_filereader reader { "--++number" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr* expr = base::parse_unary_expr();
@@ -310,7 +307,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
 
     {
         ckx_test_filereader reader { "*++array" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr* expr = base::parse_unary_expr();
@@ -325,7 +322,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
 
     {
         ckx_test_filereader reader { "&integer" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr* expr = base::parse_unary_expr();
@@ -340,7 +337,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
 
     {
         ckx_test_filereader reader { "~literal" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr* expr = base::parse_unary_expr();
@@ -355,7 +352,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
 
     {
         ckx_test_filereader reader { "!number" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr* expr = base::parse_unary_expr();
@@ -369,14 +366,13 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_unary_expr()
     }
 }
 
-template <typename CkxTokenStream>
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
+ckx_parser_impl_test::test_parse_cast_expr()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
     {
         ckx_test_filereader reader { "static_cast<vi8>(number)" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr *expr = base::parse_cast_expr();
@@ -391,7 +387,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
 
     {
         ckx_test_filereader reader { "reinterpret_cast<vr32*>(array)" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr *expr = base::parse_cast_expr();
@@ -407,7 +403,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
     {
         ckx_test_filereader reader {
             "const_cast<vr32 const*>(reinterpret_cast<vr32*>(array))" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr *expr = base::parse_cast_expr();
@@ -423,7 +419,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
     {
         ckx_test_filereader reader {
             "reinterpret_cast<st const*>(array)" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
         base::typename_table->add_typename(
             saber_string_pool::create_view("st"));
@@ -439,14 +435,13 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_cast_expr()
     }
 }
 
-template<typename CkxTokenStream>
-void ckx_parser_impl_test<CkxTokenStream>::test_parse_binary_expr()
+void ckx_parser_impl_test::test_parse_binary_expr()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         ckx_test_filereader reader { "number * integer" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr *expr = base::parse_binary_expr(0);
@@ -461,7 +456,7 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_binary_expr()
 
     {
         ckx_test_filereader reader { "number * *array + integer" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr *expr = base::parse_binary_expr(0);
@@ -477,7 +472,7 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_binary_expr()
     {
         ckx_test_filereader reader {
             "number>integer && integer>literal || integer+literal>*array" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr *expr = base::parse_binary_expr(0);
@@ -491,13 +486,12 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_binary_expr()
     }
 }
 
-template<typename CkxTokenStream>
-void ckx_parser_impl_test<CkxTokenStream>::test_parse_cond_expr()
+void ckx_parser_impl_test::test_parse_cond_expr()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
     {
         ckx_test_filereader reader { "number>integer ? number : integer" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr *expr = base::parse_cond_expr();
@@ -511,13 +505,12 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_cond_expr()
     }
 }
 
-template<typename CkxTokenStream>
-void ckx_parser_impl_test<CkxTokenStream>::test_parse_assign_expr()
+void ckx_parser_impl_test::test_parse_assign_expr()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
     {
         ckx_test_filereader reader { "number = literal + integer - *array" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr *expr = base::parse_assign_expr();
@@ -533,7 +526,7 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_assign_expr()
     {
         ckx_test_filereader reader {
             "(number>literal?number:literal) = *array" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_expr *expr = base::parse_assign_expr();
@@ -547,18 +540,18 @@ void ckx_parser_impl_test<CkxTokenStream>::test_parse_assign_expr()
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::initialize_test()
+ckx_parser_impl_test::initialize_test()
 {
     base::error_list = new saber::list<ckx_error>;
     base::warn_list = new saber::list<ckx_error>;
     base::typename_table = new detail::ckx_typename_table;
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::cleanup_test()
+ckx_parser_impl_test::cleanup_test()
 {
     delete base::error_list;
     delete base::warn_list;

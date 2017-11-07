@@ -26,54 +26,54 @@
 #include "string.hpp"
 #include "defs.hpp"
 
-namespace ckx
+namespace we
 {
 namespace detail
 {
-    class ckx_fp_reader_impl;
-    class ckx_istream_reader_impl;
+    class we_fp_reader_impl;
+    class we_istream_reader_impl;
 } // namespace detail
 
 
-interface ckx_file_reader
+interface we_file_reader
 {
 public:
-    ckx_file_reader() = default;
-    virtual ~ckx_file_reader() = 0;
+    we_file_reader() = default;
+    virtual ~we_file_reader() = 0;
     virtual qchar get_next_char(void) = 0;
 
-    ckx_file_reader(const ckx_file_reader& _another) = delete;
-    ckx_file_reader* operator= (const ckx_file_reader& _another) = delete;
+    we_file_reader(const we_file_reader& _another) = delete;
+    we_file_reader* operator= (const we_file_reader& _another) = delete;
 };
 
 
-class ckx_fp_reader final implements ckx_file_reader
+class we_fp_reader final implements we_file_reader
 {
 public:
-    explicit ckx_fp_reader(std::FILE* _fp);
-    ~ckx_fp_reader() override final;
+    explicit we_fp_reader(std::FILE* _fp);
+    ~we_fp_reader() override final;
     qchar get_next_char() override final;
 
-    ckx_fp_reader(const ckx_fp_reader& _another) = delete;
-    ckx_fp_reader& operator= (const ckx_fp_reader& _another) = delete;
+    we_fp_reader(const we_fp_reader& _another) = delete;
+    we_fp_reader& operator= (const we_fp_reader& _another) = delete;
 
 private:
-    detail::ckx_fp_reader_impl *impl;
+    detail::we_fp_reader_impl *impl;
 };
 
 
-class ckx_istream_reader final implements ckx_file_reader
+class we_istream_reader final implements we_file_reader
 {
 public:
-    explicit ckx_istream_reader(std::istream& _stream);
-    ~ckx_istream_reader() override final;
+    explicit we_istream_reader(std::istream& _stream);
+    ~we_istream_reader() override final;
     qchar get_next_char() override final;
 
-    ckx_istream_reader(const ckx_istream_reader& _another) = delete;
-    ckx_istream_reader& operator= (const ckx_istream_reader& _another) = delete;
+    we_istream_reader(const we_istream_reader& _another) = delete;
+    we_istream_reader& operator= (const we_istream_reader& _another) = delete;
 
 private:
-    detail::ckx_istream_reader_impl *impl;
+    detail::we_istream_reader_impl *impl;
 };
 
 } // namespace ckx

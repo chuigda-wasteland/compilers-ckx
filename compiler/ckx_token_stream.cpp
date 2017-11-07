@@ -18,13 +18,11 @@
 
 #include "ckx_token_stream.hpp"
 
-#include "ckx_file_reader.hpp"
+#include "file_reader.hpp"
 #include "vector.hpp"
 
 namespace ckx
 {
-
-ckx_token_stream::~ckx_token_stream() {}
 
 namespace detail
 {
@@ -46,22 +44,17 @@ saber::unordered_map<saber_string, ckx_token::type> ckx_identifier_table::map;
 
 
 
-class ckx_default_token_stream_impl
+class ckx_token_stream_impl final
 {
 public:
-    explicit ckx_default_token_stream_impl(ckx_file_reader &_file_reader);
-    ~ckx_default_token_stream_impl();
+    explicit ckx_token_stream_impl(we::we_file_reader &_file_reader);
+    ~ckx_token_stream_impl();
 
     saber_ptr<ckx_token> operator_index_impl(int _offset);
     saber::vector<ckx_error>& get_error_impl(void);
     void operator_incr_impl(void);
 
 private:
-    qsizet current_pos;
-    saber::vector<saber_ptr<ckx_token>> token_buffer;
-    saber::vector<ckx_error> errors;
-    saber_string src;
-
     void do_split_tokens();
 
     void solve_numbers();
@@ -80,46 +73,50 @@ private:
     qchar make_conversion();
 
     inline bool is_part_of_id(qchar _ch);
-    inline qchar ch();
+    qchar ch();
     inline saber_string_view str();
     inline qcoord& char_coord();
     inline void next_char();
-    inline void next_line();
 
     inline void lex_error(saber_string &&);
     inline void lex_warn(saber_string &&);
 
+private:
+    we::we_file_reader& reader;
+    qsizet current_pos;
     qcoord char_coord_temp;
-    qsizet char_index_temp;
-
     saber_string_view string_temp;
+
+    saber::vector<saber_ptr<ckx_token>> token_buffer;
+    saber::vector<ckx_error> errors;
+
+    qchar char_temp;
 };
 
 }
 
-ckx_default_token_stream::ckx_default_token_stream(
-        ckx_file_reader &_file_reader)
+ckx_token_stream::ckx_token_stream(we::we_file_reader &_file_reader)
 {
-    impl = new detail::ckx_default_token_stream_impl(_file_reader);
+    impl = new detail::ckx_token_stream_impl(_file_reader);
 }
 
-ckx_default_token_stream::~ckx_default_token_stream()
+ckx_token_stream::~ckx_token_stream()
 {
     delete impl;
 }
 
 saber_ptr<ckx_token>
-ckx_default_token_stream::operator [](int _offset)
+ckx_token_stream::operator [](int _offset)
 {
     return impl->operator_index_impl(_offset);
 }
 
-saber::vector<ckx_error>& ckx_default_token_stream::get_error()
+saber::vector<ckx_error>& ckx_token_stream::get_error()
 {
     return impl->get_error_impl();
 }
 
-void ckx_default_token_stream::operator ++ ()
+void ckx_token_stream::operator ++ ()
 {
     impl->operator_incr_impl();
 }
@@ -155,32 +152,22 @@ void ckx_identifier_table::initialize()
 
 
 
-static constexpr size_t default_reserved_size = 1024;
-
-ckx_default_token_stream_impl::ckx_default_token_stream_impl(
-        ckx_file_reader &_file_reader) :
+ckx_token_stream_impl::ckx_token_stream_impl(
+        we::we_file_reader &_file_reader) :
+    reader(_file_reader),
     current_pos(0),
     char_coord_temp(1, 1),
-    char_index_temp(0),
     string_temp(saber_string_pool::create_view(""))
 {
-    src.reserve(default_reserved_size);
-
-    qchar ch = _file_reader.get_next_char();
-    while (ch != (qchar)saber::char_traits<qchar>::eof())
-    {
-        src.push_back(ch);
-        ch = _file_reader.get_next_char();
-    }
-
+    next_char();
     do_split_tokens();
 }
 
-ckx_default_token_stream_impl::~ckx_default_token_stream_impl()
+ckx_token_stream_impl::~ckx_token_stream_impl()
 {}
 
 saber_ptr<ckx_token>
-ckx_default_token_stream_impl::operator_index_impl(int _offset)
+ckx_token_stream_impl::operator_index_impl(int _offset)
 {
     if ( _offset + current_pos < token_buffer.size() )
     {
@@ -192,26 +179,26 @@ ckx_default_token_stream_impl::operator_index_impl(int _offset)
     }
 }
 
-saber::vector<ckx_error> &ckx_default_token_stream_impl::get_error_impl()
+saber::vector<ckx_error> &ckx_token_stream_impl::get_error_impl()
 {
     return errors;
 }
 
-void ckx_default_token_stream_impl::operator_incr_impl()
+void ckx_token_stream_impl::operator_incr_impl()
 {
     current_pos++;
 }
 
 
 
-void ckx_default_token_stream_impl::do_split_tokens()
+void ckx_token_stream_impl::do_split_tokens()
 {
-    while (ch() != '\0')
+    while ( ch() != static_cast<qchar>(saber::char_traits<qchar>::eof()) )
     {
         switch (ch())
         {
         case '\n':
-            next_line(); break;
+            next_char(); break;
 
         case '\f': case '\v': case '\t': case '\r': case ' ':
             next_char(); break;
@@ -275,7 +262,7 @@ void ckx_default_token_stream_impl::do_split_tokens()
 }
 
 /**
-    @brief function ckx_default_token_stream_impl::solve_$xxxxx();
+    @brief function ckx_token_stream_impl::solve_$xxxxx();
 
     These functions would start at the first character of a lexeme
     with the assertion that there must be a targeted lexeme. And they
@@ -323,7 +310,7 @@ void ckx_default_token_stream_impl::do_split_tokens()
 
 
 /**
-    @brief ckx_default_token_stream_impl::solve_numbers
+    @brief ckx_token_stream_impl::solve_numbers
     This function solves numbers nomatter what kind it is. And the add the
     newly built number token into the token stream.
 
@@ -342,7 +329,7 @@ void ckx_default_token_stream_impl::do_split_tokens()
 
  */
 
-void ckx_default_token_stream_impl::solve_numbers()
+void ckx_token_stream_impl::solve_numbers()
 {
     qint64 i = scan_integer();
     qreal r = i;
@@ -393,7 +380,7 @@ void ckx_default_token_stream_impl::solve_numbers()
     }
 }
 
-void ckx_default_token_stream_impl::solve_char_literal()
+void ckx_token_stream_impl::solve_char_literal()
 {
     next_char();
     qchar result = (ch()!='\\') ? ch() : make_conversion();
@@ -408,7 +395,7 @@ void ckx_default_token_stream_impl::solve_char_literal()
     next_char();
 }
 
-void ckx_default_token_stream_impl::solve_bitwise_or_logic_op()
+void ckx_token_stream_impl::solve_bitwise_or_logic_op()
 {
     ckx_token::type new_token_type;
     qchar pre = ch();
@@ -441,7 +428,7 @@ void ckx_default_token_stream_impl::solve_bitwise_or_logic_op()
     if (is_logic) next_char();
 }
 
-void ckx_default_token_stream_impl::solve_add_n_sub()
+void ckx_token_stream_impl::solve_add_n_sub()
 {
     ckx_token::type new_token_type;
     qchar op = ch();
@@ -480,7 +467,7 @@ void ckx_default_token_stream_impl::solve_add_n_sub()
     token_buffer.emplace_back(new ckx_token(char_coord(), new_token_type));
 }
 
-void ckx_default_token_stream_impl::solve_op_or_opassign()
+void ckx_token_stream_impl::solve_op_or_opassign()
 {
     ckx_token::type new_token_type;
 
@@ -530,7 +517,7 @@ void ckx_default_token_stream_impl::solve_op_or_opassign()
     if (is_opassign) next_char();
 }
 
-void ckx_default_token_stream_impl::solve_colon_or_scope()
+void ckx_token_stream_impl::solve_colon_or_scope()
 {
     next_char();
     if (ch() == ':')
@@ -546,7 +533,7 @@ void ckx_default_token_stream_impl::solve_colon_or_scope()
     }
 }
 
-void ckx_default_token_stream_impl::solve_ordinary_op()
+void ckx_token_stream_impl::solve_ordinary_op()
 {
     ckx_token::type new_token_type;
 
@@ -574,13 +561,13 @@ void ckx_default_token_stream_impl::solve_ordinary_op()
 }
 
 /**
-    @brief ckx_default_token_stream_impl::scan_full_id_string
+    @brief ckx_token_stream_impl::scan_full_id_string
 
     @details This function will store the scanned string into str().
     And other functions will have to retrieve the lexical value from str().
     Not elegant at all.
  */
-void ckx_default_token_stream_impl::scan_full_id_string()
+void ckx_token_stream_impl::scan_full_id_string()
 {
     saber_string strtemp;
     strtemp.clear();
@@ -596,7 +583,7 @@ void ckx_default_token_stream_impl::scan_full_id_string()
     string_temp = saber_string_pool::create_view(saber::move(strtemp));
 }
 
-bool ckx_default_token_stream_impl::solve_keyword()
+bool ckx_token_stream_impl::solve_keyword()
 {
     ckx_token::type type;
     bool is_identifier;
@@ -613,7 +600,7 @@ bool ckx_default_token_stream_impl::solve_keyword()
     }
 }
 
-void ckx_default_token_stream_impl::solve_identifier()
+void ckx_token_stream_impl::solve_identifier()
 {
     token_buffer.emplace_back(
         new ckx_token(char_coord(), str()));
@@ -621,7 +608,7 @@ void ckx_default_token_stream_impl::solve_identifier()
 
 
 
-qint64 ckx_default_token_stream_impl::scan_integer()
+qint64 ckx_token_stream_impl::scan_integer()
 {
     qint64 ret = 0;
     bool is_negative = false;
@@ -641,7 +628,7 @@ qint64 ckx_default_token_stream_impl::scan_integer()
     return ret;
 }
 
-qreal ckx_default_token_stream_impl::scan_floating_part()
+qreal ckx_token_stream_impl::scan_floating_part()
 {
     qreal ret = 0;
     quint8 digit_count = 0;
@@ -660,10 +647,9 @@ qreal ckx_default_token_stream_impl::scan_floating_part()
     return ret;
 }
 
-qchar ckx_default_token_stream_impl::make_conversion()
+qchar ckx_token_stream_impl::make_conversion()
 {
     next_char();
-
     switch (ch())
     {
     case '0': return '\0';
@@ -683,7 +669,7 @@ qchar ckx_default_token_stream_impl::make_conversion()
 
 
 
-inline bool ckx_default_token_stream_impl::is_part_of_id(qchar _ch)
+inline bool ckx_token_stream_impl::is_part_of_id(qchar _ch)
 {
     if (_ch == '_') return true;
     else if (_ch >= 'A' && _ch <= 'Z') return true;
@@ -692,43 +678,41 @@ inline bool ckx_default_token_stream_impl::is_part_of_id(qchar _ch)
     else return false;
 }
 
-inline qchar ckx_default_token_stream_impl::ch()
+inline qchar ckx_token_stream_impl::ch()
 {
-    return src[char_index_temp];
+    return char_temp;
 }
 
-inline saber_string_view ckx_default_token_stream_impl::str()
+inline saber_string_view ckx_token_stream_impl::str()
 {
     return string_temp;
 }
 
-inline qcoord& ckx_default_token_stream_impl::char_coord()
+inline qcoord& ckx_token_stream_impl::char_coord()
 {
     return char_coord_temp;
 }
 
-inline void ckx_default_token_stream_impl::next_char()
+inline void ckx_token_stream_impl::next_char()
 {
+    char_temp = reader.get_next_char();
     char_coord_temp.second++;
-    char_index_temp++;
-}
-
-inline void ckx_default_token_stream_impl::next_line()
-{
-    char_coord_temp.first++;
-    char_coord_temp.second = 1;
-    char_index_temp++;
+    if (char_temp == '\n')
+    {
+        char_coord_temp.first++;
+        char_coord_temp.second = 1;
+    }
 }
 
 
 
-inline void ckx_default_token_stream_impl::lex_error(saber_string&& _desc)
+inline void ckx_token_stream_impl::lex_error(saber_string&& _desc)
 {
     errors.emplace_back(
         char_coord(), saber_string_pool::create_view(saber::move(_desc)));
 }
 
-inline void ckx_default_token_stream_impl::lex_warn(saber_string&& _desc)
+inline void ckx_token_stream_impl::lex_warn(saber_string&& _desc)
 {
     errors.emplace_back(
         char_coord(), saber_string_pool::create_view(saber::move(_desc)));

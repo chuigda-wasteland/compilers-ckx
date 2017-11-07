@@ -20,7 +20,7 @@
 #define CKX_TOKEN_STREAM_HPP
 
 #include "ckx_token.hpp"
-#include "ckx_file_reader.hpp"
+#include "file_reader.hpp"
 
 #include "memory.hpp"
 #include "string.hpp"
@@ -34,48 +34,24 @@ namespace ckx
 
 using saber::saber_ptr;
 
-/**
-    @brief The ckx_token_stream class
-
-    @fn saber_ptr<ckx_token> operator[] (int offset)
-    This function returns the n-th token with respect to the current token
-
-    @fn saber::vector<ckx_error>& get_error()
-    This function returns all lexical errors occurred in the scanning stage
-
-    @fn void operator++()
-    This function moves the "current token"
- */
-interface ckx_token_stream
-{
-public:
-    explicit ckx_token_stream() = default;
-    virtual ~ckx_token_stream() = 0;
-
-    virtual saber_ptr<ckx_token> operator[] (int _offset) = 0;
-    virtual saber::vector<ckx_error>& get_error() = 0;
-    virtual void operator++ () = 0;
-};
-
-
 namespace detail
 {
-class ckx_default_token_stream_impl;
+class ckx_token_stream_impl;
 } // namespace detail
 
 
-class ckx_default_token_stream implements ckx_token_stream
+class ckx_token_stream final
 {
 public:
-    explicit ckx_default_token_stream(ckx_file_reader& _file_reader);
-    ~ckx_default_token_stream();
+    explicit ckx_token_stream(we::we_file_reader &_file_reader);
+    ~ckx_token_stream();
 
-    saber_ptr<ckx_token> operator[] (int _offset) override final;
-    saber::vector<ckx_error>& get_error() override final;
-    void operator++ () override final;
+    saber_ptr<ckx_token> operator[] (int _offset);
+    saber::vector<ckx_error>& get_error();
+    void operator++ ();
 
 private:
-    detail::ckx_default_token_stream_impl *impl;
+    detail::ckx_token_stream_impl *impl;
 };
 
 } // namespace ckx

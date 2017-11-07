@@ -31,7 +31,7 @@ And finally I designed ckx which is absolutely not C.
 
 	1)  import std.io;
 	2)  
-	3)  ckx
+	3)  fn main() : i32
 	4)  {
 	5)  	vi16 a, b;
 	6)  	input(a);
@@ -44,7 +44,7 @@ And finally I designed ckx which is absolutely not C.
 
 The first line `import std.io` uses ckx keyword `import` to import `io` utility module from package `std`. As you can see, ckx will have a very powerful module manage system, and we will use this package manage system in the future. But currently I ~~the programmer~~ does not know how to implement this module system. So in the early versions, ckx will include a preprocessor system, importing functions still uses `#include`.
 
-the `ckx block` is equivalent to the `main` function in C or C++. it returns an integer of type `vi16`.
+the `function main` is equivalent to the `main` function in C or C++. it shall returns an integer..
 
 ### Basic data types
 
@@ -105,7 +105,25 @@ Pointers in ckx is the same as pointers in C. The powerful low-level operator.
 
 ### Arrays
 
-> Still under work. If you have a good idea about it, contact me and I'll be appreciated.
+> P0001R0 "Array TS"
+
+Unlike in C, an `array` in ckx means a `range`. That is to say, for any array, it is possible to calculate its size according to its start point and finish point.
+
+There are four "create array" grammers:
+    
+    type[] array = type[]()(start-point, finish-point);           (1)
+    type[] array = type[](array-size)(start-point);               (2)
+    type[] array = type[](array-size);                            (3)
+    type[] array = type[](array-size){initializer-list};          (4)
+    
+(1) Create an array according to the given storage, specified by start-point and finish-point.
+
+(2) Create an array according to the given storage, unlike (1), the finishpoint is calculated through n automatically.
+
+(3) Create an array on stack, containing n default-initialized elements.
+
+(4) Create an array on stack, containing n elements, with the first several elements initialized with initializer-list.
+ 
 
 ### Other special features
 

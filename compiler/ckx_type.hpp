@@ -61,6 +61,7 @@ public:
         type_enum,
 
         type_pointer,
+        type_array,
         type_qualifier,
 
         type_alias
@@ -244,6 +245,18 @@ private:
     saber_ptr<ckx_type> target;
 };
 
+class ckx_array_type final implements ckx_type
+{
+public:
+    ckx_array_type(saber_ptr<ckx_type> _element);
+    ~ckx_array_type() override final = default;
+    qsizet size() const override final;
+    saber_string to_string() const override final;
+
+private:
+    saber_ptr<ckx_type> element;
+};
+
 class ckx_type_alias final implements ckx_type
 {
 public:
@@ -263,6 +276,7 @@ public:
     static saber_ptr<ckx_type> get_type(ckx_token::type _basic_type_token);
     static saber_ptr<ckx_type> qual_const(saber_ptr<ckx_type> _base);
     static saber_ptr<ckx_type> pointer_to(saber_ptr<ckx_type> _base);
+    static saber_ptr<ckx_type> array_of(saber_ptr<ckx_type> _base);
 
     /// @note made public may benefit testing a lot.
 

@@ -23,7 +23,7 @@
 
 using namespace ckx;
 
-class ckx_test_filereader final implements ckx_file_reader
+class ckx_test_filereader final implements we::we_file_reader
 {
 public:
     ckx_test_filereader(saber_string&& _str) : str(saber::move(_str)) {}
@@ -40,11 +40,11 @@ private:
     saber_string str;
 };
 
-template <typename CkxTokenStream>
+
 class ckx_parser_impl_test final :
-        public detail::ckx_parser_impl<CkxTokenStream>
+        public detail::ckx_parser_impl
 {
-    using base = detail::ckx_parser_impl<CkxTokenStream>;
+    using base = detail::ckx_parser_impl;
 
 public:
     void test_parse_func_decl();
@@ -59,23 +59,23 @@ private:
 
 int main()
 {
-    ckx_parser_impl_test<ckx_default_token_stream> test;
+    ckx_parser_impl_test test;
     test.test_parse_func_decl();
     test.test_parse_func_def();
     return 0;
 }
 
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_func_decl()
+ckx_parser_impl_test::test_parse_func_decl()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         ckx_test_filereader reader
             { "fn add (vi8 a, vi8 b) : vi8;" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_func_stmt *func = base::parse_func_stmt();
@@ -91,7 +91,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_func_decl()
     {
         ckx_test_filereader reader
             { "fn heap_alloc (vu32 sz) : vi8*;" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
         ckx_ast_func_stmt *func = base::parse_func_stmt();
@@ -109,7 +109,7 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_func_decl()
             { "fn CreateStudent (vi8 const * name,\n"
               "                  vi8 chinese,\n"
               "                  vi8 math) : Student* const;" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
         base::typename_table->add_typename(
             saber_string_pool::create_view("Student"));
@@ -125,11 +125,11 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_func_decl()
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_func_def()
+ckx_parser_impl_test::test_parse_func_def()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         const char* str =
@@ -143,7 +143,7 @@ R"cpp(
 )cpp";
 
         ckx_test_filereader reader { str };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
         base::typename_table->add_typename(
             saber_string_pool::create_view("Student"));
@@ -159,18 +159,18 @@ R"cpp(
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::initialize_test()
+ckx_parser_impl_test::initialize_test()
 {
     base::error_list = new saber::list<ckx_error>;
     base::warn_list = new saber::list<ckx_error>;
     base::typename_table = new detail::ckx_typename_table;
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::cleanup_test()
+ckx_parser_impl_test::cleanup_test()
 {
     delete base::error_list;
     delete base::warn_list;

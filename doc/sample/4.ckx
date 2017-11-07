@@ -2,7 +2,7 @@ fn input(vu64 *n) : void;
 fn print(vu64 n) : void;
 fn fibonacci(vu64 n) : vu64;
 
-ckx
+fn main() : vi32
 {
 	vu64 n;
 	input(&n);

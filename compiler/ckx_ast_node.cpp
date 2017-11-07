@@ -138,13 +138,16 @@ ckx_ast_for_stmt::~ckx_ast_for_stmt()
     delete clause;
 }
 
+
 ckx_ast_break_stmt::ckx_ast_break_stmt(saber_ptr<ckx_token> _at_token) :
     ckx_ast_stmt(_at_token)
 {}
 
+
 ckx_ast_continue_stmt::ckx_ast_continue_stmt(saber_ptr<ckx_token> _at_token) :
     ckx_ast_stmt(_at_token)
 {}
+
 
 ckx_ast_return_stmt::ckx_ast_return_stmt(saber_ptr<ckx_token> _at_token,
                                          ckx_ast_expr *_return_expr) :
@@ -157,22 +160,16 @@ ckx_ast_return_stmt::~ckx_ast_return_stmt()
     delete return_expr;
 }
 
+ckx_ast_decl_stmt::init_decl::~init_decl() { delete init; }
+
 ckx_ast_decl_stmt::ckx_ast_decl_stmt(saber_ptr<ckx_token> _at_token,
-                                     saber_ptr<ckx_type> _type) :
+        saber_ptr<ckx_type> _type,
+        saber::vector<init_decl> &&_decls) :
     ckx_ast_stmt(_at_token),
-    type(_type)
+    type(_type),
+    decls(saber::move(_decls))
 {}
 
-void
-ckx_ast_decl_stmt::add_decl(ckx_ast_init_decl *_decl)
-{
-    decls.push_back(_decl);
-}
-
-ckx_ast_decl_stmt::~ckx_ast_decl_stmt()
-{
-    for (auto it = decls.begin(); it != decls.end(); ++it) delete *it;
-}
 
 ckx_ast_expr_stmt::ckx_ast_expr_stmt(saber_ptr<ckx_token> _at_token,
                                      ckx_ast_expr *_expr) :
@@ -190,7 +187,7 @@ ckx_ast_expr_stmt::~ckx_ast_expr_stmt()
 ckx_ast_func_stmt::ckx_ast_func_stmt(
         saber_ptr<ckx_token> _at_token,
         saber_string_view _name,
-        saber::vector<ckx_ast_init_decl *> &&_param_decls,
+        saber::vector<ckx_ast_func_stmt::param_decl> &&_param_decls,
         saber_ptr<ckx_type> _ret_type,
         ckx_ast_compound_stmt *_fnbody) :
     ckx_ast_stmt(_at_token),
@@ -202,40 +199,20 @@ ckx_ast_func_stmt::ckx_ast_func_stmt(
 
 ckx_ast_func_stmt::~ckx_ast_func_stmt()
 {
-    for (auto& param_decl : param_decls)
-        delete param_decl;
     delete fnbody;
 }
 
 
 
-ckx_ast_init_decl::ckx_ast_init_decl(saber_ptr<ckx_token> _at_token,
-                                     saber_ptr<ckx_type> _type,
-                                     saber_string_view _name,
-                                     ckx_ast_expr *_init) :
-    ckx_ast_node(_at_token), type(_type), name(_name), init(_init)
-{}
-
-ckx_ast_init_decl::~ckx_ast_init_decl()
-{
-    delete init;
-}
-
-
-
 ckx_ast_struct_stmt::ckx_ast_struct_stmt(saber_ptr<ckx_token> _at_token,
-                                         saber_string_view _name) :
+                                         saber_string_view _name,
+                                         saber::vector<field> &&_fields) :
     ckx_ast_stmt(_at_token),
-    name(_name)
+    name(_name),
+    fields(saber::move(_fields))
 {}
 
 ckx_ast_struct_stmt::~ckx_ast_struct_stmt() {}
-
-void ckx_ast_struct_stmt::add_field(saber_ptr<ckx_type> _type,
-                                    saber_string_view _name)
-{
-    fields.emplace_back(_type, _name);
-}
 
 const saber::vector<ckx_ast_struct_stmt::field>&
 ckx_ast_struct_stmt::get_fields() const
@@ -243,9 +220,13 @@ ckx_ast_struct_stmt::get_fields() const
     return fields;
 }
 
+
 ckx_ast_variant_stmt::ckx_ast_variant_stmt(saber_ptr<ckx_token> _at_token,
-                                           saber_string_view _name) :
-    ckx_ast_stmt(_at_token), name(_name)
+                                           saber_string_view _name,
+                                           saber::vector<field> &&_fields) :
+    ckx_ast_stmt(_at_token),
+    name(_name),
+    fields(saber::move(_fields))
 {}
 
 ckx_ast_variant_stmt::~ckx_ast_variant_stmt() {}
@@ -256,12 +237,6 @@ ckx_ast_variant_stmt::get_fields() const
     return fields;
 }
 
-void
-ckx_ast_variant_stmt::add_field(saber_ptr<ckx_type> _type,
-                                saber_string_view _name)
-{
-    fields.emplace_back(_type, _name);
-}
 
 ckx_ast_alias_stmt::ckx_ast_alias_stmt(saber_ptr<ckx_token> _at_token,
                                        saber_string_view _name,
@@ -271,18 +246,16 @@ ckx_ast_alias_stmt::ckx_ast_alias_stmt(saber_ptr<ckx_token> _at_token,
     type(_type)
 {}
 
+
 ckx_ast_enum_stmt::ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token,
-                                     saber_string_view _name) :
+                                     saber_string_view _name,
+                                     saber::vector<enumerator> &&_enumerators) :
     ckx_ast_stmt(_at_token),
-    name(_name)
+    name(_name),
+    enumerators(_enumerators)
 {}
 
 ckx_ast_enum_stmt::~ckx_ast_enum_stmt() {}
-
-void ckx_ast_enum_stmt::add_enumerator(saber_string_view _name, qint64 _value)
-{
-    enumerators.emplace_back(_name, _value);
-}
 
 const saber::vector<ckx_ast_enum_stmt::enumerator>&
 ckx_ast_enum_stmt::get_enumerators() const
@@ -435,5 +408,36 @@ ckx_ast_vr_literal_expr::ckx_ast_vr_literal_expr(saber_ptr<ckx_token> _at_token,
     ckx_ast_expr(_at_token),
     val(_val)
 {}
+
+ckx_ast_array_expr::ckx_ast_array_expr(saber_ptr<ckx_token> _at_token,
+                                       saber_ptr<ckx_type> _array_of_type) :
+    ckx_ast_expr(_at_token),
+    array_of_type(_array_of_type)
+{}
+
+ckx_ast_array_expr::~ckx_ast_array_expr()
+{
+    delete start;
+    delete finish;
+    for (auto &item : init_list)
+        delete item;
+}
+
+void ckx_ast_array_expr::set_size(qint32 _size)
+{
+    size = _size;
+}
+
+void ckx_ast_array_expr::set_range(ckx_ast_expr *_start, ckx_ast_expr *_finish)
+{
+    start = _start;
+    finish = _finish;
+}
+
+void ckx_ast_array_expr::set_init_list(
+        saber::vector<ckx_ast_expr *> &&_init_list)
+{
+    init_list = saber::move(_init_list);
+}
 
 } // namespace ckx

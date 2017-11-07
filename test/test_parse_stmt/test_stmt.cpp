@@ -23,7 +23,7 @@
 
 using namespace ckx;
 
-class ckx_test_filereader final implements ckx_file_reader
+class ckx_test_filereader final implements we::we_file_reader
 {
 public:
     ckx_test_filereader(saber_string&& _str) : str(saber::move(_str)) {}
@@ -40,11 +40,11 @@ private:
     saber_string str;
 };
 
-template <typename CkxTokenStream>
+
 class ckx_parser_impl_test final :
-        public detail::ckx_parser_impl<CkxTokenStream>
+        public detail::ckx_parser_impl
 {
-    using base = detail::ckx_parser_impl<CkxTokenStream>;
+    using base = detail::ckx_parser_impl;
 
 public:
     void test_parse_expr_stmt();
@@ -61,15 +61,15 @@ private:
     void initialize_test(const char *_parse_string);
     void cleanup_test();
 
-    ckx_file_reader *reader;
-    ckx_fp_writer writer { stdout };
+    we::we_file_reader *reader;
+    we::we_fp_writer writer { stdout };
 };
 
 
 
 int main()
 {
-    ckx_parser_impl_test<ckx_default_token_stream> test;
+    ckx_parser_impl_test test;
     test.test_parse_expr_stmt();
     test.test_parse_if_stmt();
     test.test_parse_while_stmt();
@@ -84,9 +84,9 @@ int main()
 }
 
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_expr_stmt()
+ckx_parser_impl_test::test_parse_expr_stmt()
 {
     {
         initialize_test("a = 3 + 2; b = a + 3;");
@@ -112,9 +112,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_expr_stmt()
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_if_stmt()
+ckx_parser_impl_test::test_parse_if_stmt()
 {
     {
         const char* str =
@@ -146,9 +146,9 @@ R"lyp(
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_while_stmt()
+ckx_parser_impl_test::test_parse_while_stmt()
 {
     {
         initialize_test("while (cpp_is_fuck()) make_cpp_more_fucking();");
@@ -161,9 +161,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_while_stmt()
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_do_while_stmt()
+ckx_parser_impl_test::test_parse_do_while_stmt()
 {
     {
         initialize_test("do make_cpp_more_fucking(); while (cpp_is_fuck());");
@@ -176,9 +176,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_do_while_stmt()
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_for_stmt()
+ckx_parser_impl_test::test_parse_for_stmt()
 {
     {
         initialize_test("for (i = 0; i < 10; ++i) print(array[i]);");
@@ -211,9 +211,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_for_stmt()
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_break_stmt()
+ckx_parser_impl_test::test_parse_break_stmt()
 {
     {
         initialize_test("break; break;");
@@ -229,9 +229,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_break_stmt()
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_continue_stmt()
+ckx_parser_impl_test::test_parse_continue_stmt()
 {
     {
         initialize_test("continue; continue;");
@@ -247,9 +247,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_continue_stmt()
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_return_stmt()
+ckx_parser_impl_test::test_parse_return_stmt()
 {
     {
         initialize_test("return;");
@@ -274,9 +274,9 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_return_stmt()
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_compound_stmt()
+ckx_parser_impl_test::test_parse_compound_stmt()
 {
     {
         const char* str =
@@ -300,21 +300,21 @@ R"(
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::initialize_test(const char* _parse_string)
+ckx_parser_impl_test::initialize_test(const char* _parse_string)
 {
     base::error_list = new saber::list<ckx_error>;
     base::warn_list = new saber::list<ckx_error>;
     base::typename_table = new detail::ckx_typename_table;
 
     reader = new ckx_test_filereader(_parse_string);
-    base::token_stream = new CkxTokenStream(*reader);
+    base::token_stream = new ckx_token_stream(*reader);
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::cleanup_test()
+ckx_parser_impl_test::cleanup_test()
 {
     delete base::error_list;
     delete base::warn_list;

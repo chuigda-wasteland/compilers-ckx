@@ -16,7 +16,7 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
   */
 
-#include "ckx_file_reader.hpp"
+#include "file_reader.hpp"
 #include "ckx_parser.hpp"
 #include "ckx_ast_node.hpp"
 
@@ -39,12 +39,12 @@ int main(int argc, const char* argv[])
         return -1;
     }
 
-    ckx_fp_reader reader(fp);
-    ckx_fp_writer writer(stdout);
-    saber_ptr<ckx_default_token_stream> stream =
-        new ckx_default_token_stream(reader);
+    we::we_fp_reader reader(fp);
+    we::we_fp_writer writer(stdout);
+    saber_ptr<ckx_token_stream> stream =
+        new ckx_token_stream(reader);
 
-    ckx_parser<ckx_default_token_stream> parser;
+    ckx_parser parser;
     auto parse_result = parser.parse(stream);
     parse_result.trans_unit->ast_dump(writer, 0);
 

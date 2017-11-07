@@ -23,7 +23,7 @@
 
 using namespace ckx;
 
-class ckx_test_filereader final implements ckx_file_reader
+class ckx_test_filereader final implements we::we_file_reader
 {
 public:
     ckx_test_filereader(saber_string&& _str) : str(saber::move(_str)) {}
@@ -40,11 +40,11 @@ private:
     saber_string str;
 };
 
-template <typename CkxTokenStream>
+
 class ckx_parser_impl_test final :
-        public detail::ckx_parser_impl<CkxTokenStream>
+        public detail::ckx_parser_impl
 {
-    using base = detail::ckx_parser_impl<CkxTokenStream>;
+    using base = detail::ckx_parser_impl;
 
 public:
     void test_parse_struct();
@@ -63,7 +63,7 @@ private:
 
 int main()
 {
-    ckx_parser_impl_test<ckx_default_token_stream> test;
+    ckx_parser_impl_test test;
     test.test_parse_struct();
     test.test_parse_enum();
     test.test_parse_alias();
@@ -72,11 +72,11 @@ int main()
 }
 
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_struct()
+ckx_parser_impl_test::test_parse_struct()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         const char* str =
@@ -90,7 +90,7 @@ R"noip(
 )noip";
 
         ckx_test_filereader reader { str };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
         ckx_ast_struct_stmt *stmt =
             base::template parse_record_stmt<ckx_ast_struct_stmt>();
@@ -111,7 +111,7 @@ R"noip(
 )noip";
 
         ckx_test_filereader reader { str };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
         ckx_ast_struct_stmt *stmt =
                 base::template parse_record_stmt<ckx_ast_struct_stmt>();
@@ -123,11 +123,11 @@ R"noip(
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_enum()
+ckx_parser_impl_test::test_parse_enum()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         const char* str =
@@ -139,26 +139,27 @@ R"noip(
         }
 )noip";
         ckx_test_filereader reader { str };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
         ckx_ast_enum_stmt *stmt = base::parse_enum_stmt();
         stmt->ast_dump(writer, 0);
         delete stmt;
+
         assert(base::error_list->empty());
         assert(base::warn_list->empty());
         cleanup_test();
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::test_parse_alias()
+ckx_parser_impl_test::test_parse_alias()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         ckx_test_filereader reader { "alias pcvi8 = vi8 const *;" };
-        base::token_stream = new CkxTokenStream(reader);
+        base::token_stream = new ckx_token_stream(reader);
         initialize_test();
         ckx_ast_alias_stmt *stmt = base::parse_alias_stmt();
         stmt->ast_dump(writer, 0);
@@ -169,18 +170,18 @@ ckx_parser_impl_test<CkxTokenStream>::test_parse_alias()
     }
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::initialize_test()
+ckx_parser_impl_test::initialize_test()
 {
     base::error_list = new saber::list<ckx_error>;
     base::warn_list = new saber::list<ckx_error>;
     base::typename_table = new detail::ckx_typename_table;
 }
 
-template <typename CkxTokenStream>
+
 void
-ckx_parser_impl_test<CkxTokenStream>::cleanup_test()
+ckx_parser_impl_test::cleanup_test()
 {
     delete base::error_list;
     delete base::warn_list;
