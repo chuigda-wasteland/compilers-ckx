@@ -20,7 +20,7 @@
 #define CKX_TOKEN_STREAM_HPP
 
 #include "ckx_token.hpp"
-#include "ckx_file_reader.hpp"
+#include "file_reader.hpp"
 
 #include "memory.hpp"
 #include "string.hpp"
@@ -43,7 +43,7 @@ class ckx_token_stream_impl;
 class ckx_token_stream final
 {
 public:
-    explicit ckx_token_stream(ckx_file_reader& _file_reader);
+    explicit ckx_token_stream(we::we_file_reader &_file_reader);
     ~ckx_token_stream();
 
     saber_ptr<ckx_token> operator[] (int _offset);

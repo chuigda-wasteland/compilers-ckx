@@ -18,7 +18,7 @@
 
 #include "ckx_token_stream.hpp"
 
-#include "ckx_file_reader.hpp"
+#include "file_reader.hpp"
 #include "vector.hpp"
 
 namespace ckx
@@ -47,7 +47,7 @@ saber::unordered_map<saber_string, ckx_token::type> ckx_identifier_table::map;
 class ckx_token_stream_impl final
 {
 public:
-    explicit ckx_token_stream_impl(ckx_file_reader &_file_reader);
+    explicit ckx_token_stream_impl(we::we_file_reader &_file_reader);
     ~ckx_token_stream_impl();
 
     saber_ptr<ckx_token> operator_index_impl(int _offset);
@@ -82,7 +82,7 @@ private:
     inline void lex_warn(saber_string &&);
 
 private:
-    ckx_file_reader& reader;
+    we::we_file_reader& reader;
     qsizet current_pos;
     qcoord char_coord_temp;
     saber_string_view string_temp;
@@ -95,7 +95,7 @@ private:
 
 }
 
-ckx_token_stream::ckx_token_stream(ckx_file_reader &_file_reader)
+ckx_token_stream::ckx_token_stream(we::we_file_reader &_file_reader)
 {
     impl = new detail::ckx_token_stream_impl(_file_reader);
 }
@@ -153,7 +153,7 @@ void ckx_identifier_table::initialize()
 
 
 ckx_token_stream_impl::ckx_token_stream_impl(
-        ckx_file_reader &_file_reader) :
+        we::we_file_reader &_file_reader) :
     reader(_file_reader),
     current_pos(0),
     char_coord_temp(1, 1),

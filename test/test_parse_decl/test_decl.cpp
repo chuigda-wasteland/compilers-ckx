@@ -23,7 +23,7 @@
 
 using namespace ckx;
 
-class ckx_test_filereader final implements ckx_file_reader
+class ckx_test_filereader final implements we::we_file_reader
 {
 public:
     ckx_test_filereader(saber_string&& _str) : str(saber::move(_str)) {}
@@ -70,7 +70,7 @@ int main()
 void
 ckx_parser_impl_test::test()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         ckx_test_filereader reader {"vi8 a, b;"};
@@ -130,7 +130,7 @@ ckx_parser_impl_test::test()
 
 void ckx_parser_impl_test::test_array_decl()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         ckx_test_filereader reader { "vi8[] array = vi8[](5){1, 2, 3, 4, 5};" };

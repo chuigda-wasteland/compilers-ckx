@@ -1,8 +1,0 @@
-﻿#ifndef VY3LEX
-#define VY3LEX(X, Y)
-#endif
-
-VY3LEX("1122", 1122)
-VY3LEX("012345", 12345)
-VY3LEX("000000", 0)
-VY3LEX("001000", 1000)

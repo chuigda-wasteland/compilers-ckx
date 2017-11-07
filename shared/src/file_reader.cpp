@@ -17,24 +17,22 @@
   */
 
 
-#include "ckx_file_reader.hpp"
+#include "file_reader.hpp"
 #include <iostream>
 
-using namespace ckx;
-
-ckx_file_reader::~ckx_file_reader() {}
-
-namespace ckx
+namespace we
 {
+
+we_file_reader::~we_file_reader() {}
 
 namespace detail
 {
 
-class ckx_fp_reader_impl
+class we_fp_reader_impl
 {
 public:
-    explicit ckx_fp_reader_impl(std::FILE* _fp);
-    ~ckx_fp_reader_impl() = default;
+    explicit we_fp_reader_impl(std::FILE* _fp);
+    ~we_fp_reader_impl() = default;
 
     inline qchar get_next_char_impl();
 
@@ -43,11 +41,11 @@ private:
 };
 
 
-class ckx_istream_reader_impl
+class we_istream_reader_impl
 {
 public:
-    explicit ckx_istream_reader_impl(std::istream& _stream);
-    ~ckx_istream_reader_impl() = default;
+    explicit we_istream_reader_impl(std::istream& _stream);
+    ~we_istream_reader_impl() = default;
 
     inline qchar get_next_char_impl();
 
@@ -57,33 +55,33 @@ private:
 
 } // namespace detail
 
-ckx_fp_reader::ckx_fp_reader(FILE *_fp)
+we_fp_reader::we_fp_reader(FILE *_fp)
 {
-    this->impl = new detail::ckx_fp_reader_impl(_fp);
+    this->impl = new detail::we_fp_reader_impl(_fp);
 }
 
-ckx_fp_reader::~ckx_fp_reader()
+we_fp_reader::~we_fp_reader()
 {
     delete this->impl;
 }
 
-qchar ckx_fp_reader::get_next_char()
+qchar we_fp_reader::get_next_char()
 {
     return this->impl->get_next_char_impl();
 }
 
 
-ckx_istream_reader::ckx_istream_reader(std::istream &_stream)
+we_istream_reader::we_istream_reader(std::istream &_stream)
 {
-    this->impl = new detail::ckx_istream_reader_impl(_stream);
+    this->impl = new detail::we_istream_reader_impl(_stream);
 }
 
-ckx_istream_reader::~ckx_istream_reader()
+we_istream_reader::~we_istream_reader()
 {
     delete this->impl;
 }
 
-qchar ckx_istream_reader::get_next_char()
+qchar we_istream_reader::get_next_char()
 {
     return this->impl->get_next_char_impl();
 }
@@ -91,9 +89,9 @@ qchar ckx_istream_reader::get_next_char()
 namespace detail
 {
 
-ckx_fp_reader_impl::ckx_fp_reader_impl(FILE *_fp) : fp(_fp) {}
+we_fp_reader_impl::we_fp_reader_impl(FILE *_fp) : fp(_fp) {}
 
-inline qchar ckx_fp_reader_impl::get_next_char_impl()
+inline qchar we_fp_reader_impl::get_next_char_impl()
 {
     qchar ret;
     if (~std::fscanf(fp, "%c", &ret)) return ret;
@@ -101,11 +99,11 @@ inline qchar ckx_fp_reader_impl::get_next_char_impl()
 }
 
 
-ckx_istream_reader_impl::ckx_istream_reader_impl(std::istream &_stream) :
+we_istream_reader_impl::we_istream_reader_impl(std::istream &_stream) :
     stream(_stream)
 {}
 
-inline qchar ckx_istream_reader_impl::get_next_char_impl()
+inline qchar we_istream_reader_impl::get_next_char_impl()
 {
     qchar ch;
     return stream >> ch ? ch :

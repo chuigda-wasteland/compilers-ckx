@@ -23,7 +23,7 @@
 
 using namespace ckx;
 
-class ckx_test_filereader final implements ckx_file_reader
+class ckx_test_filereader final implements we::we_file_reader
 {
 public:
     ckx_test_filereader(saber_string&& _str) : str(saber::move(_str)) {}
@@ -84,7 +84,7 @@ int main()
 void
 ckx_parser_impl_test::test_parse_basic_expr()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         ckx_test_filereader reader {"123 literal number   39.5 array"};
@@ -123,7 +123,7 @@ ckx_parser_impl_test::test_parse_basic_expr()
 void
 ckx_parser_impl_test::test_parse_type()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         ckx_test_filereader reader { "vi8 const * const * const" };
@@ -191,7 +191,7 @@ ckx_parser_impl_test::test_parse_type()
 void
 ckx_parser_impl_test::test_parse_postfix_expr()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         ckx_test_filereader reader { "a[5]" };
@@ -258,7 +258,7 @@ ckx_parser_impl_test::test_parse_postfix_expr()
 void
 ckx_parser_impl_test::test_parse_unary_expr()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         ckx_test_filereader reader { "++number" };
@@ -369,7 +369,7 @@ ckx_parser_impl_test::test_parse_unary_expr()
 void
 ckx_parser_impl_test::test_parse_cast_expr()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
     {
         ckx_test_filereader reader { "static_cast<vi8>(number)" };
         base::token_stream = new ckx_token_stream(reader);
@@ -437,7 +437,7 @@ ckx_parser_impl_test::test_parse_cast_expr()
 
 void ckx_parser_impl_test::test_parse_binary_expr()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
 
     {
         ckx_test_filereader reader { "number * integer" };
@@ -488,7 +488,7 @@ void ckx_parser_impl_test::test_parse_binary_expr()
 
 void ckx_parser_impl_test::test_parse_cond_expr()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
     {
         ckx_test_filereader reader { "number>integer ? number : integer" };
         base::token_stream = new ckx_token_stream(reader);
@@ -507,7 +507,7 @@ void ckx_parser_impl_test::test_parse_cond_expr()
 
 void ckx_parser_impl_test::test_parse_assign_expr()
 {
-    ckx_fp_writer writer { stdout };
+    we::we_fp_writer writer { stdout };
     {
         ckx_test_filereader reader { "number = literal + integer - *array" };
         base::token_stream = new ckx_token_stream(reader);

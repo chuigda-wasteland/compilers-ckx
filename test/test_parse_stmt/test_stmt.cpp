@@ -23,7 +23,7 @@
 
 using namespace ckx;
 
-class ckx_test_filereader final implements ckx_file_reader
+class ckx_test_filereader final implements we::we_file_reader
 {
 public:
     ckx_test_filereader(saber_string&& _str) : str(saber::move(_str)) {}
@@ -61,8 +61,8 @@ private:
     void initialize_test(const char *_parse_string);
     void cleanup_test();
 
-    ckx_file_reader *reader;
-    ckx_fp_writer writer { stdout };
+    we::we_file_reader *reader;
+    we::we_fp_writer writer { stdout };
 };
 
 

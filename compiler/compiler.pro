@@ -4,7 +4,6 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += main.cpp \
-    ckx_file_reader.cpp \
     ckx_token.cpp \
     ../saber/src/safe_stl_general.cpp \
     ckx_token_stream.cpp \
@@ -14,11 +13,12 @@ SOURCES += main.cpp \
     ckx_env_table.cpp \
     ckx_token_set.cpp \
     ckx_ast_dump.cpp \
-    ckx_file_writer.cpp \
-    ckx_operator.cpp
+    ckx_operator.cpp \
+    ../shared/src/file_reader.cpp \
+    ../shared/src/file_writer.cpp \
 
 HEADERS += \
-    ckx_file_reader.hpp \
+    we_file_reader.hpp \
     ckx_token.hpp \
     ../saber/include/algorithm.hpp \
     ../saber/include/deque.hpp \
@@ -39,7 +39,9 @@ HEADERS += \
     ../saber/include/vector.hpp \
     ../saber/include/string.hpp \
     ../saber/include/unordered_map.hpp \
-    defs.hpp \
+    ../shared/include/file_reader.hpp \
+    ../shared/include/file_writer.hpp \
+    ../shared/include/defs.hpp \
     ckx_token_stream.hpp \
     ckx_parser.hpp \
     ckx_ast_node.hpp \
@@ -52,11 +54,12 @@ HEADERS += \
     ckx_token_set.hpp \
     ../saber/include/string_pool.hpp \
     ../saber/include/string_pool.hpp \
-    ckx_file_writer.hpp \
+    we::we_file_writer.hpp \
     ckx_operator.hpp \
     ckx_parser_impl.hpp
 
 INCLUDEPATH += ../saber/include/
+INCLUDEPATH += ../shared/include/
 
 DISTFILES += \
     LICENSE \
