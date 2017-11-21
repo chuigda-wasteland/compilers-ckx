@@ -24,6 +24,7 @@
 #include "llvm_value.hpp"
 #include "llvm_type.hpp"
 #include "vector.hpp"
+#include "list.hpp"
 
 namespace faker
 {
@@ -33,7 +34,7 @@ namespace detail
 class llvm_ir_builder_impl final
 {
 public:
-    llvm_ir_builder_impl();
+    llvm_ir_builder_impl() = default;
     ~llvm_ir_builder_impl();
     llvm_ir_builder_impl(const llvm_ir_builder_impl&) = delete;
     llvm_ir_builder_impl(llvm_ir_builder_impl&&) = delete;
@@ -110,20 +111,24 @@ private:
     template <typename InstructionPtrType>
     InstructionPtrType insert_after_current(InstructionPtrType _instruction)
     {
-        _instruction.insert_self_after(cur_insertion_point);
-        return cur_insertion_point = _instruction;
+        _instruction->insert_self_after(cur_insertion_point);
+        cur_insertion_point = _instruction;
+        return _instruction;
+    }
+
+    llvm_value* insert_into_table(llvm_value* _value) {
+        value_table.push_back(_value);
+        return _value;
     }
 
     llvm_implicit_list_node global_head_node;
-    llvm_instruction *stashed_global_insertion_point = nullptr;
-    saber::vector<llvm_func_def*> functions;
-
-    llvm_instruction *cur_insertion_point = global_head_node;
+    llvm_implicit_list_node *stashed_global_insertion_point = nullptr;
+    llvm_implicit_list_node *cur_insertion_point = &global_head_node;
 
     quint64 local_temp_var_counter = 0;
     quint64 local_temp_label_counter = 0;
 
-    saber::vector<llvm_value*> value_table;
+    saber::list<llvm_value*> value_table;
 };
 
 } // namespace detail
