@@ -26,26 +26,29 @@ llvm_instruction::~llvm_instruction() {}
 
 
 llvm_func_decl::llvm_func_decl(
+        llvm_type _return_type,
         saber_string_view _name,
         saber::vector<llvm_type> &&_param_type_list,
         saber::vector<saber_string_view> &&_param_name_list,
-        llvm_type _return_type) :
+        llvm_func_attrs _attrs) :
+    return_type(_return_type),
     name(_name),
     param_type_list(saber::move(_param_type_list)),
     param_name_list(saber::move(_param_name_list)),
-    return_type(_return_type)
+    attrs(_attrs)
 {}
 
 
 llvm_func_def::llvm_func_def(
-        saber_string_view _name,
+        llvm_type _return_type, saber_string_view _name,
         saber::vector<llvm_type> &&_param_type_list,
         saber::vector<saber_string_view> &&_param_name_list,
-        llvm_type _return_type) :
+        llvm_func_attrs _attrs) :
+    return_type(_return_type),
     name(_name),
     param_type_list(saber::move(_param_type_list)),
     param_name_list(saber::move(_param_name_list)),
-    return_type(_return_type)
+    attrs(_attrs)
 {}
 
 

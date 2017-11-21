@@ -29,39 +29,44 @@ namespace faker
 {
 
 /// @brief declare <return-type> @<name> (<param_type_list x param_name_list>)
+///                <attributes> ;
 class llvm_func_decl final implements llvm_instruction
 {
 public:
-    llvm_func_decl(saber_string_view _name,
+    llvm_func_decl(llvm_type _return_type,
+                   saber_string_view _name,
                    saber::vector<llvm_type>&& _param_type_list,
                    saber::vector<saber_string_view>&& _param_name_list,
-                   llvm_type _return_type);
+                   llvm_func_attrs _attrs);
     ~llvm_func_decl() override final = default;
 
 private:
+    llvm_type return_type;
     saber_string_view name;
     saber::vector<llvm_type> param_type_list;
     saber::vector<saber_string_view> param_name_list;
-    llvm_type return_type;
+    llvm_func_attrs attrs;
 };
 
 
 /// @brief define <return-type> @<name> (<param_type_list x param_name_list>)
-/// [temporary] attrs nounwind and noinline will be added automatically.
+///                             <attributes> { <...> }
 class llvm_func_def final implements llvm_instruction
 {
 public:
-    llvm_func_def(saber_string_view _name,
+    llvm_func_def(llvm_type _return_type,
+                  saber_string_view _name,
                   saber::vector<llvm_type>&& _param_type_list,
                   saber::vector<saber_string_view>&& _param_name_list,
-                  llvm_type _return_type);
+                  llvm_func_attrs _attrs);
     ~llvm_func_def() override final = default;
 
 private:
+    llvm_type return_type;
     saber_string_view name;
     saber::vector<llvm_type> param_type_list;
     saber::vector<saber_string_view> param_name_list;
-    llvm_type return_type;
+    llvm_func_attrs attrs;
 };
 
 
@@ -209,9 +214,9 @@ public:
         ot_fcmp_ole   = 37,    ///   1  0  1  0  1
     };
 
-    llvm_cmp_instruction(
-            llvm_value *_result, comparsion_type _op, llvm_type _compared_type,
-            llvm_value *_val1, llvm_value *_val2);
+    llvm_cmp_instruction(llvm_value *_result, comparsion_type _op,
+                         llvm_type _compared_type,
+                         llvm_value *_val1, llvm_value *_val2);
     ~llvm_cmp_instruction() override final = default;
 
 private:
@@ -304,7 +309,7 @@ class llvm_alloca_instruction final implements llvm_instruction
 public:
     llvm_alloca_instruction(llvm_value *_result,
                             llvm_type _yield_type,
-                            quint32 _num_elems = 1);
+                            quint32 _num_elems);
     ~llvm_alloca_instruction() override final = default;
 
 private:

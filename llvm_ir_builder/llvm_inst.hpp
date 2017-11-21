@@ -70,6 +70,26 @@ class llvm_load_instruction;
 class llvm_store_instruction;
 class llvm_getelementptr_instruction;
 
+class llvm_func_attrs
+{
+public:
+    enum inline_type
+    {
+        it_default,
+        it_defaultinline,
+        it_noinline,
+        it_always,
+    };
+
+    llvm_func_attrs(bool _nounwind, inline_type _inlining) :
+        nounwind(_nounwind),
+        inlining(_inlining)
+    {}
+
+private:
+    bool nounwind : 1;
+    unsigned inlining : 2;
+};
 
 } // namespace faker
 
