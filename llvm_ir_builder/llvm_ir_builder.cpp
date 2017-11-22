@@ -34,7 +34,32 @@ llvm_ir_builder::~llvm_ir_builder()
     delete impl;
 }
 
+void llvm_ir_builder::create_n_enter_func(
+        llvm_type _return_type, saber_string_view _name,
+        saber::vector<llvm_type> &&_param_type_list,
+        saber::vector<saber_string_view> _param_name_list,
+        llvm_func_attrs _attrs)
+{
+    impl->create_n_enter_func(
+        _return_type, _name,
+        saber::move(_param_type_list), saber::move(_param_name_list), _attrs);
+}
 
+void llvm_ir_builder::leave_func()
+{
+    impl->leave_func();
+}
+
+llvm_instruction *llvm_ir_builder::create_func_decl(
+        llvm_type _return_type, saber_string_view _name,
+        saber::vector<llvm_type> &&_param_type_list,
+        saber::vector<saber_string_view> _param_name_list,
+        llvm_func_attrs _attrs)
+{
+    return impl->create_func_decl(
+        _return_type, _name,
+        saber::move(_param_type_list), saber::move(_param_name_list), _attrs);
+}
 
 llvm_instruction*
 llvm_ir_builder::create_return(llvm_type _type, llvm_value *_value)
@@ -82,6 +107,11 @@ llvm_label*
 llvm_ir_builder::create_label(saber_string_view _name)
 {
     return impl->create_label(_name);
+}
+
+llvm_label *llvm_ir_builder::create_temporary_label()
+{
+    return impl->create_temporary_label();
 }
 
 

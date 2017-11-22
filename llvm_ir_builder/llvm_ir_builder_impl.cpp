@@ -32,6 +32,47 @@ llvm_ir_builder_impl::~llvm_ir_builder_impl()
     /// Incomplete yet. needs more refining.
 }
 
+void llvm_ir_builder_impl::create_n_enter_func(
+        llvm_type _return_type,
+        saber_string_view _name,
+        saber::vector<llvm_type> &&_param_type_list,
+        saber::vector<saber_string_view> _param_name_list,
+        llvm_func_attrs _attrs)
+{
+    assert(local_temp_var_counter == 0);
+    assert(local_temp_label_counter == 0);
+    assert(stashed_global_insertion_point == nullptr);
+    auto fndef = new llvm_func_def(_return_type, _name,
+                                   saber::move(_param_type_list),
+                                   saber::move(_param_name_list),
+                                   _attrs);
+    functions.push_back(new llvm_function_block(fndef));
+    stashed_global_insertion_point = cur_insertion_point;
+    cur_insertion_point = fndef;
+}
+
+void llvm_ir_builder_impl::leave_func()
+{
+    local_temp_var_counter = 0;
+    local_temp_label_counter = 0;
+
+    cur_insertion_point = stashed_global_insertion_point;
+    stashed_global_insertion_point = nullptr;
+}
+
+llvm_func_decl *llvm_ir_builder_impl::create_func_decl(
+        llvm_type _return_type, saber_string_view _name,
+        saber::vector<llvm_type> &&_param_type_list,
+        saber::vector<saber_string_view> _param_name_list,
+        llvm_func_attrs _attrs)
+{
+    return insert_after_current(
+        new llvm_func_decl(
+            _return_type, _name,
+            saber::move(_param_type_list), saber::move(_param_name_list),
+            _attrs));
+}
+
 llvm_ret_instruction* llvm_ir_builder_impl::create_return(llvm_type _type,
                                                           llvm_value *_value)
 {

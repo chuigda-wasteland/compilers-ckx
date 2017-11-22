@@ -47,13 +47,21 @@ public:
     llvm_ir_builder& operator= (const llvm_ir_builder&) = delete;
     llvm_ir_builder& operator= (llvm_ir_builder&&) = delete;
 
-    void create_n_enter_func(saber_string_view _name, llvm_type _ret);
+    void create_n_enter_func(llvm_type _return_type, saber_string_view _name,
+                             saber::vector<llvm_type> &&_param_type_list,
+                             saber::vector<saber_string_view> _param_name_list,
+                             llvm_func_attrs _attrs);
     void leave_func();
 
     llvm_instruction* get_insert_point();
     void set_insert_after(llvm_instruction* _instruction);
 
     /// @fn control flows
+    llvm_instruction* create_func_decl(
+            llvm_type _return_type, saber_string_view _name,
+            saber::vector<llvm_type> &&_param_type_list,
+            saber::vector<saber_string_view> _param_name_list,
+            llvm_func_attrs _attrs);
     llvm_instruction* create_return_void();
     llvm_instruction* create_return(llvm_type _type, llvm_value* _value);
     llvm_instruction* create_branch(llvm_label *_label);
@@ -67,9 +75,7 @@ public:
                                   saber_string_view _func_name,
                                   saber::vector<llvm_value*> &&_args);
     llvm_label*       create_label(saber_string_view _name);
-    /// @todo we are not certain about how this function will be used.
-    /// llvm_instruction* create_unnamed_label();
-
+    llvm_label*       create_temporary_label();
 
 COMMENT(BEGIN_BLOCK)
 
@@ -97,11 +103,14 @@ COMMENT(BEGIN_BLOCK)
 COMMENT(END_BLOCK)
 
     /// @fn memory accessing operations
-    llvm_instruction* create_alloca(llvm_value *_result, llvm_type _type, quint32 _array_size);
-    llvm_instruction* create_load(llvm_value *_result, llvm_type _type, llvm_value *_ptr);
+    llvm_instruction* create_alloca(llvm_value *_result, llvm_type _type,
+                                    quint32 _array_size);
+    llvm_instruction* create_load(llvm_value *_result, llvm_type _type,
+                                  llvm_value *_ptr);
     llvm_instruction* create_store(llvm_type _type,
                                    llvm_value *_ptr, llvm_value *_val);
-    llvm_instruction* create_getelementptr(llvm_value *_result, llvm_type _type, llvm_value *_ptr,
+    llvm_instruction* create_getelementptr(llvm_value *_result,
+                                           llvm_type _type, llvm_value *_ptr,
                                            llvm_type _ty, llvm_value *_idx);
 
     /// @fn functions dealing with values

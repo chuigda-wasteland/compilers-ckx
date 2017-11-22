@@ -41,13 +41,22 @@ public:
     llvm_ir_builder_impl& operator= (const llvm_ir_builder_impl&) = delete;
     llvm_ir_builder_impl& operator= (llvm_ir_builder_impl&&) = delete;
 
-    void create_n_enter_func(saber_string_view _func_name);
+    void create_n_enter_func(llvm_type _return_type, saber_string_view _name,
+                             saber::vector<llvm_type>&& _param_type_list,
+                             saber::vector<saber_string_view> _param_name_list,
+                             llvm_func_attrs _attrs);
     void leave_func();
 
     llvm_instruction* get_insert_point();
     void set_insert_after(llvm_instruction* _instruction);
 
     /// @note all `create` functions here mean `create and insert after current`
+    llvm_func_decl* create_func_decl(
+            llvm_type _return_type, saber_string_view _name,
+            saber::vector<llvm_type>&& _param_type_list,
+            saber::vector<saber_string_view> _param_name_list,
+            llvm_func_attrs _attrs);
+
     llvm_ret_instruction* create_return(llvm_type _type, llvm_value* _value);
 
     llvm_br_instruction* create_branch(llvm_label* _label);
@@ -109,13 +118,14 @@ public:
     llvm_value *create_named_var(saber_string_view _name);
 
 private:
-    open_class llvm_function_block
+    open_class llvm_function_block /// `Type rich programming`?
     {
         llvm_function_block() = delete;
         llvm_function_block(const llvm_function_block&) = delete;
         llvm_function_block(llvm_function_block&&) = delete;
 
         llvm_function_block(llvm_func_def* _fndef) : fndef(_fndef) {}
+        ~llvm_function_block() { delete fndef; }
         llvm_func_def* fndef;
     };
 
