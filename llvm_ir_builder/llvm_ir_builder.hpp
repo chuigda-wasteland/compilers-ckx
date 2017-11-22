@@ -58,8 +58,8 @@ public:
     llvm_instruction* create_return(llvm_type _type, llvm_value* _value);
     llvm_instruction* create_branch(llvm_label *_label);
     llvm_instruction* create_cond_branch(llvm_value *_cond,
-                                         llvm_instruction* _true_label,
-                                         llvm_instruction* _false_label);
+                                         llvm_label *_true_label,
+                                         llvm_label *_false_label);
     llvm_instruction* create_phi(llvm_value* _result, llvm_type _type,
                                  llvm_label *_label1, llvm_value *_val1,
                                  llvm_label *_label2, llvm_value *_val2);

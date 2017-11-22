@@ -47,13 +47,14 @@ public:
     llvm_instruction* get_insert_point();
     void set_insert_after(llvm_instruction* _instruction);
 
+    /// @note all `create` functions here mean `create and insert after current`
     llvm_ret_instruction* create_return(llvm_type _type, llvm_value* _value);
 
     llvm_br_instruction* create_branch(llvm_label* _label);
 
     llvm_condbr_instruction* create_cond_branch(llvm_value *_cond,
-                                                llvm_instruction* _true_label,
-                                                llvm_instruction* _false_label);
+                                                llvm_label *_true_label,
+                                                llvm_label *_false_label);
 
     llvm_phi_instruction* create_phi(llvm_value *_result, llvm_type _type,
                                      llvm_label *_label1, llvm_value *_val1,
@@ -108,6 +109,16 @@ public:
     llvm_value *create_named_var(saber_string_view _name);
 
 private:
+    open_class llvm_function_block
+    {
+        llvm_function_block() = delete;
+        llvm_function_block(const llvm_function_block&) = delete;
+        llvm_function_block(llvm_function_block&&) = delete;
+
+        llvm_function_block(llvm_func_def* _fndef) : fndef(_fndef) {}
+        llvm_func_def* fndef;
+    };
+
     template <typename InstructionPtrType>
     InstructionPtrType insert_after_current(InstructionPtrType _instruction)
     {
@@ -121,6 +132,7 @@ private:
         return _value;
     }
 
+    saber::list<llvm_function_block*> functions;
     llvm_implicit_list_node global_head_node;
     llvm_implicit_list_node *stashed_global_insertion_point = nullptr;
     llvm_implicit_list_node *cur_insertion_point = &global_head_node;

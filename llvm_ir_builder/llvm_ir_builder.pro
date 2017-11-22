@@ -7,7 +7,8 @@ SOURCES += \
     ../saber/src/safe_stl_general.cpp \
     llvm_inst.cpp \
     llvm_ir_builder.cpp \
-    llvm_ir_builder_impl.cpp
+    llvm_ir_builder_impl.cpp \
+    main_as_test.cpp
 
 HEADERS += \
     llvm_value.hpp \

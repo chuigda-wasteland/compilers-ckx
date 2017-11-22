@@ -32,6 +32,56 @@ llvm_ir_builder_impl::~llvm_ir_builder_impl()
     /// Incomplete yet. needs more refining.
 }
 
+llvm_ret_instruction* llvm_ir_builder_impl::create_return(llvm_type _type,
+                                                          llvm_value *_value)
+{
+    return insert_after_current(new llvm_ret_instruction(_type, _value));
+}
+
+llvm_br_instruction* llvm_ir_builder_impl::create_branch(llvm_label *_label)
+{
+    return insert_after_current(new llvm_br_instruction(_label));
+}
+
+llvm_condbr_instruction* llvm_ir_builder_impl::create_cond_branch(
+        llvm_value *_cond, llvm_label *_true_label, llvm_label *_false_label)
+{
+    return insert_after_current(
+        new llvm_condbr_instruction(_cond, _true_label, _false_label));
+}
+
+llvm_phi_instruction* llvm_ir_builder_impl::create_phi(
+        llvm_value *_result, llvm_type _type,
+        llvm_label *_label1, llvm_value *_val1,
+        llvm_label *_label2, llvm_value *_val2)
+{
+    return insert_after_current(
+        new llvm_phi_instruction(
+            _result, _type, _label1, _val1, _label2, _val2));
+}
+
+llvm_call_instruction* llvm_ir_builder_impl::create_call(
+        llvm_value *_result, llvm_type _type,
+        saber_string_view _func_name, saber::vector<llvm_value*> &&_args)
+{
+    return insert_after_current(
+        new llvm_call_instruction(
+            _result, _type, _func_name, saber::move(_args)));
+}
+
+llvm_label* llvm_ir_builder_impl::create_label(saber_string_view _name)
+{
+    return insert_after_current(new llvm_label(_name));
+}
+
+llvm_label* llvm_ir_builder_impl::create_temporary_label()
+{
+    return insert_after_current(
+        new llvm_label(
+            saber_string_pool::create_view(
+                saber::string_paste("$l.", local_temp_label_counter))));
+}
+
 llvm_binary_instruction* llvm_ir_builder_impl::create_binary_instruction(
         llvm_value *_result, llvm_binary_instruction::operator_type _op,
         llvm_type _type, llvm_value *_lhs, llvm_value *_rhs)
@@ -40,13 +90,56 @@ llvm_binary_instruction* llvm_ir_builder_impl::create_binary_instruction(
         new llvm_binary_instruction(_result, _op, _type, _lhs, _rhs));
 }
 
-/// @todo add string support for llvm_constant first
-/*
+llvm_cast_instruction* llvm_ir_builder_impl::create_cast_instruction(
+        llvm_value *_result, llvm_cast_instruction::operator_type _op,
+        llvm_type _src_type, llvm_value *_value, llvm_type _dest_type)
+{
+    return insert_after_current(
+        new llvm_cast_instruction(_result, _op, _src_type, _value, _dest_type));
+}
+
+llvm_cmp_instruction* llvm_ir_builder_impl::create_cmp_instruction(
+        llvm_value *_result, llvm_cmp_instruction::comparsion_type _op,
+        llvm_type _compared_type, llvm_value *_val1, llvm_value *_val2)
+{
+    return insert_after_current(
+        new llvm_cmp_instruction(_result, _op, _compared_type, _val1, _val2));
+}
+
+llvm_alloca_instruction* llvm_ir_builder_impl::create_alloca(
+        llvm_value *_result, llvm_type _yield_type, quint32 _num_elems)
+{
+    return insert_after_current(
+        new llvm_alloca_instruction(_result, _yield_type, _num_elems));
+}
+
+llvm_load_instruction* llvm_ir_builder_impl::create_load(
+        llvm_value *_result, llvm_type _yield_type, llvm_value *_ptr)
+{
+    return insert_after_current(
+        new llvm_load_instruction(_result, _yield_type, _ptr));
+}
+
+llvm_store_instruction* llvm_ir_builder_impl::create_store(
+        llvm_type _src_type, llvm_value *_src, llvm_value *_result)
+{
+    return insert_after_current(
+        new llvm_store_instruction(_src_type, _src, _result));
+}
+
+llvm_getelementptr_instruction* llvm_ir_builder_impl::create_getelementptr(
+        llvm_value *_result, llvm_type _yield_type, llvm_value *_ptr,
+        llvm_type _ty, llvm_value *_idx)
+{
+    return insert_after_current(
+        new llvm_getelementptr_instruction(
+            _result, _yield_type, _ptr, _ty, _idx));
+}
+
 llvm_value* llvm_ir_builder_impl::create_string_constant(saber_string_view _str)
 {
     return insert_into_table(new llvm_constant(_str));
 }
-*/
 
 llvm_value* llvm_ir_builder_impl::create_signed_constant(qint64 _i)
 {
@@ -63,20 +156,17 @@ llvm_value* llvm_ir_builder_impl::create_floating_constant(qreal _r)
     return insert_into_table(new llvm_constant(_r));
 }
 
-/// @todo add bool support for llvm_constant first
-/*
 llvm_value* llvm_ir_builder_impl::create_bool_constant(bool _b)
 {
     return insert_into_table(new llvm_constant(_b));
 }
-*/
 
 llvm_value* llvm_ir_builder_impl::create_temporary_var()
 {
     return insert_into_table(
         new llvm_variable(
             saber_string_pool::create_view(
-                saber::to_string_helper(local_temp_var_counter))));
+                saber::string_paste("$v", local_temp_var_counter))));
 }
 
 llvm_value* llvm_ir_builder_impl::create_named_var(saber_string_view _name)

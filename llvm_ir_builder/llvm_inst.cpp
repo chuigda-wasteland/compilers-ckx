@@ -24,7 +24,6 @@ namespace faker
 
 llvm_instruction::~llvm_instruction() {}
 
-
 llvm_func_decl::llvm_func_decl(
         llvm_type _return_type,
         saber_string_view _name,
@@ -71,17 +70,8 @@ llvm_new_type::llvm_new_type(saber_string_view _name,
 {}
 
 
-void llvm_label::set_label_name(saber_string_view _name)
-{
-    DEBUG_EXEC( assert(!name_set) );
-    DEBUG_EXEC( name_set = true; );
-    name = _name;
-}
-
-
 saber_string_view llvm_label::get_label_name() const
 {
-    DEBUG_EXEC( assert(name_set) );
     return name;
 }
 
@@ -98,15 +88,44 @@ llvm_binary_instruction::llvm_binary_instruction(llvm_value *_result,
     rhs(_rhs)
 {}
 
+llvm_cast_instruction::llvm_cast_instruction(llvm_value *_result,
+                                             operator_type _op,
+                                             llvm_type _origin_type,
+                                             llvm_value *_value,
+                                             llvm_type _dest_type) :
+    result(_result),
+    op(_op),
+    origin_type(_origin_type),
+    value(_value),
+    dest_type(_dest_type)
+{}
+
+llvm_cmp_instruction::llvm_cmp_instruction(llvm_value *_result,
+                                           comparsion_type _op,
+                                           llvm_type _compared_type,
+                                           llvm_value *_val1,
+                                           llvm_value *_val2) :
+    result(_result),
+    op(_op),
+    compared_type(_compared_type),
+    val1(_val1), val2(_val2)
+{}
 
 llvm_call_instruction::llvm_call_instruction(
+        llvm_value *_result,
         saber_string_view _func_name,
         llvm_type _yield_type,
-        saber::vector<llvm_value *> &&_args,
-        llvm_value *_result) :
+        saber::vector<llvm_value *> &&_args) :
+    result(_result),
     func_name(_func_name),
     yield_type(_yield_type),
-    args(saber::move(_args)),
+    args(saber::move(_args))
+{}
+
+
+llvm_ret_instruction::llvm_ret_instruction(llvm_type _type,
+                                           llvm_value *_result) :
+    type(_type),
     result(_result)
 {}
 
@@ -124,6 +143,17 @@ llvm_condbr_instruction::llvm_condbr_instruction(llvm_value *_condition,
     false_label(_false_label)
 {}
 
+llvm_phi_instruction::llvm_phi_instruction(llvm_value *_result,
+                                           llvm_type _yield_type,
+                                           llvm_label *_label1,
+                                           llvm_value *_val1,
+                                           llvm_label *_label2,
+                                           llvm_value *_val2) :
+    result(_result),
+    yield_type(_yield_type),
+    label1(_label1), label2(_label2),
+    val1(_val1), val2(_val2)
+{}
 
 llvm_alloca_instruction::llvm_alloca_instruction(llvm_value *_result,
                                                  llvm_type _yield_type,

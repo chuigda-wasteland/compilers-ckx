@@ -35,13 +35,17 @@ public:
     llvm_constant(quint64 _val);
     llvm_constant(qreal _val);
     llvm_constant(decltype(nullptr));
+    llvm_constant(bool _val);
+    llvm_constant(saber_string_view _val);
     ~llvm_constant() override final = default;
 
     saber_string_view to_string() override final;
 
 private:
-    enum class constant_type { ct_int, ct_uint, ct_real, ct_nullptr } type;
-    variant { qint64 i; quint64 u; qreal r; } v;
+    enum class constant_type { ct_int, ct_uint, ct_real, ct_nullptr,
+                               ct_bool, ct_string } type;
+    variant { qint64 i; quint64 u; qreal r; bool b; } v;
+    saber_string_view str = saber_string_pool::create_view("");
 };
 
 

@@ -112,16 +112,13 @@ private:
 class llvm_label final implements llvm_instruction
 {
 public:
-    explicit llvm_label() = default;
+    explicit llvm_label(saber_string_view _name) : name(_name) {}
     ~llvm_label() override final = default;
 
-    void set_label_name(saber_string_view _name);
     saber_string_view get_label_name() const;
 
 private:
     saber_string_view name;
-
-    DEBUG_EXEC( bool name_set; )
 };
 
 
@@ -231,17 +228,17 @@ private:
 class llvm_call_instruction final implements llvm_instruction
 {
 public:
-    llvm_call_instruction(saber_string_view _func_name,
+    llvm_call_instruction(llvm_value *_result,
+                          saber_string_view _func_name,
                           llvm_type _yield_type,
-                          saber::vector<llvm_value*>&& _args,
-                          llvm_value *_result = nullptr);
+                          saber::vector<llvm_value*>&& _args);
     ~llvm_call_instruction() override final = default;
 
 private:
+    llvm_value *result;
     saber_string_view func_name;
     llvm_type yield_type;
     saber::vector<llvm_value*> args;
-    llvm_value *result;
 };
 
 
@@ -251,11 +248,11 @@ private:
 class llvm_ret_instruction final implements llvm_instruction
 {
 public:
-    llvm_ret_instruction(llvm_type _type, llvm_value* _value);
+    llvm_ret_instruction(llvm_type _type, llvm_value* _result);
     ~llvm_ret_instruction() override final = default;
 
 private:
-    llvm_type yield_type;
+    llvm_type type;
     llvm_value *result;
 };
 
@@ -299,7 +296,7 @@ public:
 private:
     llvm_value *result;
     llvm_type yield_type;
-    llvm_label *label1, &label2;
+    llvm_label *label1, *label2;
     llvm_value *val1, *val2;
 };
 

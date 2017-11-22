@@ -56,8 +56,8 @@ llvm_ir_builder::create_branch(llvm_label *_label)
 
 llvm_instruction*
 llvm_ir_builder::create_cond_branch(llvm_value *_cond,
-                                    llvm_instruction *_true_label,
-                                    llvm_instruction *_false_label)
+                                    llvm_label *_true_label,
+                                    llvm_label *_false_label)
 {
     return impl->create_cond_branch(_cond, _true_label, _false_label);
 }

@@ -44,7 +44,21 @@ llvm_constant::llvm_constant(qreal _val) :
 }
 
 llvm_constant::llvm_constant(decltype(nullptr)) :
-    type(constant_type::ct_nullptr) {}
+    type(constant_type::ct_nullptr)
+{
+}
+
+llvm_constant::llvm_constant(bool _val) :
+    type(constant_type::ct_bool)
+{
+    v.b = _val;
+}
+
+llvm_constant::llvm_constant(saber_string_view _val) :
+    type(constant_type::ct_string),
+    str(_val)
+{
+}
 
 saber_string_view llvm_constant::to_string()
 { return saber_string_pool::create_view(""); }
