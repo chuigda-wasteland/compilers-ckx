@@ -41,6 +41,8 @@ public:
     llvm_ir_builder_impl& operator= (const llvm_ir_builder_impl&) = delete;
     llvm_ir_builder_impl& operator= (llvm_ir_builder_impl&&) = delete;
 
+    void pretty_print(we::we_file_writer& _writer);
+
     void create_n_enter_func(llvm_type _return_type, saber_string_view _name,
                              saber::vector<llvm_type>&& _param_type_list,
                              saber::vector<saber_string_view> _param_name_list,
@@ -137,7 +139,8 @@ private:
         return _instruction;
     }
 
-    llvm_value* insert_into_table(llvm_value* _value) {
+    llvm_value* insert_into_table(llvm_value* _value)
+    {
         value_table.push_back(_value);
         return _value;
     }

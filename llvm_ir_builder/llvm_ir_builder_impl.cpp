@@ -32,6 +32,20 @@ llvm_ir_builder_impl::~llvm_ir_builder_impl()
     /// Incomplete yet. needs more refining.
 }
 
+void llvm_ir_builder_impl::pretty_print(we::we_file_writer &_writer)
+{
+    for (llvm_function_block* function : functions)
+        function->fndef->pretty_print(_writer);
+
+    llvm_instruction* iter =
+        static_cast<llvm_instruction*>(global_head_node.get_next());
+    while (iter != nullptr)
+    {
+        iter->pretty_print(_writer);
+        iter = iter->get_next();
+    }
+}
+
 void llvm_ir_builder_impl::create_n_enter_func(
         llvm_type _return_type,
         saber_string_view _name,
@@ -207,7 +221,7 @@ llvm_value* llvm_ir_builder_impl::create_temporary_var()
     return insert_into_table(
         new llvm_variable(
             saber_string_pool::create_view(
-                saber::string_paste("$v", local_temp_var_counter))));
+                saber::string_paste("tv.", local_temp_var_counter))));
 }
 
 llvm_value* llvm_ir_builder_impl::create_named_var(saber_string_view _name)

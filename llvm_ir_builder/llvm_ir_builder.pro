@@ -5,6 +5,7 @@ CONFIG -= qt
 SOURCES += \
     llvm_value.cpp \
     ../saber/src/safe_stl_general.cpp \
+    ../shared/src/file_writer.cpp \
     llvm_inst.cpp \
     llvm_ir_builder.cpp \
     llvm_ir_builder_impl.cpp \
@@ -41,4 +42,5 @@ HEADERS += \
     llvm_ir_builder_impl.hpp
 
 INCLUDEPATH +=\
-    ../saber/include/
+    ../saber/include/ \
+    ../shared/include/

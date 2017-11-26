@@ -34,6 +34,11 @@ llvm_ir_builder::~llvm_ir_builder()
     delete impl;
 }
 
+void llvm_ir_builder::pretty_print(we::we_file_writer &_writer)
+{
+    impl->pretty_print(_writer);
+}
+
 void llvm_ir_builder::create_n_enter_func(
         llvm_type _return_type, saber_string_view _name,
         saber::vector<llvm_type> &&_param_type_list,
@@ -168,10 +173,10 @@ llvm_ir_builder::create_load(llvm_value *_result,
 }
 
 llvm_instruction*
-llvm_ir_builder::create_store(llvm_type _type, llvm_value *_ptr,
-                              llvm_value *_val)
+llvm_ir_builder::create_store(llvm_type _type, llvm_value *_src,
+                              llvm_value *_result)
 {
-    return impl->create_store(_type, _ptr, _val);
+    return impl->create_store(_type, _src, _result);
 }
 
 llvm_instruction*

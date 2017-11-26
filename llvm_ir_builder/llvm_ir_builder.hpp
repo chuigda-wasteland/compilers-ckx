@@ -47,6 +47,8 @@ public:
     llvm_ir_builder& operator= (const llvm_ir_builder&) = delete;
     llvm_ir_builder& operator= (llvm_ir_builder&&) = delete;
 
+    void pretty_print(we::we_file_writer& _writer);
+
     void create_n_enter_func(llvm_type _return_type, saber_string_view _name,
                              saber::vector<llvm_type> &&_param_type_list,
                              saber::vector<saber_string_view> _param_name_list,
@@ -108,7 +110,7 @@ COMMENT(END_BLOCK)
     llvm_instruction* create_load(llvm_value *_result, llvm_type _type,
                                   llvm_value *_ptr);
     llvm_instruction* create_store(llvm_type _type,
-                                   llvm_value *_ptr, llvm_value *_val);
+                                   llvm_value *_src, llvm_value *_result);
     llvm_instruction* create_getelementptr(llvm_value *_result,
                                            llvm_type _type, llvm_value *_ptr,
                                            llvm_type _ty, llvm_value *_idx);

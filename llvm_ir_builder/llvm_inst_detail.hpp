@@ -40,6 +40,8 @@ public:
                    llvm_func_attrs _attrs);
     ~llvm_func_decl() override final = default;
 
+    void pretty_print(we::we_file_writer& _writer) override final;
+
 private:
     llvm_type return_type;
     saber_string_view name;
@@ -61,6 +63,8 @@ public:
                   llvm_func_attrs _attrs);
     ~llvm_func_def() override final = default;
 
+    void pretty_print(we::we_file_writer& _writer) override final;
+
 private:
     llvm_type return_type;
     saber_string_view name;
@@ -77,6 +81,8 @@ public:
     explicit llvm_global_constant(llvm_value* _value);
     ~llvm_global_constant() override final = default;
 
+    void pretty_print(we::we_file_writer& _writer) override final;
+
 private:
     llvm_value *value;
 };
@@ -88,6 +94,8 @@ class llvm_global_variable final implements llvm_instruction
 public:
     llvm_global_variable(llvm_type _type, saber_string_view _name);
     ~llvm_global_variable() override final = default;
+
+    void pretty_print(we::we_file_writer& _writer) override final;
 
 private:
     llvm_type type;
@@ -101,6 +109,8 @@ class llvm_new_type final implements llvm_instruction
 public:
     llvm_new_type(saber_string_view _name, saber::vector<llvm_type>&& _fields);
     ~llvm_new_type() override final = default;
+
+    void pretty_print(we::we_file_writer& _writer) override final;
 
 private:
     saber_string_view name;
@@ -116,6 +126,8 @@ public:
     ~llvm_label() override final = default;
 
     saber_string_view get_label_name() const;
+
+    void pretty_print(we::we_file_writer& _writer) override final;
 
 private:
     saber_string_view name;
@@ -141,11 +153,13 @@ public:
                             llvm_value *_rhs);
     ~llvm_binary_instruction() override final = default;
 
+    void pretty_print(we::we_file_writer& _writer) override final;
+
 private:
+    llvm_value *result;
     operator_type op;
     llvm_type yield_type;
     llvm_value *lhs, *rhs;
-    llvm_value *result;
 };
 
 
@@ -167,6 +181,8 @@ public:
                           llvm_value *_value,
                           llvm_type _dest_type);
     ~llvm_cast_instruction() override final = default;
+
+    void pretty_print(we::we_file_writer& _writer) override final;
 
 private:
     llvm_value *result;
@@ -203,18 +219,20 @@ public:
         __UUSED3  = 15,        ///      1  X  X  X
 
         /// OPERCODE        =        F  _  L  G  E
-        ot_fcmp_one   = 32,    ///   1  0  0  0  0
-        ot_fcmp_oeq   = 33,    ///   1  0  0  0  1
-        ot_fcmp_ogt   = 34,    ///   1  0  0  1  0
-        ot_fcmp_oge   = 35,    ///   1  0  0  1  1
-        ot_fcmp_olt   = 36,    ///   1  0  1  0  0
-        ot_fcmp_ole   = 37,    ///   1  0  1  0  1
+        ot_fcmp_one   = 32,    ///   1  X  0  0  0
+        ot_fcmp_oeq   = 33,    ///   1  X  0  0  1
+        ot_fcmp_ogt   = 34,    ///   1  X  0  1  0
+        ot_fcmp_oge   = 35,    ///   1  X  0  1  1
+        ot_fcmp_olt   = 36,    ///   1  X  1  0  0
+        ot_fcmp_ole   = 37,    ///   1  X  1  0  1
     };
 
     llvm_cmp_instruction(llvm_value *_result, comparsion_type _op,
                          llvm_type _compared_type,
                          llvm_value *_val1, llvm_value *_val2);
     ~llvm_cmp_instruction() override final = default;
+
+    void pretty_print(we::we_file_writer& _writer) override final;
 
 private:
     llvm_value *result;
@@ -224,20 +242,22 @@ private:
 };
 
 
-/// @brief call <yield_type> @<func_name> (<args>)
+/// @brief <result>opt = call <yield_type> @<func_name> (<args>)
 class llvm_call_instruction final implements llvm_instruction
 {
 public:
     llvm_call_instruction(llvm_value *_result,
-                          saber_string_view _func_name,
                           llvm_type _yield_type,
+                          saber_string_view _func_name,
                           saber::vector<llvm_value*>&& _args);
     ~llvm_call_instruction() override final = default;
 
+    void pretty_print(we::we_file_writer& _writer) override final;
+
 private:
     llvm_value *result;
-    saber_string_view func_name;
     llvm_type yield_type;
+    saber_string_view func_name;
     saber::vector<llvm_value*> args;
 };
 
@@ -251,6 +271,8 @@ public:
     llvm_ret_instruction(llvm_type _type, llvm_value* _result);
     ~llvm_ret_instruction() override final = default;
 
+    void pretty_print(we::we_file_writer& _writer) override final;
+
 private:
     llvm_type type;
     llvm_value *result;
@@ -263,6 +285,8 @@ class llvm_br_instruction final implements llvm_instruction
 public:
     explicit llvm_br_instruction(llvm_label* _dest);
     ~llvm_br_instruction() override final = default;
+
+    void pretty_print(we::we_file_writer& _writer) override final;
 
 private:
     llvm_label *dest;
@@ -278,12 +302,14 @@ public:
                             llvm_label *_false_label);
     ~llvm_condbr_instruction() override final = default;
 
+    void pretty_print(we::we_file_writer& _writer) override final;
+
 private:
     llvm_value *condition;
     llvm_label *true_label, *false_label;
 };
 
-/// @brief <result> = phi <yield_type> <label1> <val1> <label2> <val2>
+/// @brief <result> = phi <yield_type> [val1, label1], [val2, label2]
 class llvm_phi_instruction final implements llvm_instruction
 {
 public:
@@ -293,6 +319,8 @@ public:
                          llvm_label *_label2, llvm_value* _val2);
     ~llvm_phi_instruction() override final = default;
 
+    void pretty_print(we::we_file_writer& _writer) override final;
+
 private:
     llvm_value *result;
     llvm_type yield_type;
@@ -300,7 +328,7 @@ private:
     llvm_value *val1, *val2;
 };
 
-/// @brief <result> = alloca <yield_type> <num_elems>
+/// @brief <result> = alloca <yield_type> [, i32 <num_elems>]
 class llvm_alloca_instruction final implements llvm_instruction
 {
 public:
@@ -308,6 +336,8 @@ public:
                             llvm_type _yield_type,
                             quint32 _num_elems);
     ~llvm_alloca_instruction() override final = default;
+
+    void pretty_print(we::we_file_writer& _writer) override final;
 
 private:
     llvm_value *result;
@@ -325,6 +355,8 @@ public:
                           llvm_value *_ptr);
     ~llvm_load_instruction() override final = default;
 
+    void pretty_print(we::we_file_writer& _writer) override final;
+
 private:
     llvm_value *result;
     llvm_type yield_type;
@@ -340,6 +372,8 @@ public:
                            llvm_value *_src,
                            llvm_value *_result);
     ~llvm_store_instruction() override final = default;
+
+    void pretty_print(we::we_file_writer& _writer) override final;
 
 private:
     llvm_type src_type;
@@ -360,6 +394,8 @@ public:
                                    llvm_type _ty,
                                    llvm_value* _idx);
     ~llvm_getelementptr_instruction() override final = default;
+
+    void pretty_print(we::we_file_writer& _writer) override final;
 
 private:
     llvm_value *result;

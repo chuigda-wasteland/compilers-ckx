@@ -18,6 +18,11 @@ string to_string_helper(T&& _value)
     return saber::forward<T>(_value).to_string();
 }
 
+inline string to_string_helper(bool b)
+{
+    return b ? "true" : "false";
+}
+
 inline string to_string_helper(int64_t _number)
 {
     std::stringstream stream;
