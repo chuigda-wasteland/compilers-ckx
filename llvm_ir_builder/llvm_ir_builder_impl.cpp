@@ -29,7 +29,19 @@ llvm_ir_builder_impl::~llvm_ir_builder_impl()
 {
     for (llvm_value* value : value_table)
         delete value;
-    /// Incomplete yet. needs more refining.
+
+    for (llvm_function_block* function : functions)
+        delete function;
+
+    llvm_instruction *iter = static_cast<llvm_instruction*>(
+                                 global_head_node.get_next());
+
+    while (iter != nullptr)
+    {
+        llvm_instruction* to_be_deleted = iter;
+        iter = iter->get_next();
+        delete to_be_deleted;
+    }
 }
 
 void llvm_ir_builder_impl::pretty_print(we::we_file_writer &_writer)
@@ -72,6 +84,11 @@ void llvm_ir_builder_impl::leave_func()
 
     cur_insertion_point = stashed_global_insertion_point;
     stashed_global_insertion_point = nullptr;
+}
+
+void llvm_ir_builder_impl::set_insert_after(llvm_instruction *_instruction)
+{
+    cur_insertion_point = _instruction;
 }
 
 llvm_func_decl *llvm_ir_builder_impl::create_func_decl(
@@ -134,7 +151,7 @@ llvm_label* llvm_ir_builder_impl::create_temporary_label()
     return insert_after_current(
         new llvm_label(
             saber_string_pool::create_view(
-                saber::string_paste("$l.", local_temp_label_counter))));
+                saber::string_paste("tl.", local_temp_label_counter++))));
 }
 
 llvm_binary_instruction* llvm_ir_builder_impl::create_binary_instruction(
@@ -221,7 +238,7 @@ llvm_value* llvm_ir_builder_impl::create_temporary_var()
     return insert_into_table(
         new llvm_variable(
             saber_string_pool::create_view(
-                saber::string_paste("tv.", local_temp_var_counter))));
+                saber::string_paste("tv.", local_temp_var_counter++))));
 }
 
 llvm_value* llvm_ir_builder_impl::create_named_var(saber_string_view _name)

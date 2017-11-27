@@ -55,6 +55,11 @@ void llvm_ir_builder::leave_func()
     impl->leave_func();
 }
 
+void llvm_ir_builder::set_insert_after(llvm_instruction *_instruction)
+{
+    impl->set_insert_after(_instruction);
+}
+
 llvm_instruction *llvm_ir_builder::create_func_decl(
         llvm_type _return_type, saber_string_view _name,
         saber::vector<llvm_type> &&_param_type_list,

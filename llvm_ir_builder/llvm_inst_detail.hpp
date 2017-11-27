@@ -61,7 +61,7 @@ public:
                   saber::vector<llvm_type>&& _param_type_list,
                   saber::vector<saber_string_view>&& _param_name_list,
                   llvm_func_attrs _attrs);
-    ~llvm_func_def() override final = default;
+    ~llvm_func_def() override final;
 
     void pretty_print(we::we_file_writer& _writer) override final;
 
@@ -201,16 +201,16 @@ public:
     enum class comparsion_type : qchar
     {
         /// OPERCODE        =           U  L  G  E
-        ot_icmp_sne  =  0,     ///      0  0  0  0
-        ot_icmp_seq  =  1,     ///      0  0  0  1
+        ot_icmp_ne  =  0,      ///      X  0  0  0
+        ot_icmp_eq  =  1,      ///      X  0  0  1
         ot_icmp_sgt  =  2,     ///      0  0  1  0
         ot_icmp_sge  =  3,     ///      0  0  1  1
         ot_icmp_slt  =  4,     ///      0  1  0  0
         ot_icmp_sle  =  5,     ///      0  1  0  1
         __UUSED0  =  6,        ///      0  X  X  0
         __UUSED1  =  7,        ///      0  X  X  X
-        ot_icmp_une  =  8,     ///      1  0  0  0
-        ot_icmp_ueq  =  9,     ///      1  0  0  1
+        __UUSED11    =  8,     ///      X  0  0  0
+        __UUSED12    =  9,     ///      X  0  0  1
         ot_icmp_ugt  = 10,     ///      1  0  1  0
         ot_icmp_uge  = 11,     ///      1  0  1  1
         ot_icmp_ult  = 12,     ///      1  1  0  0

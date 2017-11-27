@@ -59,7 +59,7 @@ void llvm_func_decl::pretty_print(we::we_file_writer &_writer)
     for (size_t i = 0; i < param_type_list.size(); i++)
     {
         _writer.write(param_type_list[i]);
-        _writer.write(" ");
+        _writer.write(" %");
         _writer.write(param_name_list[i]);
         if (i != param_type_list.size()-1) _writer.write(", ");
     }
@@ -80,6 +80,17 @@ llvm_func_def::llvm_func_def(
     attrs(_attrs)
 {}
 
+llvm_func_def::~llvm_func_def()
+{
+    llvm_instruction* iter = get_next();
+    while (iter != nullptr)
+    {
+        llvm_instruction* to_be_deleted = iter;
+        iter = iter->get_next();
+        delete to_be_deleted;
+    }
+}
+
 void llvm_func_def::pretty_print(we::we_file_writer &_writer)
 {
     _writer.write("define ");
@@ -90,7 +101,7 @@ void llvm_func_def::pretty_print(we::we_file_writer &_writer)
     for (size_t i = 0; i < param_type_list.size(); i++)
     {
         _writer.write(param_type_list[i]);
-        _writer.write(" ");
+        _writer.write(" %");
         _writer.write(param_name_list[i]);
         if (i != param_type_list.size()-1) _writer.write(", ");
     }
@@ -270,11 +281,11 @@ void llvm_cmp_instruction::pretty_print(we::we_file_writer &_writer)
         _writer.write("icmp ");
         if (comp_type_bitmask & 0x10)
             _writer.write("u");
-        else
+        else if (comp_type_bitmask & 0x04)
             _writer.write("s");
     }
 
-    switch (comp_type_bitmask & 0x08)
+    switch (comp_type_bitmask & 0x04)
     {
     case 0: _writer.write("ne "); break;
     case 1: _writer.write("eq "); break;
@@ -368,7 +379,7 @@ void llvm_condbr_instruction::pretty_print(we::we_file_writer &_writer)
 {
     _writer.write("br i1 ");
     _writer.write(condition->to_string());
-    _writer.write(" label %");
+    _writer.write(", label %");
     _writer.write(true_label->get_label_name());
     _writer.write(", label %");
     _writer.write(false_label->get_label_name());
