@@ -49,7 +49,7 @@ public:
     }
 
 private:
-    llvm_implicit_list_node *prev, *next;
+    llvm_implicit_list_node *prev = nullptr, *next = nullptr;
 };
 
 } // namespace faker

@@ -34,7 +34,42 @@ llvm_ir_builder::~llvm_ir_builder()
     delete impl;
 }
 
+void llvm_ir_builder::pretty_print(we::we_file_writer &_writer)
+{
+    impl->pretty_print(_writer);
+}
 
+void llvm_ir_builder::create_n_enter_func(
+        llvm_type _return_type, saber_string_view _name,
+        saber::vector<llvm_type> &&_param_type_list,
+        saber::vector<saber_string_view> _param_name_list,
+        llvm_func_attrs _attrs)
+{
+    impl->create_n_enter_func(
+        _return_type, _name,
+        saber::move(_param_type_list), saber::move(_param_name_list), _attrs);
+}
+
+void llvm_ir_builder::leave_func()
+{
+    impl->leave_func();
+}
+
+void llvm_ir_builder::set_insert_after(llvm_instruction *_instruction)
+{
+    impl->set_insert_after(_instruction);
+}
+
+llvm_instruction *llvm_ir_builder::create_func_decl(
+        llvm_type _return_type, saber_string_view _name,
+        saber::vector<llvm_type> &&_param_type_list,
+        saber::vector<saber_string_view> _param_name_list,
+        llvm_func_attrs _attrs)
+{
+    return impl->create_func_decl(
+        _return_type, _name,
+        saber::move(_param_type_list), saber::move(_param_name_list), _attrs);
+}
 
 llvm_instruction*
 llvm_ir_builder::create_return(llvm_type _type, llvm_value *_value)
@@ -56,26 +91,26 @@ llvm_ir_builder::create_branch(llvm_label *_label)
 
 llvm_instruction*
 llvm_ir_builder::create_cond_branch(llvm_value *_cond,
-                                    llvm_instruction *_true_label,
-                                    llvm_instruction *_false_label)
+                                    llvm_label *_true_label,
+                                    llvm_label *_false_label)
 {
     return impl->create_cond_branch(_cond, _true_label, _false_label);
 }
 
 llvm_instruction*
-llvm_ir_builder::create_phi(llvm_type _type, llvm_value *_rec,
+llvm_ir_builder::create_phi(llvm_value *_result, llvm_type _type,
                             llvm_label *_label1, llvm_value *_val1,
                             llvm_label *_label2, llvm_value *_val2)
 {
-    return impl->create_phi(_type, _rec, _label1, _val1, _label2, _val2);
+    return impl->create_phi(_result, _type, _label1, _val1, _label2, _val2);
 }
 
 llvm_instruction*
-llvm_ir_builder::create_call(llvm_type _type, llvm_value *_rec,
-                             saber_string_view _callee,
+llvm_ir_builder::create_call(llvm_value *_result, llvm_type _type,
+                             saber_string_view _func_name,
                              saber::vector<llvm_value *> &&_args)
 {
-    return impl->create_call(_type, _rec, _callee, saber::move(_args));
+    return impl->create_call(_result, _type, _func_name, saber::move(_args));
 }
 
 llvm_label*
@@ -84,37 +119,41 @@ llvm_ir_builder::create_label(saber_string_view _name)
     return impl->create_label(_name);
 }
 
+llvm_label *llvm_ir_builder::create_temporary_label()
+{
+    return impl->create_temporary_label();
+}
+
 
 COMMENT(BEGIN_BLOCK)
 #   define BINOP(OPCODE) \
     llvm_instruction* \
-    llvm_ir_builder::create_##OPCODE(llvm_type _type, \
-                                llvm_value *_left, llvm_value *_right, \
-                                llvm_value *_rec) \
+    llvm_ir_builder::create_##OPCODE(llvm_value *_result, llvm_type _type,\
+                                     llvm_value* _lhs, llvm_value *_rhs) \
     { \
         return impl->create_binary_instruction( \
-            _type, llvm_binary_instruction::operator_type::ot_##OPCODE, \
-            _rec, _left, _right); \
+            _result, llvm_binary_instruction::operator_type::ot_##OPCODE, \
+            _type, _lhs, _rhs); \
     }
 
 #   define CASTOP(OPCODE) \
     llvm_instruction* \
-    llvm_ir_builder::create_##OPCODE(llvm_type _src_type, llvm_value *_src, \
-                                     llvm_type _desired, llvm_value *_rec) \
+    llvm_ir_builder::create_##OPCODE(llvm_value *_result, llvm_type _src_type,\
+                                     llvm_value *_src, llvm_type _dest_type) \
     { \
         return impl->create_cast_instruction( \
-            llvm_cast_instruction::operator_type::ot_##OPCODE, _rec, \
-            _src_type, _src, _desired); \
+             _result, llvm_cast_instruction::operator_type::ot_##OPCODE, \
+            _src_type, _src, _dest_type); \
     }
 
 #   define CMPOP(OPCODE) \
     llvm_instruction* \
-    llvm_ir_builder::create_##OPCODE(llvm_type _type, llvm_value *_left, \
-                                     llvm_value *_right, llvm_value *_rec) \
+    llvm_ir_builder::create_##OPCODE(llvm_value *_result, llvm_type _type,\
+                                     llvm_value *_val1, llvm_value *_val2) \
     { \
-        return impl->create_cmp_instruction(_type, \
-            llvm_cmp_instruction::comparsion_type::ot_##OPCODE, _rec, \
-            _left, _right); \
+        return impl->create_cmp_instruction( \
+            _result, llvm_cmp_instruction::comparsion_type::ot_##OPCODE, \
+            _type, _val1, _val2); \
     }
 
 #   include "opdef.hpp"
@@ -125,32 +164,32 @@ COMMENT(END_BLOCK)
 
 
 llvm_instruction*
-llvm_ir_builder::create_alloca(llvm_type *_type, quint32 _array_size,
-                               llvm_value *_receiver)
+llvm_ir_builder::create_alloca(llvm_value *_result,
+                               llvm_type _type, quint32 _array_size)
 {
-    return impl->create_alloca(_type, _array_size, _receiver);
+    return impl->create_alloca(_result, _type, _array_size);
 }
 
 llvm_instruction*
-llvm_ir_builder::create_load(llvm_type *_type, llvm_value *_ptr,
-                             llvm_value *_rec)
+llvm_ir_builder::create_load(llvm_value *_result,
+                             llvm_type _type, llvm_value *_ptr)
 {
-    return impl->create_load(_type, _ptr, _rec);
+    return impl->create_load(_result, _type, _ptr);
 }
 
 llvm_instruction*
-llvm_ir_builder::create_store(llvm_type _type, llvm_value *_ptr,
-                              llvm_value *_val)
+llvm_ir_builder::create_store(llvm_type _type, llvm_value *_src,
+                              llvm_value *_result)
 {
-    return impl->create_store(_type, _ptr, _val);
+    return impl->create_store(_type, _src, _result);
 }
 
 llvm_instruction*
-llvm_ir_builder::create_getelementptr(llvm_type _type, llvm_value *_ptr,
-                                      llvm_type _ty, llvm_value *_idx,
-                                      llvm_value *_rec)
+llvm_ir_builder::create_getelementptr(llvm_value *_result,
+                                      llvm_type _type, llvm_value *_ptr,
+                                      llvm_type _ty, llvm_value *_idx)
 {
-    return impl->create_getelementptr(_type, _ptr, _ty, _idx, _rec);
+    return impl->create_getelementptr(_result, _type, _ptr, _ty, _idx);
 }
 
 llvm_value *llvm_ir_builder::create_string_constant(saber_string_view _str)

@@ -23,7 +23,7 @@
 #include <cstddef>
 
 #include <utility>
-#include <string.hpp>
+#include "string.hpp"
 
 using qint64 = std::int64_t;
 using qint32 = std::int32_t;
@@ -74,5 +74,7 @@ inline saber::string to_string_helper(const qcoord& _coord)
 #define make_use_of : public
 
 #define Q_ON_HOLD(ANYTHING)
+
+#define COMMENT(COMMENTS)
 
 #endif // DEFS_HPP

@@ -24,6 +24,8 @@
 #include "string_pool.hpp"
 #include "llvm_implicit_list.hpp"
 
+#include "file_writer.hpp"
+
 namespace faker
 {
 
@@ -46,8 +48,7 @@ public:
             llvm_implicit_list_node::get_next());
     }
 
-DEBUG_EXEC( private: )
-DEBUG_EXEC(     const quint8 nocopy_flag = std::numeric_limits<quint8>::max(); )
+    virtual void pretty_print(we::we_file_writer& writer) = 0;
 };
 
 class llvm_func_decl;
@@ -70,6 +71,28 @@ class llvm_load_instruction;
 class llvm_store_instruction;
 class llvm_getelementptr_instruction;
 
+class llvm_func_attrs
+{
+public:
+    enum inline_type
+    {
+        it_default,
+        it_defaultinline,
+        it_noinline,
+        it_always,
+    };
+
+    llvm_func_attrs(bool _nounwind, inline_type _inlining) :
+        nounwind(_nounwind), inlining(_inlining) {}
+
+    ~llvm_func_attrs() = default;
+
+    void pretty_print(we::we_file_writer &_writer);
+
+private:
+    bool nounwind : 1;
+    unsigned inlining : 2;
+};
 
 } // namespace faker
 
