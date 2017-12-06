@@ -23,53 +23,86 @@ namespace ckx
 {
 
 ckx_type::ckx_type(category _category) :
-    this_category(_category)
+    type_category(_category),
+    qual(0)
 {}
 
 ckx_type::~ckx_type() {}
 
 const ckx_type::category &ckx_type::get_category() const
 {
-    return this_category;
+    return type_category;
 }
 
+bool ckx_type::is_const() const
+{
+    return qual & qual_const;
+}
+
+bool ckx_type::is_volatile() const
+{
+    return qual & qual_volatile;
+}
+
+bool ckx_type::is_restrict() const
+{
+    return qual & qual_volatile;
+}
+
+void ckx_type::add_const()
+{
+    qual |= qual_const;
+}
+
+void ckx_type::add_volatile()
+{
+    qual |= qual_volatile;
+}
+
+void ckx_type::add_restrict()
+{
+    qual |= qual_restrict;
+}
+
+void ckx_type::remove_const()
+{
+    qual &=  ~qual_const;
+}
+
+void ckx_type::remove_volatile()
+{
+    qual &=  ~qual_volatile;
+}
+
+void ckx_type::remove_restrict()
+{
+    qual &=  ~qual_restrict;
+}
+
+unsigned char ckx_type::get_qual_bits() const
+{
+    return qual;
+}
+
+void ckx_type::from_qual_bits(unsigned char qual_bits)
+{
+    qual = qual_bits;
+}
+
+saber_string ckx_type::qual_to_string() const
+{
+    saber_string ret;
+    if (qual & qual_const) ret += " const";
+    if (qual & qual_volatile) ret += " volatile";
+    if (qual & qual_restrict) ret += " restrict";
+    return ret;
+}
 
 
 ckx_basic_type::ckx_basic_type(category _basic_category) :
     ckx_type(_basic_category)
 {}
 
-qsizet ckx_basic_type::size() const
-{
-    switch (this_category)
-    {
-    case category::type_vi8:
-    case category::type_vu8:
-        return 1;
-
-    case category::type_vi16:
-    case category::type_vu16:
-        return 2;
-
-    case category::type_vi32:
-    case category::type_vu32:
-    case category::type_vr32:
-        return 3;
-
-    case category::type_vi64:
-    case category::type_vu64:
-    case category::type_vr64:
-        return 4;
-
-    case category::type_vch:
-        return 2;
-
-    case category::type_void:
-    default:
-        // what the fuck!
-        return 0;
-    }
-}
 
 saber_string
 ckx_basic_type::to_string() const
@@ -99,7 +132,7 @@ ckx_basic_type::to_string() const
         {category::type_void, "void"}
     };
 
-    return typename_string_list.find(this_category)->second;
+    return typename_string_list.find(type_category)->second + qual_to_string();
 }
 
 
@@ -108,12 +141,6 @@ ckx_id_type::ckx_id_type(saber_string_view _name) :
     ckx_type(category::type_id),
     name(_name)
 {}
-
-qsizet
-ckx_id_type::size() const
-{
-    return 0;
-}
 
 saber_string
 ckx_id_type::to_string() const
@@ -134,18 +161,10 @@ ckx_struct_type::ckx_struct_type(saber_string_view _struct_name) :
     struct_name(_struct_name)
 {}
 
-qsizet ckx_struct_type::size() const
-{
-    if ( fields.empty() ) return 0;
-
-    return (fields.rbegin()->offset
-           + fields.rbegin()->type->size());
-}
-
 saber_string
 ckx_struct_type::to_string() const
 {
-    return "StructType[[" + struct_name.get() + "]]";
+    return "StructType[[" + struct_name.get() + "]]" + qual_to_string();
 }
 
 ckx_struct_type::add_status
@@ -155,7 +174,7 @@ ckx_struct_type::add_field(saber_string_view _name, saber_ptr<ckx_type> _type)
         if (x.name == _name)
             return add_status::add_duplicate;
 
-    fields.emplace_back(saber::move(_name), _type, size());
+    fields.emplace_back(saber::move(_name), _type);
     return add_status::add_success;
 }
 
@@ -166,15 +185,10 @@ ckx_variant_type::ckx_variant_type(saber_string_view _variant_name) :
     variant_name(_variant_name)
 {}
 
-qsizet ckx_variant_type::size() const
-{
-    return field_size_max;
-}
-
 saber_string
 ckx_variant_type::to_string() const
 {
-    return "VariantType[[" + variant_name.get() + "]]";
+    return "VariantType[[" + variant_name.get() + "]]" + qual_to_string();
 }
 
 ckx_variant_type::add_status
@@ -184,9 +198,7 @@ ckx_variant_type::add_field(saber_string_view _name, saber_ptr<ckx_type> _type)
         if (x.name == _name)
             return add_status::add_duplicate;
 
-    fields.emplace_back(saber::move(_name), _type, size());
-    field_size_max = (field_size_max > _type->size()) ?
-                         field_size_max : _type->size();
+    fields.emplace_back(saber::move(_name), _type);
     return add_status::add_success;
 }
 
@@ -197,15 +209,10 @@ ckx_enum_type::ckx_enum_type(saber_string_view _enum_name) :
     enum_name(_enum_name)
 {}
 
-qsizet ckx_enum_type::size() const
-{
-    return 8;
-}
-
 saber_string
 ckx_enum_type::to_string() const
 {
-    return "EnumType[[" + enum_name.get() + "]]";
+    return "EnumType[[" + enum_name.get() + "]]" + qual_to_string();
 }
 
 ckx_enum_type::add_status
@@ -229,11 +236,6 @@ ckx_func_type::ckx_func_type(
     param_type_list(saber::move(_param_type_list))
 {}
 
-qsizet ckx_func_type::size() const
-{
-    return 8;
-}
-
 saber_string
 ckx_func_type::to_string() const
 {
@@ -242,27 +244,8 @@ ckx_func_type::to_string() const
         ret += type->to_string() + saber_string(",");
     ret += saber_string(") -> ");
     ret += return_type->to_string();
-    return ret;
+    return ret  + qual_to_string();
 }
-
-
-
-ckx_qualification::ckx_qualification(saber_ptr<ckx_type> _qualified) :
-    ckx_type(ckx_type::category::type_qualifier),
-    qualified(_qualified)
-{}
-
-qsizet ckx_qualification::size() const
-{
-    return qualified->size();
-}
-
-saber_string
-ckx_qualification::to_string() const
-{
-    return qualified->to_string() + saber_string(" const");
-}
-
 
 
 ckx_pointer_type::ckx_pointer_type(saber_ptr<ckx_type> _target) :
@@ -270,16 +253,12 @@ ckx_pointer_type::ckx_pointer_type(saber_ptr<ckx_type> _target) :
     target(_target)
 {}
 
-qsizet ckx_pointer_type::size() const
-{
-    return target->size();
-}
-
 saber_string
 ckx_pointer_type::to_string() const
 {
-    return target->to_string() + saber_string(" *");
+    return target->to_string() + saber_string(" *")  + qual_to_string();
 }
+
 
 
 ckx_array_type::ckx_array_type(saber_ptr<ckx_type> _element) :
@@ -287,16 +266,12 @@ ckx_array_type::ckx_array_type(saber_ptr<ckx_type> _element) :
     element(_element)
 {}
 
-qsizet ckx_array_type::size() const
-{
-    return 16;
-}
-
 saber_string
 ckx_array_type::to_string() const
 {
-    return element->to_string() + "[]";
+    return element->to_string() + "[]"  + qual_to_string();
 }
+
 
 
 saber_ptr<ckx_type>
@@ -324,7 +299,7 @@ ckx_type_helper::get_type(ckx_token::type _basic_type_token)
 saber_ptr<ckx_type>
 ckx_type_helper::qual_const(saber_ptr<ckx_type> _base)
 {
-    return saber_ptr<ckx_type>(new ckx_qualification(_base));
+    _base->add_const(); return _base;
 }
 
 saber_ptr<ckx_type>

@@ -62,20 +62,44 @@ public:
 
         type_pointer,
         type_array,
-        type_qualifier,
-
         type_alias
+    };
+
+    enum qualifiers
+    {
+        qual_const    = 0x01,
+        qual_volatile = 0x02,
+        qual_restrict = 0x04,
+
+        qual_mask = qual_const | qual_volatile | qual_restrict
     };
 
     ckx_type(category _category);
     virtual ~ckx_type() = 0;
-
-    const category& get_category() const;
-    virtual qsizet size() const = 0;
     virtual saber_string to_string() const = 0;
 
+    const category& get_category() const;
+
+    bool is_const() const;
+    bool is_volatile() const;
+    bool is_restrict() const;
+
+    void add_const();
+    void add_volatile();
+    void add_restrict();
+
+    void remove_const();
+    void remove_volatile();
+    void remove_restrict();
+
+    unsigned char get_qual_bits() const;
+    void from_qual_bits(unsigned char qual_bits);
+
 protected:
-    category this_category;
+    category type_category;
+    unsigned char qual;
+
+    saber_string qual_to_string() const;
 };
 
 
@@ -85,7 +109,6 @@ public:
     ckx_basic_type(category _basic_category);
     ~ckx_basic_type() override final = default;
 
-    qsizet size() const override final;
     saber_string to_string() const override final;
 };
 
@@ -95,7 +118,6 @@ public:
     ckx_id_type(saber_string_view _name);
     ~ckx_id_type() override final = default;
 
-    qsizet size() const override final;
     saber_string to_string() const override final;
 
     saber_string_view get_name() const;
@@ -120,17 +142,14 @@ public:
         qsizet offset;
 
         field(saber_string_view _name,
-              saber_ptr<ckx_type> _type,
-              qsizet _offset)
-            : name(_name), type(_type), offset(_offset) {}
+              saber_ptr<ckx_type> _type)
+            : name(_name), type(_type) {}
     };
 
     ckx_struct_type(saber_string_view _struct_name);
     ~ckx_struct_type() override final = default;
 
-    qsizet size() const override final;
     saber_string to_string() const override final;
-
     add_status add_field(saber_string_view _name, saber_ptr<ckx_type> _type);
 
 private:
@@ -154,22 +173,18 @@ public:
         qsizet offset;
 
         field(saber_string_view _name,
-              saber_ptr<ckx_type> _type,
-              qsizet _offset)
-            : name(saber::move(_name)), type(_type), offset(_offset) {}
+              saber_ptr<ckx_type> _type)
+            : name(saber::move(_name)), type(_type) {}
     };
 
     ckx_variant_type(saber_string_view _variant_name);
     ~ckx_variant_type() override final = default;
 
-    qsizet size() const override final;
     saber_string to_string() const override final;
-
     add_status add_field(saber_string_view _name, saber_ptr<ckx_type> _type);
 
 private:
     saber::vector<field> fields;
-    qsizet field_size_max = 0;
     saber_string_view variant_name;
 };
 
@@ -194,9 +209,7 @@ public:
     ckx_enum_type(saber_string_view _enum_name);
     ~ckx_enum_type() override final = default;
 
-    qsizet size() const override final;
     saber_string to_string() const override final;
-
     add_status add_enumerator(saber_string_view _name, qint64 _value);
 
 private:
@@ -211,25 +224,11 @@ public:
                   saber::vector<saber_ptr<ckx_type>>&& _param_type_list);
     ~ckx_func_type() override final = default;
 
-    qsizet size() const override final;
     saber_string to_string() const override final;
 
 private:
     saber_ptr<ckx_type> return_type;
     saber::vector<saber_ptr<ckx_type>> param_type_list;
-};
-
-class ckx_qualification final implements ckx_type
-{
-public:
-    ckx_qualification(saber_ptr<ckx_type> _qualified);
-    ~ckx_qualification() override final = default;
-
-    qsizet size() const override final;
-    saber_string to_string() const override final;
-
-private:
-    saber_ptr<ckx_type> qualified;
 };
 
 class ckx_pointer_type final implements ckx_type
@@ -238,7 +237,6 @@ public:
     ckx_pointer_type(saber_ptr<ckx_type> _target);
     ~ckx_pointer_type() override final = default;
 
-    qsizet size() const override final;
     saber_string to_string() const override final;
 
 private:
@@ -250,7 +248,7 @@ class ckx_array_type final implements ckx_type
 public:
     ckx_array_type(saber_ptr<ckx_type> _element);
     ~ckx_array_type() override final = default;
-    qsizet size() const override final;
+
     saber_string to_string() const override final;
 
 private:
@@ -263,11 +261,27 @@ public:
     ckx_type_alias(saber_ptr<ckx_type> _origin);
     ~ckx_type_alias() override final = default;
 
-    qsizet size() const override final;
     saber_string to_string() const override final;
 
 private:
     saber_ptr<ckx_type> origin;
+};
+
+
+
+open_class ckx_type_cast_step
+{
+    enum class castop : qchar
+    { cst_static, cst_const, cst_reinterpret, cst_ckx };
+
+    castop op;
+    saber_ptr<ckx_type> from;
+    saber_ptr<ckx_type> to;
+
+    ckx_type_cast_step(castop _op,
+                       saber_ptr<ckx_type> from,
+                       saber_ptr<ckx_type> to);
+    ~ckx_type_cast_step() = default;
 };
 
 class ckx_type_helper
@@ -295,6 +309,18 @@ public:
     static saber_ptr<ckx_type> get_vr64_type();
 
     static saber_ptr<ckx_type> get_void_type();
+
+    static bool
+    can_static_cast(saber_ptr<ckx_type> _t1, saber_ptr<ckx_type> _t2);
+
+    static bool
+    can_reinterpret_cast(saber_ptr<ckx_type> _t1, saber_ptr<ckx_type> _t2);
+
+    static bool
+    can_const_cast(saber_ptr<ckx_type> _t1, saber_ptr<ckx_type> _t2);
+
+    static saber::pair<ckx_type_cast_step, ckx_type_cast_step>
+    try_ckx_cast(saber_ptr<ckx_type> _t1, saber_ptr<ckx_type> _t2);
 };
 
 } // namespace ckx
