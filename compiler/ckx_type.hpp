@@ -78,12 +78,18 @@ public:
     ckx_type(category _category);
     virtual ~ckx_type() = 0;
 
+    /// @note Type comparing
+    /// There are four kinds of relations between two types in compilers-ckx
+    ///     0. exact-equal: the type itself and the qualifier is all the same
+    ///     1. can-implicit-static-cast
+    ///     2. can-implicit-const-cast
+    ///     3. can-cast-to
+    ///     4. incomptiable: only reinterpret_cast can make up the gap
+    ///                      between two types
+
     virtual bool type_equal_to(saber_ptr<ckx_type> _another) const = 0;
 
-    /// @todo finish the following two functions.
-    // bool exact_equal_to(saber_ptr<ckx_type> _another) const;
-    // bool comptiable_with(saber_ptr<ckx_type> _another) const;
-    // bool can_cast_to(saber_ptr<ckx_type> _another) const;
+    bool exact_equal_to(saber_ptr<ckx_type> _another) const;
 
     virtual saber_string to_string() const = 0;
 
@@ -311,8 +317,6 @@ open_class ckx_type_cast_step
     ~ckx_type_cast_step() = default;
 };
 
-using ckx_type_cast_path = saber::pair<ckx_type_cast_step, ckx_type_cast_step>;
-
 class ckx_type_helper
 {
 public:
@@ -339,30 +343,12 @@ public:
 
     static saber_ptr<ckx_type> get_void_type();
 
-    static bool
-    type_equal(saber_ptr<ckx_type> _ty1, saber_ptr<ckx_type> _ty2);
-
-    static bool
-    can_implicit_cast(saber_ptr<ckx_type> _from, saber_ptr<ckx_type> _to);
-
-    static bool
-    can_static_cast(saber_ptr<ckx_type> _from, saber_ptr<ckx_type> _to);
-
-    static bool
-    can_reinterpret_cast(saber_ptr<ckx_type> _from, saber_ptr<ckx_type> _to);
-
-    static bool
-    can_const_cast(saber_ptr<ckx_type> _from, saber_ptr<ckx_type> _to);
-
-    static ckx_type_cast_path
-    try_ckx_cast(saber_ptr<ckx_type> _from, saber_ptr<ckx_type> _to);
-
     enum class type_relation
     {
         tr_equal,
         tr_comptiable,
         tr_cancast,
-        tr_incomtiable
+        tr_incomptiable
     };
 
     static type_relation
