@@ -27,6 +27,7 @@
 #include "ckx_token.hpp"
 #include "defs.hpp"
 
+
 namespace ckx
 {
 
@@ -76,6 +77,14 @@ public:
 
     ckx_type(category _category);
     virtual ~ckx_type() = 0;
+
+    virtual bool type_equal_to(saber_ptr<ckx_type> _another) const = 0;
+
+    /// @todo finish the following two functions.
+    // bool exact_equal_to(saber_ptr<ckx_type> _another) const;
+    // bool comptiable_with(saber_ptr<ckx_type> _another) const;
+    // bool can_cast_to(saber_ptr<ckx_type> _another) const;
+
     virtual saber_string to_string() const = 0;
 
     const category& get_category() const;
@@ -93,7 +102,10 @@ public:
     void remove_restrict();
 
     unsigned char get_qual_bits() const;
-    void from_qual_bits(unsigned char qual_bits);
+    void from_qual_bits(unsigned char _qual_bits);
+
+    bool is_more_qual_than(saber_ptr<ckx_type> _another) const;
+    bool is_less_qual_than(saber_ptr<ckx_type> _another) const;
 
 protected:
     category type_category;
@@ -109,6 +121,7 @@ public:
     ckx_basic_type(category _basic_category);
     ~ckx_basic_type() override final = default;
 
+    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
 };
 
@@ -118,6 +131,7 @@ public:
     ckx_id_type(saber_string_view _name);
     ~ckx_id_type() override final = default;
 
+    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
 
     saber_string_view get_name() const;
@@ -149,7 +163,10 @@ public:
     ckx_struct_type(saber_string_view _struct_name);
     ~ckx_struct_type() override final = default;
 
+    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
+
+    saber_string_view get_name() const;
     add_status add_field(saber_string_view _name, saber_ptr<ckx_type> _type);
 
 private:
@@ -180,7 +197,10 @@ public:
     ckx_variant_type(saber_string_view _variant_name);
     ~ckx_variant_type() override final = default;
 
+    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
+
+    saber_string_view get_name() const;
     add_status add_field(saber_string_view _name, saber_ptr<ckx_type> _type);
 
 private:
@@ -209,7 +229,10 @@ public:
     ckx_enum_type(saber_string_view _enum_name);
     ~ckx_enum_type() override final = default;
 
+    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
+
+    saber_string_view get_name() const;
     add_status add_enumerator(saber_string_view _name, qint64 _value);
 
 private:
@@ -224,6 +247,7 @@ public:
                   saber::vector<saber_ptr<ckx_type>>&& _param_type_list);
     ~ckx_func_type() override final = default;
 
+    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
 
 private:
@@ -237,6 +261,7 @@ public:
     ckx_pointer_type(saber_ptr<ckx_type> _target);
     ~ckx_pointer_type() override final = default;
 
+    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
 
 private:
@@ -249,6 +274,7 @@ public:
     ckx_array_type(saber_ptr<ckx_type> _element);
     ~ckx_array_type() override final = default;
 
+    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
 
 private:
@@ -261,6 +287,7 @@ public:
     ckx_type_alias(saber_ptr<ckx_type> _origin);
     ~ckx_type_alias() override final = default;
 
+    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
 
 private:
@@ -283,6 +310,8 @@ open_class ckx_type_cast_step
                        saber_ptr<ckx_type> to);
     ~ckx_type_cast_step() = default;
 };
+
+using ckx_type_cast_path = saber::pair<ckx_type_cast_step, ckx_type_cast_step>;
 
 class ckx_type_helper
 {
@@ -311,16 +340,33 @@ public:
     static saber_ptr<ckx_type> get_void_type();
 
     static bool
-    can_static_cast(saber_ptr<ckx_type> _t1, saber_ptr<ckx_type> _t2);
+    type_equal(saber_ptr<ckx_type> _ty1, saber_ptr<ckx_type> _ty2);
 
     static bool
-    can_reinterpret_cast(saber_ptr<ckx_type> _t1, saber_ptr<ckx_type> _t2);
+    can_implicit_cast(saber_ptr<ckx_type> _from, saber_ptr<ckx_type> _to);
 
     static bool
-    can_const_cast(saber_ptr<ckx_type> _t1, saber_ptr<ckx_type> _t2);
+    can_static_cast(saber_ptr<ckx_type> _from, saber_ptr<ckx_type> _to);
 
-    static saber::pair<ckx_type_cast_step, ckx_type_cast_step>
-    try_ckx_cast(saber_ptr<ckx_type> _t1, saber_ptr<ckx_type> _t2);
+    static bool
+    can_reinterpret_cast(saber_ptr<ckx_type> _from, saber_ptr<ckx_type> _to);
+
+    static bool
+    can_const_cast(saber_ptr<ckx_type> _from, saber_ptr<ckx_type> _to);
+
+    static ckx_type_cast_path
+    try_ckx_cast(saber_ptr<ckx_type> _from, saber_ptr<ckx_type> _to);
+
+    enum class type_relation
+    {
+        tr_equal,
+        tr_comptiable,
+        tr_cancast,
+        tr_incomtiable
+    };
+
+    static type_relation
+    resolve_type_relation(saber_ptr<ckx_type> _ty1, saber_ptr<ckx_type> _ty2);
 };
 
 } // namespace ckx

@@ -84,9 +84,9 @@ unsigned char ckx_type::get_qual_bits() const
     return qual;
 }
 
-void ckx_type::from_qual_bits(unsigned char qual_bits)
+void ckx_type::from_qual_bits(unsigned char _qual_bits)
 {
-    qual = qual_bits;
+    qual = _qual_bits;
 }
 
 saber_string ckx_type::qual_to_string() const
@@ -135,6 +135,13 @@ ckx_basic_type::to_string() const
     return typename_string_list.find(type_category)->second + qual_to_string();
 }
 
+bool
+ckx_basic_type::type_equal_to(saber_ptr<ckx_type> _another) const
+{
+    return (type_category == _another->get_category())
+           && (get_qual_bits() == _another->get_qual_bits());
+}
+
 
 
 ckx_id_type::ckx_id_type(saber_string_view _name) :
@@ -146,6 +153,20 @@ saber_string
 ckx_id_type::to_string() const
 {
     return name.get();
+}
+
+bool
+ckx_id_type::type_equal_to(saber_ptr<ckx_type> _another) const
+{
+    if (get_qual_bits() == _another->get_qual_bits())
+    {
+        if (_another->get_category() == ckx_type::category::type_id)
+        {
+            ckx_id_type *id_type = static_cast<ckx_id_type*>(_another.get());
+            return (get_name() == id_type->get_name());
+        }
+    }
+    return false;
 }
 
 saber_string_view
@@ -161,10 +182,30 @@ ckx_struct_type::ckx_struct_type(saber_string_view _struct_name) :
     struct_name(_struct_name)
 {}
 
+bool
+ckx_struct_type::type_equal_to(saber_ptr<ckx_type> _another) const
+{
+    if (get_qual_bits() == _another->get_qual_bits())
+    {
+        if (_another->get_category() == ckx_type::category::type_struct)
+        {
+            ckx_struct_type *struct_type =
+                static_cast<ckx_struct_type*>(_another.get());
+            return this->get_name() == struct_type->get_name();
+        }
+    }
+    return false;
+}
+
 saber_string
 ckx_struct_type::to_string() const
 {
     return "StructType[[" + struct_name.get() + "]]" + qual_to_string();
+}
+
+saber_string_view ckx_struct_type::get_name() const
+{
+    return struct_name;
 }
 
 ckx_struct_type::add_status
@@ -185,10 +226,30 @@ ckx_variant_type::ckx_variant_type(saber_string_view _variant_name) :
     variant_name(_variant_name)
 {}
 
+bool
+ckx_variant_type::type_equal_to(saber_ptr<ckx_type> _another) const
+{
+    if (get_qual_bits() == _another->get_qual_bits())
+    {
+        if (_another->get_category() == ckx_type::category::type_variant)
+        {
+            ckx_variant_type *variant_type =
+                static_cast<ckx_variant_type*>(_another.get());
+            return this->get_name() == variant_type->get_name();
+        }
+    }
+    return false;
+}
+
 saber_string
 ckx_variant_type::to_string() const
 {
     return "VariantType[[" + variant_name.get() + "]]" + qual_to_string();
+}
+
+saber_string_view ckx_variant_type::get_name() const
+{
+    return variant_name;
 }
 
 ckx_variant_type::add_status
@@ -209,10 +270,30 @@ ckx_enum_type::ckx_enum_type(saber_string_view _enum_name) :
     enum_name(_enum_name)
 {}
 
+bool
+ckx_enum_type::type_equal_to(saber_ptr<ckx_type> _another) const
+{
+    if (get_qual_bits() == _another->get_qual_bits())
+    {
+        if (_another->get_category() == ckx_type::category::type_enum)
+        {
+            ckx_enum_type *enum_type =
+                static_cast<ckx_enum_type*>(_another.get());
+            return (get_name() == enum_type->get_name());
+        }
+    }
+    return false;
+}
+
 saber_string
 ckx_enum_type::to_string() const
 {
     return "EnumType[[" + enum_name.get() + "]]" + qual_to_string();
+}
+
+saber_string_view ckx_enum_type::get_name() const
+{
+    return enum_name;
 }
 
 ckx_enum_type::add_status
@@ -236,6 +317,31 @@ ckx_func_type::ckx_func_type(
     param_type_list(saber::move(_param_type_list))
 {}
 
+bool
+ckx_func_type::type_equal_to(saber_ptr<ckx_type> _another) const
+{
+    if (get_qual_bits() != _another->get_qual_bits())
+        return false;
+    if (_another->get_category() != ckx_type::category::type_function)
+        return false;
+
+    ckx_func_type *func_type =
+            static_cast<ckx_func_type*>(_another.get());
+    if (!return_type->type_equal_to(func_type->return_type))
+        return false;
+
+    if (param_type_list.size() == func_type->param_type_list.size())
+        return false;
+
+    for (size_t i = 0; i < param_type_list.size(); i++)
+    {
+        if (!param_type_list[i]->type_equal_to(func_type->param_type_list[i]))
+            return false;
+    }
+
+    return true;
+}
+
 saber_string
 ckx_func_type::to_string() const
 {
@@ -253,6 +359,21 @@ ckx_pointer_type::ckx_pointer_type(saber_ptr<ckx_type> _target) :
     target(_target)
 {}
 
+bool
+ckx_pointer_type::type_equal_to(saber_ptr<ckx_type> _another) const
+{
+    if (get_qual_bits() == _another->get_qual_bits())
+    {
+        if (_another->get_category() == ckx_type::category::type_pointer)
+        {
+            ckx_pointer_type *ptr_type =
+                static_cast<ckx_pointer_type*>(_another.get());
+            return target->type_equal_to(ptr_type->target);
+        }
+    }
+    return false;
+}
+
 saber_string
 ckx_pointer_type::to_string() const
 {
@@ -265,6 +386,21 @@ ckx_array_type::ckx_array_type(saber_ptr<ckx_type> _element) :
     ckx_type(ckx_type::category::type_array),
     element(_element)
 {}
+
+bool
+ckx_array_type::type_equal_to(saber_ptr<ckx_type> _another) const
+{
+    if (get_qual_bits() == _another->get_qual_bits())
+    {
+        if (_another->get_category() == ckx_type::category::type_array)
+        {
+            ckx_array_type *arr_type =
+                static_cast<ckx_array_type*>(_another.get());
+            return element->type_equal_to(arr_type->element);
+        }
+    }
+    return false;
+}
 
 saber_string
 ckx_array_type::to_string() const
