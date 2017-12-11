@@ -7,15 +7,12 @@ SOURCES += main.cpp \
     ckx_token.cpp \
     ../saber/src/safe_stl_general.cpp \
     ckx_token_stream.cpp \
-    ckx_parser.cpp \
-    ckx_ast_node.cpp \
-    ckx_type.cpp \
-    ckx_env_table.cpp \
     ckx_token_set.cpp \
-    ckx_ast_dump.cpp \
     ckx_operator.cpp \
     ../shared/src/file_reader.cpp \
     ../shared/src/file_writer.cpp \
+    ckx_fake_parser.cpp \
+    ckx_error_intepreter.cpp
 
 HEADERS += \
     we_file_reader.hpp \
@@ -43,20 +40,16 @@ HEADERS += \
     ../shared/include/file_writer.hpp \
     ../shared/include/defs.hpp \
     ckx_token_stream.hpp \
-    ckx_parser.hpp \
-    ckx_ast_node.hpp \
     ckx_error.hpp \
-    ckx_type.hpp \
-    ckx_env_table.hpp \
     gg.h \
-    ckx_ast_node_fwd.hpp \
     ../saber/include/unordered_set.hpp \
     ckx_token_set.hpp \
     ../saber/include/string_pool.hpp \
     ../saber/include/string_pool.hpp \
     we::we_file_writer.hpp \
     ckx_operator.hpp \
-    ckx_parser_impl.hpp
+    ckx_fake_parser.h \
+    ckx_error_intepreter.h
 
 INCLUDEPATH += ../saber/include/
 INCLUDEPATH += ../shared/include/

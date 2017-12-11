@@ -149,12 +149,12 @@ we_fp_writer_impl::we_fp_writer_impl(std::FILE *_fp) :
 
 inline void we_fp_writer_impl::write_impl(qint64 _value)
 {
-    std::fprintf(fp, "%" PRId64, _value);
+    std::fprintf(fp, "%lld", _value);
 }
 
 inline void we_fp_writer_impl::write_impl(quint64 _value)
 {
-    std::fprintf(fp, "%" PRIu64, _value);
+    std::fprintf(fp, "%lld", _value);
 }
 
 inline void we_fp_writer_impl::write_impl(qreal _value)

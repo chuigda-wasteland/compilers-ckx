@@ -700,7 +700,7 @@ inline void ckx_token_stream_impl::next_char()
     if (char_temp == '\n')
     {
         char_coord_temp.first++;
-        char_coord_temp.second = 1;
+        char_coord_temp.second = 0;
     }
 }
 
