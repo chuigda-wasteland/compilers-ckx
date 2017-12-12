@@ -50,7 +50,7 @@ public:
     explicit ckx_token_stream_impl(we::we_file_reader &_file_reader);
     ~ckx_token_stream_impl();
 
-    saber_ptr<ckx_token> operator_index_impl(int _offset);
+    ckx_token operator_index_impl(int _offset);
     saber::vector<ckx_error>& get_error_impl(void);
     void operator_incr_impl(void);
 
@@ -87,7 +87,7 @@ private:
     qcoord char_coord_temp;
     saber_string_view string_temp;
 
-    saber::vector<saber_ptr<ckx_token>> token_buffer;
+    saber::vector<ckx_token> token_buffer;
     saber::vector<ckx_error> errors;
 
     qchar char_temp;
@@ -105,7 +105,7 @@ ckx_token_stream::~ckx_token_stream()
     delete impl;
 }
 
-saber_ptr<ckx_token>
+ckx_token
 ckx_token_stream::operator [](int _offset)
 {
     return impl->operator_index_impl(_offset);
@@ -129,15 +129,19 @@ namespace detail
 qpair<ckx_token::type, bool>
 ckx_identifier_table::lookup(saber_string_view _name)
 {
-    if (!initialized) initialize();
+    if (!initialized)
+    {
+        initialize();
+        initialized = true;
+    }
+
     if (map.find(_name.get()) != map.end())
     {
         return qpair<ckx_token::type, bool>(map[_name.get()], true);
     }
     else
     {
-        return qpair<ckx_token::type, bool>(
-                    ckx_token::type::tk_eoi, false);
+        return qpair<ckx_token::type, bool>(ckx_token::type::tk_eoi, false);
     }
 }
 
@@ -166,7 +170,7 @@ ckx_token_stream_impl::ckx_token_stream_impl(
 ckx_token_stream_impl::~ckx_token_stream_impl()
 {}
 
-saber_ptr<ckx_token>
+ckx_token
 ckx_token_stream_impl::operator_index_impl(int _offset)
 {
     if ( _offset + current_pos < token_buffer.size() )
@@ -175,7 +179,7 @@ ckx_token_stream_impl::operator_index_impl(int _offset)
     }
     else
     {
-        return saber_ptr<ckx_token>(nullptr);
+        return ckx_token(char_coord(), ckx_token::type::tk_eoi);
     }
 }
 
@@ -258,8 +262,7 @@ void ckx_token_stream_impl::do_split_tokens()
         }
     }
 
-    token_buffer.emplace_back(
-        new ckx_token(char_coord(), ckx_token::type::tk_eoi));
+    token_buffer.emplace_back(char_coord(), ckx_token::type::tk_eoi);
 }
 
 /**
@@ -373,11 +376,11 @@ void ckx_token_stream_impl::solve_numbers()
 
     if (is_real)
     {
-        token_buffer.emplace_back(new ckx_token(char_coord(), r));
+        token_buffer.emplace_back(char_coord(), r);
     }
     else
     {
-        token_buffer.emplace_back(new ckx_token(char_coord(), i));
+        token_buffer.emplace_back(char_coord(), i);
     }
 }
 
@@ -392,7 +395,7 @@ void ckx_token_stream_impl::solve_char_literal()
         return;
     }
 
-    token_buffer.emplace_back(new ckx_token(char_coord(), result));
+    token_buffer.emplace_back(char_coord(), result);
     next_char();
 }
 
@@ -425,7 +428,7 @@ void ckx_token_stream_impl::solve_bitwise_or_logic_op()
         assert(false); // what the fuck!
     }
 
-    token_buffer.emplace_back(new ckx_token(char_coord(), new_token_type));
+    token_buffer.emplace_back(char_coord(), new_token_type);
     if (is_logic) next_char();
 }
 
@@ -465,7 +468,7 @@ void ckx_token_stream_impl::solve_add_n_sub()
         }
     }
 
-    token_buffer.emplace_back(new ckx_token(char_coord(), new_token_type));
+    token_buffer.emplace_back(char_coord(), new_token_type);
 }
 
 void ckx_token_stream_impl::solve_op_or_opassign()
@@ -514,7 +517,7 @@ void ckx_token_stream_impl::solve_op_or_opassign()
         break;
     }
 
-    token_buffer.emplace_back(new ckx_token(char_coord(), new_token_type));
+    token_buffer.emplace_back(char_coord(), new_token_type);
     if (is_opassign) next_char();
 }
 
@@ -524,13 +527,11 @@ void ckx_token_stream_impl::solve_colon_or_scope()
     if (ch() == ':')
     {
         next_char();
-        token_buffer.emplace_back(
-                    new ckx_token(char_coord(), ckx_token::type::tk_scope));
+        token_buffer.emplace_back(char_coord(), ckx_token::type::tk_scope);
     }
     else
     {
-        token_buffer.emplace_back(
-                    new ckx_token(char_coord(), ckx_token::type::tk_colon));
+        token_buffer.emplace_back(char_coord(), ckx_token::type::tk_colon);
     }
 }
 
@@ -557,7 +558,7 @@ void ckx_token_stream_impl::solve_ordinary_op()
         assert(false);
     }
 
-    token_buffer.emplace_back(new ckx_token(char_coord(), new_token_type));
+    token_buffer.emplace_back(char_coord(), new_token_type);
     next_char();
 }
 
@@ -592,7 +593,7 @@ bool ckx_token_stream_impl::solve_keyword()
 
     if (is_identifier)
     {
-        token_buffer.emplace_back(new ckx_token(char_coord(), type));
+        token_buffer.emplace_back(char_coord(), type);
         return true;
     }
     else
@@ -603,8 +604,7 @@ bool ckx_token_stream_impl::solve_keyword()
 
 void ckx_token_stream_impl::solve_identifier()
 {
-    token_buffer.emplace_back(
-        new ckx_token(char_coord(), str()));
+    token_buffer.emplace_back(char_coord(), str());
 }
 
 
