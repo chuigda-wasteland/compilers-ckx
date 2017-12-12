@@ -149,23 +149,20 @@ open_class ckx_token
     ckx_token(const qcoord& _pos, saber_string_view _id);
 
     ckx_token() = delete;
-    ckx_token(const ckx_token&) = delete;
-    ckx_token& operator= (const ckx_token&) = delete;
-
     ~ckx_token();
 
     type token_type;
 
-    variant
+    variant token_value
     {
-        qchar ch;
-        qint64 i64;
-        quint64 u64;
-        qreal r;
+        const qchar ch;
+        const qint64 i64;
+        const quint64 u64;
+        const qreal r;
     } v;
+    const saber_string_view str = saber_string_pool::create_view("");
 
-    qcoord position;
-    saber_string_view str;
+    const qcoord position;
 
 private:
     // This constructor reserved for internal use.
@@ -181,7 +178,7 @@ struct ckx_token_type_hash
     }
 };
 
-saber_string to_string_helper(saber_ptr<ckx_token> _token);
+saber_string to_string_helper(ckx_token _token);
 
 } // namespace ckx
 

@@ -32,8 +32,6 @@
 namespace ckx
 {
 
-using saber::saber_ptr;
-
 namespace detail
 {
 class ckx_token_stream_impl;
@@ -46,7 +44,7 @@ public:
     explicit ckx_token_stream(we::we_file_reader &_file_reader);
     ~ckx_token_stream();
 
-    saber_ptr<ckx_token> operator[] (int _offset);
+    ckx_token operator[] (int _offset);
     saber::vector<ckx_error>& get_error();
     void operator++ ();
 

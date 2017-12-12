@@ -181,8 +181,7 @@ public:
     saber_ptr(T* _ptr) :
         ptr(_ptr),
         shared_count(new size_t(1))
-    {
-    }
+    {}
 
     saber_ptr(const saber_ptr& _another) :
         ptr(_another.ptr),

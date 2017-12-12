@@ -98,12 +98,12 @@ protected:
     saber_ptr<ckx_type> parse_type();
 
     /// @brief utility functions
-    bool id_is_typename(saber_ptr<ckx_token> _token);
+    bool id_is_typename(ckx_token _token);
 
     /// @brief token-access functions
     /// simply encapsuled token-stream again.
-    inline  saber_ptr<ckx_token>  current_token();
-    inline  saber_ptr<ckx_token>  peek_next_token();
+    inline  ckx_token  current_token();
+    inline  ckx_token  peek_next_token();
     inline  void                  next_token();
 
     inline  bool  expect_n_eat(ckx_token::type _token_type,

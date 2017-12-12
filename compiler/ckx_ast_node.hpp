@@ -41,20 +41,20 @@ using saber::saber_ptr;
 interface ckx_ast_node
 {
 public:
-    explicit ckx_ast_node(saber_ptr<ckx_token> _at_token);
+    explicit ckx_ast_node(ckx_token _at_token);
     ~ckx_ast_node() = default;
 
-    saber_ptr<ckx_token> get_at_token();
+    ckx_token get_at_token();
     virtual void ast_dump(we::we_file_writer& _writer, quint16 _level) = 0;
 
 private:
-    saber_ptr<ckx_token> at_token;
+    const ckx_token at_token;
 };
 
 class ckx_ast_translation_unit final implements ckx_ast_node
 {
 public:
-    explicit ckx_ast_translation_unit(saber_ptr<ckx_token> _at_token);
+    explicit ckx_ast_translation_unit(ckx_token _at_token);
     ~ckx_ast_translation_unit();
 
     void add_new_stmt(ckx_ast_stmt *_stmt);
@@ -68,7 +68,7 @@ private:
 interface ckx_ast_stmt implements ckx_ast_node
 {
 public:
-    explicit ckx_ast_stmt(saber_ptr<ckx_token> _at_token);
+    explicit ckx_ast_stmt(ckx_token _at_token);
     virtual ~ckx_ast_stmt() = 0;
 
     virtual void ast_dump(we::we_file_writer& _writer, quint16 _level) = 0;
@@ -84,7 +84,7 @@ public:
 class ckx_ast_compound_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_compound_stmt(saber_ptr<ckx_token> _at_token);
+    ckx_ast_compound_stmt(ckx_token _at_token);
     ~ckx_ast_compound_stmt() override final;
 
     void add_new_stmt(ckx_ast_stmt *_stmt);
@@ -97,7 +97,7 @@ private:
 class ckx_ast_if_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_if_stmt(saber_ptr<ckx_token> _at_token,
+    ckx_ast_if_stmt(ckx_token _at_token,
                     ckx_ast_expr* _condition,
                     ckx_ast_stmt* _then_clause,
                     ckx_ast_stmt* _else_clause);
@@ -114,7 +114,7 @@ private:
 class ckx_ast_while_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_while_stmt(saber_ptr<ckx_token> _at_token,
+    ckx_ast_while_stmt(ckx_token _at_token,
                        ckx_ast_expr *_condition,
                        ckx_ast_stmt *_clause);
     ~ckx_ast_while_stmt() override final;
@@ -129,7 +129,7 @@ private:
 class ckx_ast_do_while_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_do_while_stmt(saber_ptr<ckx_token> _at_token,
+    ckx_ast_do_while_stmt(ckx_token _at_token,
                           ckx_ast_expr *_condition,
                           ckx_ast_stmt *_clause);
     ~ckx_ast_do_while_stmt() override final;
@@ -144,7 +144,7 @@ private:
 class ckx_ast_for_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_for_stmt(saber_ptr<ckx_token> _at_token,
+    ckx_ast_for_stmt(ckx_token _at_token,
                      ckx_ast_expr *_init,
                      ckx_ast_expr *_condition,
                      ckx_ast_expr *_incr,
@@ -163,7 +163,7 @@ private:
 class ckx_ast_break_stmt final implements ckx_ast_stmt
 {
 public:
-    explicit ckx_ast_break_stmt(saber_ptr<ckx_token> _at_token);
+    explicit ckx_ast_break_stmt(ckx_token _at_token);
     ~ckx_ast_break_stmt() override final = default;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
@@ -172,7 +172,7 @@ public:
 class ckx_ast_continue_stmt final implements ckx_ast_stmt
 {
 public:
-    explicit ckx_ast_continue_stmt(saber_ptr<ckx_token> _at_token);
+    explicit ckx_ast_continue_stmt(ckx_token _at_token);
     ~ckx_ast_continue_stmt() override final = default;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
@@ -181,7 +181,7 @@ public:
 class ckx_ast_return_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_return_stmt(saber_ptr<ckx_token> _at_token,
+    ckx_ast_return_stmt(ckx_token _at_token,
                         ckx_ast_expr* _return_expr);
     ~ckx_ast_return_stmt() override final;
 
@@ -209,7 +209,7 @@ public:
         ckx_ast_expr* init;
     };
 
-    explicit ckx_ast_decl_stmt(saber_ptr<ckx_token> _at_token,
+    explicit ckx_ast_decl_stmt(ckx_token _at_token,
                                saber_ptr<ckx_type> _type,
                                saber::vector<init_decl>&& _decls);
     ~ckx_ast_decl_stmt() override final = default;
@@ -224,7 +224,7 @@ private:
 class ckx_ast_expr_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_expr_stmt(saber_ptr<ckx_token> _at_token, ckx_ast_expr* _expr);
+    ckx_ast_expr_stmt(ckx_token _at_token, ckx_ast_expr* _expr);
     ~ckx_ast_expr_stmt() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
@@ -244,7 +244,7 @@ public:
         saber_string_view name;
     };
 
-    ckx_ast_func_stmt(saber_ptr<ckx_token> _at_token,
+    ckx_ast_func_stmt(ckx_token _at_token,
                       saber_string_view _name,
                       saber::vector<param_decl>&& _param_decls,
                       saber_ptr<ckx_type> _ret_type,
@@ -271,7 +271,7 @@ public:
         saber_string_view name;
     };
 
-    ckx_ast_struct_stmt(saber_ptr<ckx_token> _at_token,
+    ckx_ast_struct_stmt(ckx_token _at_token,
                         saber_string_view _name,
                         saber::vector<field>&& _fields);
     ~ckx_ast_struct_stmt() override final;
@@ -295,7 +295,7 @@ public:
         saber_string_view name;
     };
 
-    ckx_ast_variant_stmt(saber_ptr<ckx_token> _at_token,
+    ckx_ast_variant_stmt(ckx_token _at_token,
                          saber_string_view _name,
                          saber::vector<field>&& _fields);
     ~ckx_ast_variant_stmt() override final;
@@ -319,7 +319,7 @@ public:
         qint64 value;
     };
 
-    ckx_ast_enum_stmt(saber_ptr<ckx_token> _at_token,
+    ckx_ast_enum_stmt(ckx_token _at_token,
                       saber_string_view _name,
                       saber::vector<enumerator>&& _enumerators);
     ~ckx_ast_enum_stmt() override final;
@@ -335,7 +335,7 @@ private:
 class ckx_ast_alias_stmt final implements ckx_ast_stmt
 {
 public:
-    ckx_ast_alias_stmt(saber_ptr<ckx_token> _at_token,
+    ckx_ast_alias_stmt(ckx_token _at_token,
                        saber_string_view _name,
                        saber_ptr<ckx_type> _type);
     ~ckx_ast_alias_stmt() override final = default;
@@ -350,7 +350,7 @@ private:
 interface ckx_ast_expr implements ckx_ast_node
 {
 public:
-    ckx_ast_expr(saber_ptr<ckx_token> _at_token);
+    ckx_ast_expr(ckx_token _at_token);
     virtual ~ckx_ast_expr() = 0;
 
     virtual void ast_dump(we::we_file_writer& _writer, quint16 _level) = 0;
@@ -359,7 +359,7 @@ public:
 class ckx_ast_binary_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_binary_expr(saber_ptr<ckx_token> _at_token,
+    ckx_ast_binary_expr(ckx_token _at_token,
                         ckx_op _opercode,
                         ckx_ast_expr *_loperand,
                         ckx_ast_expr *_roperand);
@@ -376,7 +376,7 @@ private:
 class ckx_ast_unary_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_unary_expr(saber_ptr<ckx_token> _at_token,
+    ckx_ast_unary_expr(ckx_token _at_token,
                        ckx_op _opercode,
                        ckx_ast_expr *_operand);
     ~ckx_ast_unary_expr() override final;
@@ -391,7 +391,7 @@ private:
 class ckx_ast_subscript_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_subscript_expr(saber_ptr<ckx_token> _at_token,
+    ckx_ast_subscript_expr(ckx_token _at_token,
                            ckx_ast_expr *_base,
                            ckx_ast_expr *_subscript);
     ~ckx_ast_subscript_expr() override final;
@@ -406,7 +406,7 @@ private:
 class ckx_ast_invoke_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_invoke_expr(saber_ptr<ckx_token> _at_token,
+    ckx_ast_invoke_expr(ckx_token _at_token,
                         ckx_ast_expr *_invokable,
                         saber::vector<ckx_ast_expr*> &&_args);
     ~ckx_ast_invoke_expr() override final;
@@ -421,7 +421,7 @@ private:
 class ckx_ast_extract_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_extract_expr(saber_ptr<ckx_token> _at_token,
+    ckx_ast_extract_expr(ckx_token _at_token,
                          ckx_ast_expr *_extracted,
                          saber_string_view _field_name);
     ~ckx_ast_extract_expr() override final;
@@ -436,7 +436,7 @@ private:
 class ckx_ast_enumerator_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_enumerator_expr(saber_ptr<ckx_token> _at_token,
+    ckx_ast_enumerator_expr(ckx_token _at_token,
                             saber_string_view _enum_name,
                             saber_string_view _enumerator_name);
     ~ckx_ast_enumerator_expr() override final = default;
@@ -451,7 +451,7 @@ private:
 class ckx_ast_cond_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_cond_expr(saber_ptr<ckx_token> _at_token,
+    ckx_ast_cond_expr(ckx_token _at_token,
                       ckx_ast_expr* _cond_expr,
                       ckx_ast_expr* _then_expr,
                       ckx_ast_expr* _else_expr);
@@ -468,7 +468,7 @@ private:
 class ckx_ast_id_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_id_expr(saber_ptr<ckx_token> _at_token, saber_string_view _name);
+    ckx_ast_id_expr(ckx_token _at_token, saber_string_view _name);
     ~ckx_ast_id_expr() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
@@ -483,7 +483,7 @@ public:
     enum class castop : qchar
     { cst_static, cst_const, cst_reinterpret, cst_ckx };
 
-    ckx_ast_cast_expr(saber_ptr<ckx_token> _at_token,
+    ckx_ast_cast_expr(ckx_token _at_token,
                       castop _op,
                       saber_ptr<ckx_type> _desired_type,
                       ckx_ast_expr* _expr);
@@ -500,7 +500,7 @@ private:
 class ckx_ast_sizeof_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_sizeof_expr(saber_ptr<ckx_token> _at_token,
+    ckx_ast_sizeof_expr(ckx_token _at_token,
                         saber_ptr<ckx_type> _type);
     ~ckx_ast_sizeof_expr() override final = default;
 
@@ -513,7 +513,7 @@ private:
 class ckx_ast_vi_literal_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_vi_literal_expr(saber_ptr<ckx_token> _at_token, qint64 _val);
+    ckx_ast_vi_literal_expr(ckx_token _at_token, qint64 _val);
     ~ckx_ast_vi_literal_expr() override final = default;
 
     void ast_dump(we::we_file_writer &_writer, quint16 _level) override final;
@@ -525,7 +525,7 @@ private:
 class ckx_ast_vr_literal_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_vr_literal_expr(saber_ptr<ckx_token> _at_token, qreal _val);
+    ckx_ast_vr_literal_expr(ckx_token _at_token, qreal _val);
     ~ckx_ast_vr_literal_expr() override final = default;
 
     void ast_dump(we::we_file_writer &_writer, quint16 _level) override final;
@@ -537,7 +537,7 @@ private:
 class ckx_ast_array_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_array_expr(saber_ptr<ckx_token> _at_token,
+    ckx_ast_array_expr(ckx_token _at_token,
                        saber_ptr<ckx_type> _array_of_type);
     ~ckx_ast_array_expr() override final;
 
