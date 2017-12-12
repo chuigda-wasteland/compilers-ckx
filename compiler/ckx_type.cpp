@@ -289,6 +289,18 @@ ckx_func_type::to_string() const
     return ret  + qual_to_string();
 }
 
+saber_ptr<ckx_type>
+ckx_func_type::get_return_type()
+{
+    return return_type;
+}
+
+const saber::vector<saber_ptr<ckx_type>>&
+ckx_func_type::get_param_type_list()
+{
+    return param_type_list;
+}
+
 
 
 ckx_pointer_type::ckx_pointer_type(saber_ptr<ckx_type> _target) :
@@ -574,6 +586,11 @@ ckx_type_helper::resolve_relation(saber_ptr<ckx_type> _ty1,
     {
         return relation::rel_can_cast;
     }
+    else if ((_ty1->is_signed_int() || _ty1->is_unsigned_int())
+             && _ty2->get_category() == ckx_type::category::type_enum)
+    {
+        return relation::rel_can_cast;
+    }
     else
     {
         return relation::rel_incomptialble;
@@ -586,8 +603,8 @@ ckx_type_helper::func_relation
 ckx_type_helper::resolve_func_relation(saber_ptr<ckx_type> _ty1,
                                        saber_ptr<ckx_type> _ty2)
 {
-    ckx_func_type& func_ty1 = static_cast<ckx_func_type>(*_ty1);
-    ckx_func_type& func_ty2 = static_cast<ckx_func_type>(*_ty2);
+    ckx_func_type& func_ty1 = static_cast<ckx_func_type&>(*_ty1);
+    ckx_func_type& func_ty2 = static_cast<ckx_func_type&>(*_ty2);
 
     relation ret_type_rel = resolve_relation(func_ty1.get_return_type(),
                                              func_ty2.get_return_type());
@@ -606,7 +623,7 @@ ckx_type_helper::resolve_func_relation(saber_ptr<ckx_type> _ty1,
          /// Iteration
          ++it1, ++it2)
     {
-        switch (resolve_relation(**it1, **it2))
+        switch (resolve_relation(*it1, *it2))
         {
         case relation::rel_equal: break;
         case relation::rel_comptiable:
