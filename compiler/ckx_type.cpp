@@ -555,7 +555,8 @@ ckx_type_helper::resolve_relation(saber_ptr<ckx_type> _ty1,
         return relation::rel_incomptialble;
         }
 
-        /// @note only basic types left here.
+        /// @note only basic types left here. this may change in
+        /// the further future.
         default:
             return has_same_qual ? relation::rel_equal :
                                    relation::rel_const_cast;
@@ -585,9 +586,43 @@ ckx_type_helper::func_relation
 ckx_type_helper::resolve_func_relation(saber_ptr<ckx_type> _ty1,
                                        saber_ptr<ckx_type> _ty2)
 {
-    Q_UNUSED(_ty1)
-    Q_UNUSED(_ty2)
-    return func_relation::rel_incomptiable;
+    ckx_func_type& func_ty1 = static_cast<ckx_func_type>(*_ty1);
+    ckx_func_type& func_ty2 = static_cast<ckx_func_type>(*_ty2);
+
+    relation ret_type_rel = resolve_relation(func_ty1.get_return_type(),
+                                             func_ty2.get_return_type());
+
+    if (func_ty1.get_param_type_list().size()
+        != func_ty2.get_param_type_list().size())
+        return func_relation::rel_overload;
+
+    bool comptiable_but_non_equal_param_type_occured = false;
+    for (/// For-initialization
+         auto it1 = func_ty1.get_param_type_list().cbegin(),
+              it2 = func_ty2.get_param_type_list().cbegin();
+         /// Condition
+         it1 != func_ty1.get_param_type_list().cend()
+         && it2 != func_ty2.get_param_type_list().cend();
+         /// Iteration
+         ++it1, ++it2)
+    {
+        switch (resolve_relation(**it1, **it2))
+        {
+        case relation::rel_equal: break;
+        case relation::rel_comptiable:
+            comptiable_but_non_equal_param_type_occured = true; break;
+
+        default:
+            return func_relation::rel_overload;
+        }
+    }
+
+    if (comptiable_but_non_equal_param_type_occured)
+        return func_relation::rel_incomptiable;
+    else if (ret_type_rel != relation::rel_equal)
+        return func_relation::rel_incomptiable;
+    else
+        return func_relation::rel_same;
 }
 
 } // namespace ckx

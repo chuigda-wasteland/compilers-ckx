@@ -354,7 +354,7 @@ public:
     /// @brief Function comparing
     /// There are 3 kinds of relations between two function/func-types
     ///     0. same: two functions are identical.
-    ///     1. incomptiable: any of paramaters of two functions are comptiable
+    ///     1. incomptiable: all paramaters of two functions are comptiable
     ///                      so the two functions cannot be overloaded.
     ///     2. overloaded: two functions can be overloaded.
     enum class func_relation : qchar
