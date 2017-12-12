@@ -254,6 +254,7 @@ void ckx_token_stream_impl::do_split_tokens()
 
         default:
             lex_error("Unrecognized character");
+            next_char();
         }
     }
 
