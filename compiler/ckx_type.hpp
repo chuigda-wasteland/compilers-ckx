@@ -77,23 +77,14 @@ public:
 
     ckx_type(category _category);
     virtual ~ckx_type() = 0;
-
-    /// @note Type comparing
-    /// There are four kinds of relations between two types in compilers-ckx
-    ///     0. exact-equal: the type itself and the qualifier is all the same
-    ///     1. can-implicit-static-cast
-    ///     2. can-implicit-const-cast
-    ///     3. can-cast-to
-    ///     4. incomptiable: only reinterpret_cast can make up the gap
-    ///                      between two types
-
-    virtual bool type_equal_to(saber_ptr<ckx_type> _another) const = 0;
-
-    bool exact_equal_to(saber_ptr<ckx_type> _another) const;
-
     virtual saber_string to_string() const = 0;
 
-    const category& get_category() const;
+    category get_category() const;
+
+    bool is_basic() const;
+    bool is_signed_int() const;
+    bool is_unsigned_int() const;
+    bool is_float() const;
 
     bool is_const() const;
     bool is_volatile() const;
@@ -110,9 +101,6 @@ public:
     unsigned char get_qual_bits() const;
     void from_qual_bits(unsigned char _qual_bits);
 
-    bool is_more_qual_than(saber_ptr<ckx_type> _another) const;
-    bool is_less_qual_than(saber_ptr<ckx_type> _another) const;
-
 protected:
     category type_category;
     unsigned char qual;
@@ -127,7 +115,6 @@ public:
     ckx_basic_type(category _basic_category);
     ~ckx_basic_type() override final = default;
 
-    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
 };
 
@@ -137,7 +124,6 @@ public:
     ckx_id_type(saber_string_view _name);
     ~ckx_id_type() override final = default;
 
-    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
 
     saber_string_view get_name() const;
@@ -169,7 +155,6 @@ public:
     ckx_struct_type(saber_string_view _struct_name);
     ~ckx_struct_type() override final = default;
 
-    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
 
     saber_string_view get_name() const;
@@ -203,7 +188,6 @@ public:
     ckx_variant_type(saber_string_view _variant_name);
     ~ckx_variant_type() override final = default;
 
-    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
 
     saber_string_view get_name() const;
@@ -235,7 +219,6 @@ public:
     ckx_enum_type(saber_string_view _enum_name);
     ~ckx_enum_type() override final = default;
 
-    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
 
     saber_string_view get_name() const;
@@ -253,8 +236,10 @@ public:
                   saber::vector<saber_ptr<ckx_type>>&& _param_type_list);
     ~ckx_func_type() override final = default;
 
-    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
+
+    saber_ptr<ckx_type> get_return_type();
+    const saber::vector<saber_ptr<ckx_type>>& get_param_type_list();
 
 private:
     saber_ptr<ckx_type> return_type;
@@ -267,8 +252,9 @@ public:
     ckx_pointer_type(saber_ptr<ckx_type> _target);
     ~ckx_pointer_type() override final = default;
 
-    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
+
+    saber_ptr<ckx_type> get_pointee();
 
 private:
     saber_ptr<ckx_type> target;
@@ -280,11 +266,12 @@ public:
     ckx_array_type(saber_ptr<ckx_type> _element);
     ~ckx_array_type() override final = default;
 
-    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
 
+    saber_ptr<ckx_type> get_element_type();
+
 private:
-    saber_ptr<ckx_type> element;
+    saber_ptr<ckx_type> element_type;
 };
 
 class ckx_type_alias final implements ckx_type
@@ -293,8 +280,9 @@ public:
     ckx_type_alias(saber_ptr<ckx_type> _origin);
     ~ckx_type_alias() override final = default;
 
-    bool type_equal_to(saber_ptr<ckx_type> _another) const override final;
     saber_string to_string() const override final;
+
+    saber_ptr<ckx_type> get_aliasee();
 
 private:
     saber_ptr<ckx_type> origin;
@@ -343,16 +331,41 @@ public:
 
     static saber_ptr<ckx_type> get_void_type();
 
-    enum class type_relation
+    /// @brief Type comparing
+    /// There are 5 kinds of relations between two types in compilers-ckx
+    ///     0. exact-equal: the type itself and the qualifier is all the same
+    ///     1. can-implicit-static-cast, without casting away const quals.
+    ///     2. can-implicit-const-cast
+    ///     3. can-cast-to
+    ///     4. incomptiable: only reinterpret_cast can make up the gap
+    ///                      between two types
+    enum class relation : qchar
     {
-        tr_equal,
-        tr_comptiable,
-        tr_cancast,
-        tr_incomptiable
+        rel_equal,
+        rel_comptiable,
+        rel_const_cast,
+        rel_can_cast,
+        rel_incomptialble
     };
 
-    static type_relation
-    resolve_type_relation(saber_ptr<ckx_type> _ty1, saber_ptr<ckx_type> _ty2);
+    static relation
+    resolve_relation(saber_ptr<ckx_type> _ty1, saber_ptr<ckx_type> _ty2);
+
+    /// @brief Function comparing
+    /// There are 3 kinds of relations between two function/func-types
+    ///     0. same: two functions are identical.
+    ///     1. incomptiable: any of paramaters of two functions are comptiable
+    ///                      so the two functions cannot be overloaded.
+    ///     2. overloaded: two functions can be overloaded.
+    enum class func_relation : qchar
+    {
+        rel_same,
+        rel_incomptiable,
+        rel_overload
+    };
+
+    static func_relation
+    resolve_func_relation(saber_ptr<ckx_type> _ty1, saber_ptr<ckx_type> _ty2);
 };
 
 } // namespace ckx

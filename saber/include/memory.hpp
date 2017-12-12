@@ -222,6 +222,9 @@ public:
     inline T* operator->() { return ptr; }
     inline const T* operator->() const { return ptr; }
 
+    T& operator* () { return *ptr; }
+    const T& operator* () const { return *ptr; }
+
     void swap(saber_ptr& _another) noexcept
     {
         saber::swap(ptr, _another.ptr);

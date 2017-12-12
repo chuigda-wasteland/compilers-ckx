@@ -27,17 +27,36 @@ ckx_type::ckx_type(category _category) :
     qual(0)
 {}
 
-bool ckx_type::exact_equal_to(saber_ptr<ckx_type> _another) const
-{
-    return type_equal_to(_another)
-           && get_qual_bits() == _another->get_qual_bits();
-}
-
 ckx_type::~ckx_type() {}
 
-const ckx_type::category &ckx_type::get_category() const
+ckx_type::category
+ckx_type::get_category() const
 {
     return type_category;
+}
+
+bool ckx_type::is_basic() const
+{
+    return get_category() >= category::type_vi8
+           && get_category() <= category::type_void;
+}
+
+bool ckx_type::is_signed_int() const
+{
+    return get_category() >= category::type_vi8
+           && get_category() <= category::type_vi64;
+}
+
+bool ckx_type::is_unsigned_int() const
+{
+    return get_category() >= category::type_vi8
+           && get_category() <= category::type_void;
+}
+
+bool ckx_type::is_float() const
+{
+    return get_category() == category::type_vr32
+           || get_category() == category::type_vr64;
 }
 
 bool ckx_type::is_const() const
@@ -141,12 +160,6 @@ ckx_basic_type::to_string() const
     return typename_string_list.find(type_category)->second + qual_to_string();
 }
 
-bool
-ckx_basic_type::type_equal_to(saber_ptr<ckx_type> _another) const
-{
-    return (type_category == _another->get_category());
-}
-
 
 
 ckx_id_type::ckx_id_type(saber_string_view _name) :
@@ -158,17 +171,6 @@ saber_string
 ckx_id_type::to_string() const
 {
     return name.get();
-}
-
-bool
-ckx_id_type::type_equal_to(saber_ptr<ckx_type> _another) const
-{
-    if (_another->get_category() == ckx_type::category::type_id)
-    {
-        ckx_id_type *id_type = static_cast<ckx_id_type*>(_another.get());
-        return (get_name() == id_type->get_name());
-    }
-    return false;
 }
 
 saber_string_view
@@ -183,18 +185,6 @@ ckx_struct_type::ckx_struct_type(saber_string_view _struct_name) :
     ckx_type(ckx_type::category::type_struct),
     struct_name(_struct_name)
 {}
-
-bool
-ckx_struct_type::type_equal_to(saber_ptr<ckx_type> _another) const
-{
-    if (_another->get_category() == ckx_type::category::type_struct)
-    {
-        ckx_struct_type *struct_type =
-                static_cast<ckx_struct_type*>(_another.get());
-        return this->get_name() == struct_type->get_name();
-    }
-    return false;
-}
 
 saber_string
 ckx_struct_type::to_string() const
@@ -225,25 +215,14 @@ ckx_variant_type::ckx_variant_type(saber_string_view _variant_name) :
     variant_name(_variant_name)
 {}
 
-bool
-ckx_variant_type::type_equal_to(saber_ptr<ckx_type> _another) const
-{
-    if (_another->get_category() == ckx_type::category::type_variant)
-    {
-        ckx_variant_type *variant_type =
-                static_cast<ckx_variant_type*>(_another.get());
-        return this->get_name() == variant_type->get_name();
-    }
-    return false;
-}
-
 saber_string
 ckx_variant_type::to_string() const
 {
     return "VariantType[[" + variant_name.get() + "]]" + qual_to_string();
 }
 
-saber_string_view ckx_variant_type::get_name() const
+saber_string_view
+ckx_variant_type::get_name() const
 {
     return variant_name;
 }
@@ -266,25 +245,14 @@ ckx_enum_type::ckx_enum_type(saber_string_view _enum_name) :
     enum_name(_enum_name)
 {}
 
-bool
-ckx_enum_type::type_equal_to(saber_ptr<ckx_type> _another) const
-{
-    if (_another->get_category() == ckx_type::category::type_enum)
-    {
-        ckx_enum_type *enum_type =
-                static_cast<ckx_enum_type*>(_another.get());
-        return (get_name() == enum_type->get_name());
-    }
-    return false;
-}
-
 saber_string
 ckx_enum_type::to_string() const
 {
     return "EnumType[[" + enum_name.get() + "]]" + qual_to_string();
 }
 
-saber_string_view ckx_enum_type::get_name() const
+saber_string_view
+ckx_enum_type::get_name() const
 {
     return enum_name;
 }
@@ -310,29 +278,6 @@ ckx_func_type::ckx_func_type(
     param_type_list(saber::move(_param_type_list))
 {}
 
-bool
-ckx_func_type::type_equal_to(saber_ptr<ckx_type> _another) const
-{
-    if (_another->get_category() != ckx_type::category::type_function)
-        return false;
-
-    ckx_func_type *func_type =
-            static_cast<ckx_func_type*>(_another.get());
-    if (!return_type->type_equal_to(func_type->return_type))
-        return false;
-
-    if (param_type_list.size() == func_type->param_type_list.size())
-        return false;
-
-    for (size_t i = 0; i < param_type_list.size(); i++)
-    {
-        if (!param_type_list[i]->type_equal_to(func_type->param_type_list[i]))
-            return false;
-    }
-
-    return true;
-}
-
 saber_string
 ckx_func_type::to_string() const
 {
@@ -345,22 +290,11 @@ ckx_func_type::to_string() const
 }
 
 
+
 ckx_pointer_type::ckx_pointer_type(saber_ptr<ckx_type> _target) :
     ckx_type(ckx_type::category::type_pointer),
     target(_target)
 {}
-
-bool
-ckx_pointer_type::type_equal_to(saber_ptr<ckx_type> _another) const
-{
-    if (_another->get_category() == ckx_type::category::type_pointer)
-    {
-        ckx_pointer_type *ptr_type =
-                static_cast<ckx_pointer_type*>(_another.get());
-        return target->type_equal_to(ptr_type->target);
-    }
-    return false;
-}
 
 saber_string
 ckx_pointer_type::to_string() const
@@ -372,25 +306,25 @@ ckx_pointer_type::to_string() const
 
 ckx_array_type::ckx_array_type(saber_ptr<ckx_type> _element) :
     ckx_type(ckx_type::category::type_array),
-    element(_element)
+    element_type(_element)
 {}
-
-bool
-ckx_array_type::type_equal_to(saber_ptr<ckx_type> _another) const
-{
-    if (_another->get_category() == ckx_type::category::type_array)
-    {
-        ckx_array_type *arr_type =
-                static_cast<ckx_array_type*>(_another.get());
-        return element->type_equal_to(arr_type->element);
-    }
-    return false;
-}
 
 saber_string
 ckx_array_type::to_string() const
 {
-    return element->to_string() + "[]"  + qual_to_string();
+    return element_type->to_string() + "[]"  + qual_to_string();
+}
+
+saber_ptr<ckx_type> ckx_array_type::get_element_type()
+{
+    return element_type;
+}
+
+
+
+saber_ptr<ckx_type> ckx_type_alias::get_aliasee()
+{
+    return origin;
 }
 
 
@@ -529,6 +463,131 @@ ckx_type_helper::get_void_type()
     static saber_ptr<ckx_type> ret(
         new ckx_basic_type(ckx_type::category::type_void));
     return ret;
+}
+
+ckx_type_helper::relation
+ckx_type_helper::resolve_relation(saber_ptr<ckx_type> _ty1,
+                                  saber_ptr<ckx_type> _ty2)
+{
+    bool has_same_qual = _ty1->get_qual_bits() == _ty2->get_qual_bits();
+
+    saber_string_view name1 = saber_string_pool::create_view(""),
+                      name2 = saber_string_pool::create_view("");
+
+    if (_ty1->get_category() == _ty2->get_category())
+    {
+        switch (_ty1->get_category())
+        {
+        case ckx_type::category::type_alias:
+            {
+                ckx_type_alias& alias_ty1 = static_cast<ckx_type_alias&>(*_ty1);
+                ckx_type_alias& alias_ty2 = static_cast<ckx_type_alias&>(*_ty2);
+
+                relation reltemp =  resolve_relation(alias_ty1.get_aliasee(),
+                                                     alias_ty2.get_aliasee());
+                if (reltemp == relation::rel_equal)
+                {
+                    return has_same_qual ? relation::rel_equal :
+                                           relation::rel_const_cast;
+                }
+                else if (reltemp == relation::rel_comptiable)
+                {
+                    return has_same_qual ? relation::rel_comptiable :
+                                           relation::rel_const_cast;
+                }
+                else
+                {
+                    return relation::rel_incomptialble;
+                }
+            }
+
+        case ckx_type::category::type_array:
+            {
+                ckx_array_type& array_ty1 = static_cast<ckx_array_type&>(*_ty1);
+                ckx_array_type& array_ty2 = static_cast<ckx_array_type&>(*_ty2);
+
+                relation reltemp = resolve_relation(
+                                       array_ty1.get_element_type(),
+                                       array_ty2.get_element_type());
+                if (reltemp == relation::rel_equal)
+                {
+                    return has_same_qual ? relation::rel_equal :
+                                           relation::rel_const_cast;
+                }
+                return relation::rel_incomptialble;
+            }
+
+        case ckx_type::category::type_function:
+            {
+                /// @attention function types shall be handled by
+                /// "overloading resolver", not this type checker.
+                assert(false);
+                /// add this return for suppressing compiler warnings
+                return relation::rel_incomptialble;
+            }
+
+        /// @note unified solution for type with `name`s
+        {
+        case ckx_type::category::type_enum:
+            name1 = static_cast<ckx_enum_type&>(*_ty1).get_name();
+            name2 = static_cast<ckx_enum_type&>(*_ty2).get_name();
+            goto name_resolve;
+
+        case ckx_type::category::type_struct:
+            name1 = static_cast<ckx_struct_type&>(*_ty1).get_name();
+            name2 = static_cast<ckx_struct_type&>(*_ty2).get_name();
+            goto name_resolve;
+
+        case ckx_type::category::type_variant:
+            name1 = static_cast<ckx_variant_type&>(*_ty1).get_name();
+            name2 = static_cast<ckx_variant_type&>(*_ty2).get_name();
+            goto name_resolve;
+
+        case ckx_type::category::type_id:
+            name1 = static_cast<ckx_id_type&>(*_ty1).get_name();
+            name2 = static_cast<ckx_id_type&>(*_ty2).get_name();
+            goto name_resolve;
+
+        name_resolve:
+        if (name1 == name2)
+            return has_same_qual ? relation::rel_equal :
+                                   relation::rel_const_cast;
+        return relation::rel_incomptialble;
+        }
+
+        /// @note only basic types left here.
+        default:
+            return has_same_qual ? relation::rel_equal :
+                                   relation::rel_const_cast;
+        }
+    }
+    else if ((_ty1->is_signed_int() && _ty2->is_signed_int())
+             || (_ty1->is_unsigned_int() && _ty2->is_unsigned_int())
+             || (_ty1->is_float() && _ty2->is_float()))
+    {
+        return has_same_qual ? relation::rel_comptiable :
+                               relation::rel_can_cast;
+    }
+    else if (_ty1->is_basic()
+             && _ty2->is_basic())
+    {
+        return relation::rel_can_cast;
+    }
+    else
+    {
+        return relation::rel_incomptialble;
+    }
+
+    assert(false);
+}
+
+ckx_type_helper::func_relation
+ckx_type_helper::resolve_func_relation(saber_ptr<ckx_type> _ty1,
+                                       saber_ptr<ckx_type> _ty2)
+{
+    Q_UNUSED(_ty1)
+    Q_UNUSED(_ty2)
+    return func_relation::rel_incomptiable;
 }
 
 } // namespace ckx
