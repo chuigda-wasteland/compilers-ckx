@@ -163,11 +163,6 @@ open_class ckx_token
     const saber_string_view str = saber_string_pool::create_view("");
 
     const qcoord position;
-
-private:
-    // This constructor reserved for internal use.
-    // All other public constructors invokes this constructor
-    explicit ckx_token(const qcoord& _coord);
 };
 
 struct ckx_token_type_hash

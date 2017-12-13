@@ -21,144 +21,122 @@
 namespace ckx
 {
 
-ckx_var_entry::ckx_var_entry(saber_ptr<ckx_type> _var_type,
-                             saber_string_view _var_name) :
-    var_type(_var_type),
-    var_name(_var_name)
-{}
-
-ckx_func_entry::ckx_func_entry(saber_ptr<ckx_func_type> _func_type,
-                               saber_string_view _func_name) :
-    func_type(_func_type),
-    func_name(_func_name)
-{}
-
-ckx_type_entry::ckx_type_entry(saber_ptr<ckx_type> _type,
-                               saber_string_view _type_name) :
-    type(_type),
-    type_name(_type_name)
-{}
-
-
-
-ckx_env::ckx_env(ckx_env *_parent) :
-    parent(_parent)
-{}
-
-ckx_env::~ckx_env()
+bool
+ckx_env::lookup(saber_string_view _name)
 {
-    for (auto &v : var_entry_table)   delete v.second;
-    for (auto &t : type_entry_table)  delete t.second;
-    for (auto &f : func_entry_table)  delete f.second;
-}
-
-
-qpair<ckx_env::add_status, ckx_var_entry*>
-ckx_env::add_new_var(saber_string_view _name, saber_ptr<ckx_type> _type)
-{
-    if ( var_entry_table.find(_name) != var_entry_table.end() )
-    {
-        return make_pair(add_status::duplicate, nullptr);
-    }
-
-    ckx_var_entry *entry = new ckx_var_entry(_type, _name);
-    var_entry_table.insert(
-        qpair<saber_string_view, ckx_var_entry*>(_name, entry) );
-
-    return make_pair(add_status::success, entry);
-}
-
-qpair<ckx_env::add_status, ckx_type_entry*>
-ckx_env::add_new_type(saber_string_view _name, saber_ptr<ckx_type> _type)
-{
-    if ( lookup_type(_name) != nullptr )
-    {
-         return make_pair(add_status::duplicate, nullptr);
-    }
-
-    ckx_type_entry *entry = new ckx_type_entry(_type, _name);
-    type_entry_table.insert(
-        qpair<saber_string_view, ckx_type_entry*>(_name, entry ) );
-
-    return make_pair(add_status::success, entry);
-}
-
-qpair<ckx_env::add_status, ckx_func_entry*>
-ckx_env::add_new_func(saber_string_view _name,
-                      saber_ptr<ckx_func_type> _type)
-{
-    if (lookup_func(_name) == nullptr)
-    {
-        auto it = func_entry_table.emplace(
-                      _name, new saber::vector<ckx_func_entry*>());
-        ckx_func_entry *ret = new ckx_func_entry(_type, _name);
-        it.first->second->emplace_back(ret);
-        return qpair<add_status, ckx_func_entry*>(add_status::success, ret);
-    }
-    else
-    {
-        return qpair<add_status, ckx_func_entry*>(add_status::duplicate,
-                                                  nullptr);
-    }
+    return (lookup_var(_name) != nullptr)
+           || (lookup_type(_name) != nullptr)
+           || (lookup_var(_name) != nullptr);
 }
 
 bool
-ckx_env::lookup_name(saber_string_view _name)
+ckx_env::lookup_local(saber_string_view _name)
 {
-    return lookup_var(_name)
-           || lookup_type(_name)
-           || (!lookup_func(_name));
+    return (lookup_var_local(_name) != nullptr)
+           || (lookup_type_local(_name) != nullptr)
+           || (lookup_func_local(_name) != nullptr);
 }
 
-ckx_var_entry*
+ckx_env_var_entry*
 ckx_env::lookup_var(saber_string_view _name)
 {
-    ckx_env *this_iter = this;
-
-    while (this_iter != nullptr)
+    ckx_env *env_iter = this;
+    while (env_iter != nullptr)
     {
-        auto it = var_entry_table.find(_name);
-
-        if (it != var_entry_table.end())
-        {
-            qpair<const saber_string_view, ckx_var_entry*> &tref = *it;
-            return tref.second;
-        }
-
-        this_iter = this_iter->parent;
+        ckx_env_var_entry *entry = env_iter->lookup_var_local(_name);
+        if (entry != nullptr) return entry;
+        env_iter = env_iter->parent;
     }
-
     return nullptr;
 }
 
-ckx_type_entry*
+ckx_env_type_entry*
 ckx_env::lookup_type(saber_string_view _name)
 {
-    ckx_env *this_iter = this;
-
-    while (this_iter != nullptr)
+    ckx_env *env_iter = this;
+    while (env_iter != nullptr)
     {
-        auto it = type_entry_table.find(_name);
-        if (it != type_entry_table.end())
-            return it->second;
-        this_iter = this_iter->parent;
+        ckx_env_type_entry *entry = env_iter->lookup_type_local(_name);
+        if (entry != nullptr) return entry;
+        env_iter = env_iter->parent;
     }
     return nullptr;
 }
 
-saber::vector<ckx_func_entry*>* ckx_env::lookup_func(saber_string_view _name)
+saber::vector<ckx_env_func_entry>*
+ckx_env::lookup_func(saber_string_view _name)
 {
-    auto it = func_entry_table.find(_name);
-    if (it != func_entry_table.end())
-        return it->second;
+    ckx_env *env_iter = this;
+    while (env_iter != nullptr)
+    {
+        saber::vector<ckx_env_func_entry> *entry =
+            env_iter->lookup_func_local(_name);
+        if (entry != nullptr) return entry;
+        env_iter = env_iter->parent;
+    }
     return nullptr;
 }
 
-ckx_var_entry*
+ckx_env_var_entry*
 ckx_env::lookup_var_local(saber_string_view _name)
 {
-    auto it = var_entry_table.find(_name);
-    return (it == var_entry_table.end()) ? (*it).second : nullptr;
+    auto iter = vars.find(_name);
+    if (iter != vars.end())
+        return &(iter->second);
+    else
+        return nullptr;
+}
+
+ckx_env_type_entry*
+ckx_env::lookup_type_local(saber_string_view _name)
+{
+    auto iter = types.find(_name);
+    if (iter != types.end())
+        return &(iter->second);
+    else
+        return nullptr;
+}
+
+saber::vector<ckx_env_func_entry>*
+ckx_env::lookup_func_local(saber_string_view _name)
+{
+    auto iter = funcs.find(_name);
+    if (iter != funcs.end())
+        return &(iter->second);
+    else
+        return nullptr;
+}
+
+ckx_env::result_add_var
+ckx_env::add_var(ckx_token _decl_at,
+                 saber_string_view _name,
+                 saber_ptr<ckx_type> _type)
+{
+    ckx_env_var_entry *entry = lookup_var_local(_name);
+    if (entry != nullptr)
+        return result_add_var{.status=result_add_var::conflict,
+                              .v.conflict_decl=entry};
+
+    auto it = vars.emplace(_name, ckx_env_var_entry(_decl_at, _name, _type))
+                  .first;
+    return result_add_var{.status=result_add_var::success,
+                          .v.added_decl=&(it->second)};
+}
+
+ckx_env::result_add_type
+ckx_env::add_type(ckx_token _decl_at,
+                  saber_string_view _name,
+                  saber_ptr<ckx_type> _type)
+{
+    ckx_env_type_entry *entry = lookup_type(_name);
+    if (entry != nullptr)
+        return result_add_type{.status=result_add_type::conflict,
+                               .v.conflict_type=entry};
+
+    auto it = types.emplace(_name, ckx_env_type_entry(_decl_at, _name, _type))
+                   .first;
+    return result_add_type{.status=result_add_type::success,
+                           .v.added_type=&(it->second)};
 }
 
 } // namespace ckx

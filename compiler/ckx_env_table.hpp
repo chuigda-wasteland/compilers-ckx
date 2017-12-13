@@ -19,96 +19,147 @@
 #ifndef CKX_ENV_TABLE_HPP
 #define CKX_ENV_TABLE_HPP
 
-#include "ckx_type.hpp"
-
 #include "string_pool.hpp"
 #include "vector.hpp"
 #include "unordered_map.hpp"
-
 #include "defs.hpp"
 
-#include "ckx_ast_node_fwd.hpp"
+#include "ckx_type.hpp"
+#include "ckx_token.hpp"
+#include "../llvm_ir_builder/llvm_value.hpp"
+#include "../llvm_ir_builder/llvm_type.hpp"
 
 namespace ckx
 {
 
 using saber::saber_ptr;
 
-open_class ckx_var_entry
+open_class ckx_env_var_entry
 {
-    explicit ckx_var_entry(saber_ptr<ckx_type> _var_type,
-                           saber_string_view _var_name);
-    ~ckx_var_entry() = default;
-
-    saber_ptr<ckx_type> var_type;
-    saber_string_view var_name;
-};
-
-open_class ckx_func_entry
-{
-    explicit ckx_func_entry(saber_ptr<ckx_func_type> _func_type,
-                            saber_string_view _func_name);
-    ~ckx_func_entry() = default;
-
-    saber_ptr<ckx_func_type> func_type;
-    saber_string_view func_name;
-};
-
-open_class ckx_type_entry
-{
-    explicit ckx_type_entry(saber_ptr<ckx_type> type,
-                            saber_string_view _type_name);
-    ~ckx_type_entry() = default;
-
+    ckx_token decl_at;
+    saber_string_view name;
     saber_ptr<ckx_type> type;
-    saber_string_view type_name;
 
+    /// @note we are not sure that this is correct.
+    faker::llvm_value *llvm_value_bind;
+
+    ckx_env_var_entry(ckx_token _decl_at,
+                      saber_string_view _name,
+                      saber_ptr<ckx_type> _type) :
+        decl_at(_decl_at),
+        name(_name),
+        type(_type)
+    {}
 };
+
+open_class ckx_env_type_entry
+{
+    ckx_token decl_at;
+    saber_string_view name;
+    saber_ptr<ckx_type> type;
+
+    /// @note we are not sure that is this correct.
+    faker::llvm_type *llvm_type_bind;
+
+    ckx_env_type_entry(ckx_token _decl_at,
+                       saber_string_view _name,
+                       saber_ptr<ckx_type> _type) :
+        decl_at(_decl_at),
+        name(_name),
+        type(_type)
+    {}
+};
+
+open_class ckx_env_func_entry
+{
+    ckx_token decl_at;
+    saber_string_view name;
+    saber_ptr<ckx_type> type;
+    saber_string llvm_name;
+
+    ckx_env_func_entry(ckx_token _decl_at,
+                       saber_string_view _name,
+                       saber_ptr<ckx_type> _type,
+                       saber_string&& _llvm_name) :
+        decl_at(_decl_at),
+        name(_name),
+        type(_type),
+        llvm_name(saber::move(_llvm_name))
+    {}
+};
+
 
 class ckx_env
 {
 public:
-    enum add_status : qchar
+    struct result_add_var
     {
-        success,
-        duplicate
+        enum { success, conflict, fail } status;
+        variant value
+        {
+            ckx_env_var_entry* added_decl;
+            ckx_env_var_entry* conflict_decl;
+        } v;
     };
 
-    explicit ckx_env(ckx_env *_parent);
-    ~ckx_env();
+    struct result_add_type
+    {
+        enum { success, conflict, fail } status;
+        variant value
+        {
+            ckx_env_type_entry* added_type;
+            ckx_env_type_entry* conflict_type;
+        } v;
+    };
 
-    qpair<add_status, ckx_type_entry*> add_new_type(
-            saber_string_view _name, saber_ptr<ckx_type> _type);
-    qpair<add_status, ckx_func_entry*> add_new_func(
-            saber_string_view, saber_ptr<ckx_func_type> _type);
-    qpair<add_status, ckx_var_entry*> add_new_var(
-            saber_string_view, saber_ptr<ckx_type> _type);
+    struct result_add_func
+    {
+        enum { declare, redeclare, define, overload, conflict, fail } status;
+        variant value
+        {
+            ckx_env_func_entry* added_func;
+            ckx_env_func_entry* conflict_func;
+        } v;
+    };
 
-    bool lookup_name(saber_string_view _name);
+    ckx_env(ckx_env* _parent = nullptr) : parent(_parent) {}
 
-    ckx_var_entry* lookup_var(saber_string_view _name);
-    ckx_type_entry* lookup_type(saber_string_view _name);
+    bool lookup(saber_string_view _name);
+    bool lookup_local(saber_string_view _name);
 
-    /// @note We have independent representation for function table
-    /// since we need to solve function overloading in the future.
-    saber::vector<ckx_func_entry *> *lookup_func(saber_string_view _name);
+    ckx_env_var_entry* lookup_var(saber_string_view _name);
+    ckx_env_type_entry* lookup_type(saber_string_view _name);
+    saber::vector<ckx_env_func_entry>* lookup_func(saber_string_view _name);
 
-    ckx_var_entry* lookup_var_local(saber_string_view _name);
+    ckx_env_var_entry* lookup_var_local(saber_string_view _name);
+    ckx_env_type_entry* lookup_type_local(saber_string_view _name);
+    saber::vector<ckx_env_func_entry>*
+    lookup_func_local(saber_string_view _name);
 
-    inline ckx_env* get_parent() { return parent; }
+    result_add_var add_var(ckx_token _decl_at,
+                           saber_string_view _name,
+                           saber_ptr<ckx_type> _type);
+
+    result_add_type add_type(ckx_token _decl_at,
+                             saber_string_view _name,
+                             saber_ptr<ckx_type> _type);
+
+    result_add_func add_func(ckx_token _decl_at,
+                             saber_string_view _name,
+                             saber_ptr<ckx_type> _type);
 
 private:
-    saber::unordered_map<saber_string_view, ckx_var_entry*, string_view_hash>
-        var_entry_table;
-    saber::unordered_map<saber_string_view, ckx_type_entry*, string_view_hash>
-        type_entry_table;
-    saber::unordered_map<saber_string_view,
-                         saber::vector<ckx_func_entry*>*,
-                         string_view_hash>
-        func_entry_table;
+    /// just for shortening identifiers
+    using sv = saber_string_view;
+    using svhash = string_view_hash;
+
+    saber::unordered_map<sv, ckx_env_var_entry, svhash> vars;
+    saber::unordered_map<sv, ckx_env_type_entry, svhash> types;
+    saber::unordered_map<sv, saber::vector<ckx_env_func_entry>, svhash> funcs;
 
     ckx_env *parent;
 };
+
 
 } // namespace ckx
 
