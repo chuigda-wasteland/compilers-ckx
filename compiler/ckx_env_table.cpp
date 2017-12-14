@@ -136,7 +136,33 @@ ckx_env::add_type(ckx_token _decl_at,
     auto it = types.emplace(_name, ckx_env_type_entry(_decl_at, _name, _type))
                    .first;
     return result_add_type{.status=result_add_type::success,
-                           .v.added_type=&(it->second)};
+                .v.added_type=&(it->second)};
+}
+
+ckx_env::result_add_func
+ckx_env::add_func(ckx_token _decl_at,
+                  saber_string_view _name,
+                  saber_ptr<ckx_type> _type)
+{
+    saber::vector<ckx_env_func_entry>* seen_funcs = lookup_func_local(_name);
+    if (seen_funcs != nullptr)
+    {
+        for (ckx_env_func_entry &func : *seen_funcs)
+        {
+            if (ckx_type_helper::resolve_func_relation(func.type, _type)
+                == ckx_type_helper::func_relation::rel_incomptiable)
+                return result_add_func{.status=result_add_func::conflict,
+                                       .v.conflict_func=&func};
+        }
+    }
+
+    auto it = funcs.emplace( _name, saber::vector<ckx_env_func_entry>{
+                                        ckx_env_func_entry(
+                                            _decl_at, _name, _type,
+                                            "" /** @todo mangler*/)
+                           }).first;
+    return result_add_func{.status=result_add_func::declare,
+                           .v.added_func=&(it->second[0])};
 }
 
 } // namespace ckx
