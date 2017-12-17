@@ -390,8 +390,6 @@ default_allocator<T>::operator=(const default_allocator &) noexcept
     return *this;
 }
 
-
-
 template <typename Allocator>
 struct allocator_traits
 {
@@ -419,6 +417,19 @@ struct allocator_traits
         _a.deallocate(_p, _n);
     }
 };
+
+
+template <std::size_t Size, std::size_t Align>
+struct aligned_storage
+{
+    struct type
+    {
+    private: alignas(Align) unsigned char data[Size];
+    };
+};
+
+template <std::size_t Size, std::size_t Align>
+using aligned_storage_t = typename aligned_storage<Size, Align>::type;
 
 } // namespace saber
 

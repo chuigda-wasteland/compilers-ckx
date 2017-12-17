@@ -22,6 +22,7 @@
 #include "string_pool.hpp"
 #include "vector.hpp"
 #include "unordered_map.hpp"
+#include "result.hpp"
 #include "defs.hpp"
 
 #include "ckx_type.hpp"
