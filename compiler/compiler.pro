@@ -13,9 +13,10 @@ SOURCES += main.cpp \
     ckx_env_table.cpp \
     ckx_token_set.cpp \
     ckx_ast_dump.cpp \
+    ckx_type_dump.cpp \
     ckx_operator.cpp \
     ../shared/src/file_reader.cpp \
-    ../shared/src/file_writer.cpp \
+    ../shared/src/file_writer.cpp
 
 HEADERS += \
     we_file_reader.hpp \

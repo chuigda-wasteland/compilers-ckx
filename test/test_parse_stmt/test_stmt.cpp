@@ -20,6 +20,7 @@
 
 #include "ckx_parser_impl.hpp"
 #include "memory.hpp"
+#include "c8assert.hpp"
 
 using namespace ckx;
 
@@ -96,8 +97,8 @@ ckx_parser_impl_test::test_parse_expr_stmt()
         expr_stmt = base::parse_expr_stmt();
         expr_stmt->ast_dump(writer, 0);
         delete expr_stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 
@@ -106,8 +107,8 @@ ckx_parser_impl_test::test_parse_expr_stmt()
         ckx_ast_expr_stmt *expr_stmt = base::parse_expr_stmt();
         expr_stmt->ast_dump(writer, 0);
         delete expr_stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 }
@@ -125,8 +126,8 @@ R"lyp(
         ckx_ast_if_stmt *if_stmt = base::parse_if_stmt();
         if_stmt->ast_dump(writer, 0);
         delete if_stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 
@@ -140,8 +141,8 @@ R"lyp(
         ckx_ast_if_stmt *if_stmt = base::parse_if_stmt();
         if_stmt->ast_dump(writer, 0);
         delete if_stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 }
@@ -155,8 +156,8 @@ ckx_parser_impl_test::test_parse_while_stmt()
         ckx_ast_while_stmt *while_stmt = base::parse_while_stmt();
         while_stmt->ast_dump(writer, 0);
         delete while_stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 }
@@ -170,8 +171,8 @@ ckx_parser_impl_test::test_parse_do_while_stmt()
         ckx_ast_do_while_stmt *do_while_stmt = base::parse_do_while_stmt();
         do_while_stmt->ast_dump(writer, 0);
         delete do_while_stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 }
@@ -185,8 +186,8 @@ ckx_parser_impl_test::test_parse_for_stmt()
         ckx_ast_for_stmt *for_stmt = base::parse_for_stmt();
         for_stmt->ast_dump(writer, 0);
         delete for_stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 
@@ -195,8 +196,8 @@ ckx_parser_impl_test::test_parse_for_stmt()
         ckx_ast_for_stmt *for_stmt = base::parse_for_stmt();
         for_stmt->ast_dump(writer, 0);
         delete for_stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 
@@ -205,8 +206,8 @@ ckx_parser_impl_test::test_parse_for_stmt()
         ckx_ast_for_stmt *for_stmt = base::parse_for_stmt();
         for_stmt->ast_dump(writer, 0);
         delete for_stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 }
@@ -223,8 +224,8 @@ ckx_parser_impl_test::test_parse_break_stmt()
         break_stmt = base::parse_break_stmt();
         break_stmt->ast_dump(writer, 0);
         delete break_stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 }
@@ -241,8 +242,8 @@ ckx_parser_impl_test::test_parse_continue_stmt()
         continue_stmt = base::parse_continue_stmt();
         continue_stmt->ast_dump(writer, 0);
         delete continue_stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 }
@@ -256,20 +257,20 @@ ckx_parser_impl_test::test_parse_return_stmt()
         ckx_ast_return_stmt *return_stmt = base::parse_return_stmt();
         return_stmt->ast_dump(writer, 0);
         delete return_stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 
     {
         initialize_test("return how_fuck_cpp_is(cpp_std::cpp17);");
-        base::typename_table->add_typename(
+        base::typename_table.add_typename(
             saber_string_pool::create_view("cpp_std"));
         ckx_ast_return_stmt *return_stmt = base::parse_return_stmt();
         return_stmt->ast_dump(writer, 0);
         delete return_stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 }
@@ -294,8 +295,8 @@ R"(
         ckx_ast_compound_stmt *stmt = base::parse_compound_stmt();
         stmt->ast_dump(writer, 0);
         delete stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 }
@@ -304,10 +305,6 @@ R"(
 void
 ckx_parser_impl_test::initialize_test(const char* _parse_string)
 {
-    base::error_list = new saber::list<ckx_error>;
-    base::warn_list = new saber::list<ckx_error>;
-    base::typename_table = new detail::ckx_typename_table;
-
     reader = new ckx_test_filereader(_parse_string);
     base::token_stream = new ckx_token_stream(*reader);
 }
@@ -316,11 +313,8 @@ ckx_parser_impl_test::initialize_test(const char* _parse_string)
 void
 ckx_parser_impl_test::cleanup_test()
 {
-    delete base::error_list;
-    delete base::warn_list;
-    delete base::typename_table;
-
+    base::typename_table.cleanup();
     delete reader;
-    base::token_stream = nullptr;
+    delete base::token_stream;
 }
 

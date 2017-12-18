@@ -27,8 +27,11 @@ using namespace saber;
 
 void assert_printlog(bool _condition, const char* _desc)
 {
-    if (!_condition) printf("%s\n", _desc);
-    abort();
+    if (!_condition)
+    {
+        printf("%s\n", _desc);
+        abort();
+    }
 }
 
 void testcase1()

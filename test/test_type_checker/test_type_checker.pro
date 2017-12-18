@@ -5,7 +5,8 @@ CONFIG -= qt
 
 SOURCES += ../../compiler/ckx_type.cpp \
            ../../saber/src/safe_stl_general.cpp \
-    test.cpp
+           ../../compiler/ckx_type_dump.cpp \
+           test.cpp
 
 HEADERS += ../../compiler/ckx_type.hpp
 

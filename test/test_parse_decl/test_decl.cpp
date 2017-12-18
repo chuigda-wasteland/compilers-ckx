@@ -80,8 +80,8 @@ ckx_parser_impl_test::test()
         decl->ast_dump(writer, 0);
         delete decl;
 
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        assert(base::error_list.empty());
+        assert(base::warn_list.empty());
         cleanup_test();
     }
 
@@ -93,8 +93,8 @@ ckx_parser_impl_test::test()
         decl->ast_dump(writer, 0);
         delete decl;
 
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        assert(base::error_list.empty());
+        assert(base::warn_list.empty());
         cleanup_test();
     }
 
@@ -106,8 +106,8 @@ ckx_parser_impl_test::test()
         decl->ast_dump(writer, 0);
         delete decl;
 
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        assert(base::error_list.empty());
+        assert(base::warn_list.empty());
         cleanup_test();
     }
 
@@ -115,14 +115,14 @@ ckx_parser_impl_test::test()
         ckx_test_filereader reader {"student const * pcstudent;"};
         base::token_stream = new ckx_token_stream(reader);
         initialize_test();
-        base::typename_table->add_typename(
+        base::typename_table.add_typename(
             saber_string_pool::create_view("student"));
         ckx_ast_decl_stmt *decl = base::parse_decl_stmt();
         decl->ast_dump(writer, 0);
         delete decl;
 
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        assert(base::error_list.empty());
+        assert(base::warn_list.empty());
         cleanup_test();
     }
 }
@@ -140,8 +140,8 @@ void ckx_parser_impl_test::test_array_decl()
         decl->ast_dump(writer, 0);
         delete decl;
 
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        assert(base::error_list.empty());
+        assert(base::warn_list.empty());
         cleanup_test();
     }
 
@@ -153,8 +153,8 @@ void ckx_parser_impl_test::test_array_decl()
         decl->ast_dump(writer, 0);
         delete decl;
 
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        assert(base::error_list.empty());
+        assert(base::warn_list.empty());
         cleanup_test();
     }
 
@@ -166,8 +166,8 @@ void ckx_parser_impl_test::test_array_decl()
         decl->ast_dump(writer, 0);
         delete decl;
 
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        assert(base::error_list.empty());
+        assert(base::warn_list.empty());
         cleanup_test();
     }
 }
@@ -176,16 +176,12 @@ void ckx_parser_impl_test::test_array_decl()
 void
 ckx_parser_impl_test::initialize_test()
 {
-    base::error_list = new saber::list<ckx_error>;
-    base::warn_list = new saber::list<ckx_error>;
-    base::typename_table = new detail::ckx_typename_table;
 }
 
 
 void
 ckx_parser_impl_test::cleanup_test()
 {
-    delete base::error_list;
-    delete base::warn_list;
-    delete base::typename_table;
+    base::typename_table.cleanup();
+    delete base::token_stream;
 }

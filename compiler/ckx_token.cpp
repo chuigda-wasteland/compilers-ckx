@@ -20,6 +20,7 @@
 #include "ckx_token.hpp"
 #include "memory.hpp"
 #include "string_pool.hpp"
+#include "c8assert.hpp"
 
 namespace ckx
 {
@@ -90,7 +91,8 @@ saber_string to_string_helper(ckx_token _token)
     case ckx_token::type::tk_eoi:
         return "EOI";
     }
-    assert(false);
+
+    C8ASSERT(false);
 }
 
 } // namespace ckx;

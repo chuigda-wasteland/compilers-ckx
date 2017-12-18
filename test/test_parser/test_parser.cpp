@@ -41,22 +41,20 @@ int main(int argc, const char* argv[])
 
     we::we_fp_reader reader(fp);
     we::we_fp_writer writer(stdout);
-    saber_ptr<ckx_token_stream> stream =
-        new ckx_token_stream(reader);
+    ckx_token_stream *stream = new ckx_token_stream(reader);
 
     ckx_parser parser;
     auto parse_result = parser.parse(stream);
     parse_result.trans_unit->ast_dump(writer, 0);
 
-    for (auto &error : *(parse_result.error_list))
+    for (auto &error : parse_result.error_list)
     {
         std::printf("At (%lu,%lu):", error.pos.first, error.pos.second);
         std::printf("Error -- %s \n", error.desc.get().c_str());
     }
 
     delete parse_result.trans_unit;
-    delete parse_result.error_list;
-    delete parse_result.warn_list;
+    delete stream;
 
     std::fclose(fp);
     return 0;

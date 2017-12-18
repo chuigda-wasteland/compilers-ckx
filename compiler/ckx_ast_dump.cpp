@@ -17,6 +17,7 @@
 
 #include <cstdio>
 #include "ckx_ast_node.hpp"
+#include "c8assert.hpp"
 
 namespace ckx
 {
@@ -326,7 +327,7 @@ void ckx_ast_binary_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
     case ckx_op::op_mod_assign:
         _writer.write(reinterpret_cast<const qchar*>("%=")); break;
 
-    default: assert(false); // What the fuck!
+    default: C8ASSERT(false); // What the fuck!
     }
     _writer.write(reinterpret_cast<const qchar*>("\n"));
     loperand->ast_dump(_writer, _level+1);
@@ -356,7 +357,7 @@ void ckx_ast_unary_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
     case ckx_op::op_dec:
         _writer.write(reinterpret_cast<const qchar*>("Decrement")); break;
     default:
-        assert(false); // What the fuck!
+        C8ASSERT(false); // What the fuck!
     }
     _writer.write(reinterpret_cast<const qchar*>(" Towards\n"));
     operand->ast_dump(_writer, _level+1);

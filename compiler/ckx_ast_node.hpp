@@ -62,7 +62,6 @@ public:
 
 private:
     saber::vector<ckx_ast_stmt*> stmts;
-    ckx_env *global_table;
 };
 
 interface ckx_ast_stmt implements ckx_ast_node

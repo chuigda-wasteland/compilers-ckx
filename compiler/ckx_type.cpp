@@ -18,6 +18,7 @@
 
 #include "ckx_type.hpp"
 #include "unordered_map.hpp"
+#include "c8assert.hpp"
 
 namespace ckx
 {
@@ -114,51 +115,10 @@ void ckx_type::from_qual_bits(unsigned char _qual_bits)
     qual = _qual_bits;
 }
 
-saber_string ckx_type::qual_to_string() const
-{
-    saber_string ret;
-    if (qual & qual_const) ret += " const";
-    if (qual & qual_volatile) ret += " volatile";
-    if (qual & qual_restrict) ret += " restrict";
-    return ret;
-}
-
 
 ckx_basic_type::ckx_basic_type(category _basic_category) :
     ckx_type(_basic_category)
 {}
-
-
-saber_string
-ckx_basic_type::to_string() const
-{
-    struct category_hash
-    {
-        bool operator() (category _ctg) const
-        {
-            return std::hash<qchar>()(static_cast<qchar>(_ctg));
-        }
-    };
-
-    static saber::unordered_map<category, saber_string, category_hash>
-            typename_string_list
-    {
-        {category::type_vi8,  "vi8"},
-        {category::type_vi16, "vi16"},
-        {category::type_vi32, "vi32"},
-        {category::type_vi64, "vi64"},
-        {category::type_vu8,  "vu8"},
-        {category::type_vu16, "vu16"},
-        {category::type_vu32, "vu32"},
-        {category::type_vu64, "vu64"},
-        {category::type_vr32, "vr32"},
-        {category::type_vr64, "vr64"},
-        {category::type_vch,  "vch"},
-        {category::type_void, "void"}
-    };
-
-    return typename_string_list.find(type_category)->second + qual_to_string();
-}
 
 
 
@@ -167,12 +127,6 @@ ckx_id_type::ckx_id_type(saber_string_view _name) :
     name(_name)
 {}
 
-saber_string
-ckx_id_type::to_string() const
-{
-    return name.get();
-}
-
 saber_string_view
 ckx_id_type::get_name() const
 {
@@ -180,17 +134,10 @@ ckx_id_type::get_name() const
 }
 
 
-
 ckx_struct_type::ckx_struct_type(saber_string_view _struct_name) :
     ckx_type(ckx_type::category::type_struct),
     struct_name(_struct_name)
 {}
-
-saber_string
-ckx_struct_type::to_string() const
-{
-    return "StructType[[" + struct_name.get() + "]]" + qual_to_string();
-}
 
 saber_string_view ckx_struct_type::get_name() const
 {
@@ -209,17 +156,10 @@ ckx_struct_type::add_field(saber_string_view _name, saber_ptr<ckx_type> _type)
 }
 
 
-
 ckx_variant_type::ckx_variant_type(saber_string_view _variant_name) :
     ckx_type(ckx_type::category::type_variant),
     variant_name(_variant_name)
 {}
-
-saber_string
-ckx_variant_type::to_string() const
-{
-    return "VariantType[[" + variant_name.get() + "]]" + qual_to_string();
-}
 
 saber_string_view
 ckx_variant_type::get_name() const
@@ -239,17 +179,10 @@ ckx_variant_type::add_field(saber_string_view _name, saber_ptr<ckx_type> _type)
 }
 
 
-
 ckx_enum_type::ckx_enum_type(saber_string_view _enum_name) :
     ckx_type(ckx_type::category::type_enum),
     enum_name(_enum_name)
 {}
-
-saber_string
-ckx_enum_type::to_string() const
-{
-    return "EnumType[[" + enum_name.get() + "]]" + qual_to_string();
-}
 
 saber_string_view
 ckx_enum_type::get_name() const
@@ -269,7 +202,6 @@ ckx_enum_type::add_enumerator(saber_string_view _name, qint64 _value)
 }
 
 
-
 ckx_func_type::ckx_func_type(
         saber_ptr<ckx_type> _return_type,
         saber::vector<saber_ptr<ckx_type>> &&_param_type_list) :
@@ -277,17 +209,6 @@ ckx_func_type::ckx_func_type(
     return_type(saber::move(_return_type)),
     param_type_list(saber::move(_param_type_list))
 {}
-
-saber_string
-ckx_func_type::to_string() const
-{
-    saber_string ret = "fn (";
-    for (const saber_ptr<ckx_type>& type : param_type_list)
-        ret += type->to_string() + saber_string(",");
-    ret += saber_string(") -> ");
-    ret += return_type->to_string();
-    return ret  + qual_to_string();
-}
 
 saber_ptr<ckx_type>
 ckx_func_type::get_return_type()
@@ -302,18 +223,10 @@ ckx_func_type::get_param_type_list()
 }
 
 
-
 ckx_pointer_type::ckx_pointer_type(saber_ptr<ckx_type> _target) :
     ckx_type(ckx_type::category::type_pointer),
     target(_target)
 {}
-
-saber_string
-ckx_pointer_type::to_string() const
-{
-    return target->to_string() + saber_string(" *")  + qual_to_string();
-}
-
 
 
 ckx_array_type::ckx_array_type(saber_ptr<ckx_type> _element) :
@@ -321,24 +234,16 @@ ckx_array_type::ckx_array_type(saber_ptr<ckx_type> _element) :
     element_type(_element)
 {}
 
-saber_string
-ckx_array_type::to_string() const
-{
-    return element_type->to_string() + "[]"  + qual_to_string();
-}
-
 saber_ptr<ckx_type> ckx_array_type::get_element_type()
 {
     return element_type;
 }
 
 
-
 saber_ptr<ckx_type> ckx_type_alias::get_aliasee()
 {
     return origin;
 }
-
 
 
 saber_ptr<ckx_type>
@@ -359,7 +264,7 @@ ckx_type_helper::get_type(ckx_token::type _basic_type_token)
     case ckx_token::type::tk_vr64:  return get_vr64_type();
     case ckx_token::type::tk_void:   return get_void_type();
 
-    default: assert(0);
+    default: C8ASSERT(0);
     }
 }
 
@@ -533,7 +438,7 @@ ckx_type_helper::resolve_relation(saber_ptr<ckx_type> _ty1,
             {
                 /// @attention function types shall be handled by
                 /// "overloading resolver", not this type checker.
-                assert(false);
+                C8ASSERT(false);
                 /// add this return for suppressing compiler warnings
                 return relation::rel_incomptialble;
             }
@@ -581,8 +486,7 @@ ckx_type_helper::resolve_relation(saber_ptr<ckx_type> _ty1,
         return has_same_qual ? relation::rel_comptiable :
                                relation::rel_can_cast;
     }
-    else if (_ty1->is_basic()
-             && _ty2->is_basic())
+    else if (_ty1->is_basic() && _ty2->is_basic())
     {
         return relation::rel_can_cast;
     }
@@ -596,7 +500,7 @@ ckx_type_helper::resolve_relation(saber_ptr<ckx_type> _ty1,
         return relation::rel_incomptialble;
     }
 
-    assert(false);
+    C8ASSERT(false);
 }
 
 ckx_type_helper::func_relation

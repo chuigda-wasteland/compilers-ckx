@@ -8,6 +8,7 @@ SOURCES += \
     ../../shared/src/file_writer.cpp \
     ../../shared/src/file_reader.cpp \
     ../../compiler/ckx_type.cpp \
+    ../../compiler/ckx_type_dump.cpp \
     ../../compiler/ckx_ast_dump.cpp \
     ../../compiler/ckx_ast_node.cpp \
     ../../compiler/ckx_env_table.cpp \

@@ -18,6 +18,7 @@
   */
 
 #include "llvm_inst_detail.hpp"
+#include "c8assert.hpp"
 
 namespace faker
 {
@@ -207,7 +208,7 @@ void llvm_binary_instruction::pretty_print(we::we_file_writer &_writer)
     case operator_type::ot_shl:  _writer.write("shl ");  break;
     case operator_type::ot_lshr: _writer.write("lshr "); break;
     case operator_type::ot_ashr: _writer.write("ashr "); break;
-    default: assert(false);
+    default: C8ASSERT(false);
     }
     _writer.write(yield_type);
     _writer.write(" ");
@@ -245,7 +246,7 @@ void llvm_cast_instruction::pretty_print(we::we_file_writer &_writer)
     case operator_type::ot_inttoptr: _writer.write("inttoptr "); break;
     case operator_type::ot_ptrtoint: _writer.write("ptrtoint "); break;
     case operator_type::ot_bitcast:  _writer.write("bitcast ");  break;
-    default: assert(false);
+    default: C8ASSERT(false);
     }
     _writer.write(origin_type);
     _writer.write(" ");
@@ -293,7 +294,7 @@ void llvm_cmp_instruction::pretty_print(we::we_file_writer &_writer)
     case 3: _writer.write("ge "); break;
     case 4: _writer.write("lt "); break;
     case 5: _writer.write("le "); break;
-    default: assert(false);
+    default: C8ASSERT(false);
     }
 
     _writer.write(compared_type);

@@ -20,6 +20,7 @@
 
 #include "ckx_parser_impl.hpp"
 #include "memory.hpp"
+#include "c8assert.hpp"
 
 using namespace ckx;
 
@@ -96,8 +97,8 @@ R"noip(
             base::template parse_record_stmt<ckx_ast_struct_stmt>();
         stmt->ast_dump(writer, 0);
         delete stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 
@@ -117,8 +118,8 @@ R"noip(
                 base::template parse_record_stmt<ckx_ast_struct_stmt>();
         stmt->ast_dump(writer, 0);
         delete stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 }
@@ -145,8 +146,8 @@ R"noip(
         stmt->ast_dump(writer, 0);
         delete stmt;
 
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 }
@@ -164,8 +165,8 @@ ckx_parser_impl_test::test_parse_alias()
         ckx_ast_alias_stmt *stmt = base::parse_alias_stmt();
         stmt->ast_dump(writer, 0);
         delete stmt;
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
     }
 }
@@ -174,16 +175,12 @@ ckx_parser_impl_test::test_parse_alias()
 void
 ckx_parser_impl_test::initialize_test()
 {
-    base::error_list = new saber::list<ckx_error>;
-    base::warn_list = new saber::list<ckx_error>;
-    base::typename_table = new detail::ckx_typename_table;
 }
 
 
 void
 ckx_parser_impl_test::cleanup_test()
 {
-    delete base::error_list;
-    delete base::warn_list;
-    delete base::typename_table;
+    base::typename_table.cleanup();
+    delete base::token_stream;
 }

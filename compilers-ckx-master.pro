@@ -10,3 +10,6 @@ SUBDIRS += \
     test/test_parser \
     test/test_type_checker \
     llvm_ir_builder
+
+HEADERS += \
+    saber/include/c8assert.hpp

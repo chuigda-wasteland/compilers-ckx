@@ -18,18 +18,18 @@
 
 
 #include "ckx_parser_impl.hpp"
+#include "c8assert.hpp"
 
 namespace ckx
 {
 
 
-ckx_parser::parse_result::parse_result(
-        ckx_ast_translation_unit *_trans_unit,
-        saber::list<ckx_error> *_error_list,
-        saber::list<ckx_error> *_warn_list) :
-    trans_unit(_trans_unit),
-    error_list(_error_list),
-    warn_list(_warn_list)
+ckx_parser::parse_result::parse_result(ckx_ast_translation_unit *_trans_unit,
+        saber::list<ckx::ckx_error> &&_error_list,
+        saber::list<ckx::ckx_error> &&_warn_list) :
+    trans_unit(saber::move(_trans_unit)),
+    error_list(saber::move(_error_list)),
+    warn_list(saber::move(_warn_list))
 {}
 
 
@@ -41,17 +41,13 @@ ckx_parser::parse_result::~parse_result()
 }
 
 
-ckx_parser::parse_result::parse_result(
-        parse_result &&_another) :
+ckx_parser::parse_result::parse_result(parse_result &&_another) :
     trans_unit(_another.trans_unit),
-    error_list(_another.error_list),
-    warn_list(_another.warn_list)
+    error_list(saber::move(_another.error_list)),
+    warn_list(saber::move(_another.warn_list))
 {
     _another.trans_unit = nullptr;
-    _another.error_list = nullptr;
-    _another.warn_list = nullptr;
 }
-
 
 
 
@@ -60,17 +56,13 @@ ckx_parser::ckx_parser()
     p_impl = new detail::ckx_parser_impl;
 }
 
-
-
 ckx_parser::~ckx_parser()
 {
     delete p_impl;
 }
 
-
-
 typename ckx_parser::parse_result
-ckx_parser::parse(saber_ptr<ckx_token_stream> _token_stream)
+ckx_parser::parse(ckx_token_stream* _token_stream)
 {
     return p_impl->parse_impl(_token_stream);
 }
@@ -81,13 +73,9 @@ namespace detail
 {
 
 typename ckx_parser::parse_result
-ckx_parser_impl::parse_impl(saber_ptr<ckx_token_stream> _token_stream)
+ckx_parser_impl::parse_impl(ckx_token_stream* _token_stream)
 {
     token_stream = _token_stream;
-    error_list = new saber::list<ckx_error>;
-    warn_list = new saber::list<ckx_error>;
-    typename_table = new ckx_typename_table;
-
     ckx_ast_translation_unit *trans_unit =
          new ckx_ast_translation_unit(current_token());
 
@@ -98,10 +86,12 @@ ckx_parser_impl::parse_impl(saber_ptr<ckx_token_stream> _token_stream)
 
     ckx_parser::parse_result ret =
         ckx_parser::parse_result(
-            trans_unit, error_list, warn_list);
+            trans_unit, saber::move(error_list), saber::move(warn_list));
+
     trans_unit = nullptr;
-    warn_list = nullptr;
-    delete typename_table;
+    error_list.clear();
+    warn_list.clear();
+    typename_table.cleanup();
     return ret;
 }
 
@@ -240,9 +230,9 @@ ckx_ast_expr_stmt*
 ckx_parser_impl::parse_expr_stmt()
 {
     ckx_token at_token = current_token();
-    ckx_ast_expr_stmt *ret = new ckx_ast_expr_stmt(at_token, parse_expr());
+    ckx_ast_expr *expr = parse_expr();
     expect_n_eat(ckx_token::type::tk_semicolon);
-    return ret;
+    return new ckx_ast_expr_stmt(at_token, expr);
 }
 
 
@@ -274,7 +264,7 @@ ckx_parser_impl::parse_decl_stmt()
 ckx_ast_func_stmt*
 ckx_parser_impl::parse_func_stmt()
 {
-    assert(current_token().token_type == ckx_token::type::tk_function);
+    C8ASSERT(current_token().token_type == ckx_token::type::tk_function);
 
     ckx_token at_token = current_token();
     next_token();
@@ -320,7 +310,7 @@ template <typename CkxAstRecordStmt>
 CkxAstRecordStmt*
 ckx_parser_impl::parse_record_stmt()
 {
-    assert(current_token().token_type == ckx_token::type::tk_struct \
+    C8ASSERT(current_token().token_type == ckx_token::type::tk_struct \
            || current_token().token_type == ckx_token::type::tk_variant);
     static_assert(
         saber::traits::type_equivalent<CkxAstRecordStmt, ckx_ast_struct_stmt>::
@@ -333,7 +323,7 @@ ckx_parser_impl::parse_record_stmt()
     next_token();
 
     saber_string_view record_name = current_token().str;
-    typename_table->add_typename(record_name);
+    typename_table.add_typename(record_name);
     next_token();
     expect_n_eat(ckx_token::type::tk_lbrace);
     saber::vector<typename CkxAstRecordStmt::field> fields;
@@ -363,11 +353,11 @@ ckx_parser_impl::parse_record_stmt()
 ckx_ast_enum_stmt*
 ckx_parser_impl::parse_enum_stmt()
 {
-    assert(current_token().token_type == ckx_token::type::tk_enum);
+    C8ASSERT(current_token().token_type == ckx_token::type::tk_enum);
     ckx_token at_token = current_token();
     next_token();
     saber_string_view enum_name = current_token().str;
-    typename_table->add_typename(enum_name);
+    typename_table.add_typename(enum_name);
 
     next_token();
     expect_n_eat(ckx_token::type::tk_lbrace);
@@ -394,7 +384,7 @@ ckx_parser_impl::parse_enum_stmt()
 
 ckx_ast_alias_stmt *ckx_parser_impl::parse_alias_stmt()
 {
-    assert(current_token().token_type == ckx_token::type::tk_alias);
+    C8ASSERT(current_token().token_type == ckx_token::type::tk_alias);
     ckx_token at_token = current_token();
     next_token();
 
@@ -405,7 +395,7 @@ ckx_ast_alias_stmt *ckx_parser_impl::parse_alias_stmt()
     saber_ptr<ckx_type> type = parse_type();
     expect_n_eat(ckx_token::type::tk_semicolon);
 
-    typename_table->add_typename(name);
+    typename_table.add_typename(name);
     return new ckx_ast_alias_stmt(at_token, name, type);
 }
 
@@ -413,7 +403,7 @@ ckx_ast_alias_stmt *ckx_parser_impl::parse_alias_stmt()
 ckx_ast_if_stmt*
 ckx_parser_impl::parse_if_stmt()
 {
-    assert(current_token().token_type == ckx_token::type::tk_if);
+    C8ASSERT(current_token().token_type == ckx_token::type::tk_if);
     ckx_token at_token = current_token();
     next_token();
 
@@ -437,7 +427,7 @@ ckx_parser_impl::parse_if_stmt()
 ckx_ast_while_stmt*
 ckx_parser_impl::parse_while_stmt()
 {
-    assert(current_token().token_type == ckx_token::type::tk_while);
+    C8ASSERT(current_token().token_type == ckx_token::type::tk_while);
     ckx_token at_token = current_token();
     next_token();
 
@@ -453,7 +443,7 @@ ckx_parser_impl::parse_while_stmt()
 ckx_ast_do_while_stmt*
 ckx_parser_impl::parse_do_while_stmt()
 {
-    assert(current_token().token_type == ckx_token::type::tk_do);
+    C8ASSERT(current_token().token_type == ckx_token::type::tk_do);
     ckx_token at_token = current_token();
     next_token();
 
@@ -471,7 +461,7 @@ ckx_parser_impl::parse_do_while_stmt()
 ckx_ast_for_stmt*
 ckx_parser_impl::parse_for_stmt()
 {
-    assert(current_token().token_type == ckx_token::type::tk_for);
+    C8ASSERT(current_token().token_type == ckx_token::type::tk_for);
     ckx_token at_token = current_token();
     next_token();
 
@@ -497,7 +487,7 @@ ckx_parser_impl::parse_for_stmt()
 ckx_ast_break_stmt*
 ckx_parser_impl::parse_break_stmt()
 {
-    assert(current_token().token_type == ckx_token::type::tk_break);
+    C8ASSERT(current_token().token_type == ckx_token::type::tk_break);
     ckx_token at_token = current_token();
     next_token();
     expect_n_eat(ckx_token::type::tk_semicolon);
@@ -510,7 +500,7 @@ ckx_parser_impl::parse_break_stmt()
 ckx_ast_continue_stmt*
 ckx_parser_impl::parse_continue_stmt()
 {
-    assert(current_token().token_type == ckx_token::type::tk_continue);
+    C8ASSERT(current_token().token_type == ckx_token::type::tk_continue);
     ckx_token at_token = current_token();
     next_token();
     expect_n_eat(ckx_token::type::tk_semicolon);
@@ -522,7 +512,7 @@ ckx_parser_impl::parse_continue_stmt()
 ckx_ast_return_stmt*
 ckx_parser_impl::parse_return_stmt()
 {
-    assert(current_token().token_type == ckx_token::type::tk_return);
+    C8ASSERT(current_token().token_type == ckx_token::type::tk_return);
     ckx_token at_token = current_token();
     next_token();
 
@@ -589,7 +579,7 @@ ckx_parser_impl::parse_array_expr()
 {
     ckx_token at_token = current_token();
     saber_ptr<ckx_type> array_type = parse_type();
-    assert(array_type != nullptr);
+    C8ASSERT(array_type != nullptr);
 
     ckx_ast_array_expr *ret = new ckx_ast_array_expr(at_token, array_type);
 
@@ -711,7 +701,7 @@ ckx_parser_impl::parse_cast_expr()
         castop = ckx_ast_cast_expr::castop::cst_reinterpret; break;
     case ckx_token::type::tk_ckx_cast:
         castop = ckx_ast_cast_expr::castop::cst_ckx; break;
-    default: assert(false); // What the fuck!
+    default: C8ASSERT(false); // What the fuck!
     }
     next_token();
     expect_n_eat(ckx_token::type::tk_lt);
@@ -873,7 +863,7 @@ ckx_parser_impl::parse_basic_expr()
         }
 
     default:
-        assert(0);
+        return nullptr;
     }
 }
 
@@ -918,21 +908,21 @@ ckx_parser_impl::parse_type()
 inline ckx_token
 ckx_parser_impl::current_token()
 {
-    return token_stream.get()->operator[](0);
+    return token_stream->operator[](0);
 }
 
 
 inline ckx_token
 ckx_parser_impl::peek_next_token()
 {
-    return token_stream.get()->operator[](1);
+    return token_stream->operator[](1);
 }
 
 
 inline void
 ckx_parser_impl::next_token()
 {
-    return token_stream.get()->operator++();
+    return token_stream->operator++();
 }
 
 
@@ -965,32 +955,32 @@ inline bool ckx_parser_impl::expect(ckx_token::type _token_type)
 bool
 ckx_parser_impl::id_is_typename(ckx_token _token)
 {
-    assert(_token.token_type == ckx_token::type::tk_id);
-    return typename_table->query_typename(_token.str);
+    C8ASSERT(_token.token_type == ckx_token::type::tk_id);
+    return typename_table.query_typename(_token.str);
 }
 
 
 void
 ckx_parser_impl::syntax_error(const qcoord &_coord,
-                                              saber_string_view _desc)
+                              saber_string_view _desc)
 {
-    error_list->emplace_back(_coord, _desc);
+    error_list.emplace_back(_coord, _desc);
 }
 
 
 void
 ckx_parser_impl::syntax_warn(const qcoord &_coord,
-                                             saber_string_view _desc)
+                             saber_string_view _desc)
 {
-    warn_list->emplace_back(_coord, _desc);
+    warn_list.emplace_back(_coord, _desc);
 }
 
 
 void
 ckx_parser_impl::skip2_token(const ckx_token_set& _token_set)
 {
-    while ( _token_set.find(current_token().token_type) == _token_set.end()
-            && (current_token().token_type != ckx_token::type::tk_eoi) )
+    while (_token_set.find(current_token().token_type) == _token_set.end()
+           && (current_token().token_type != ckx_token::type::tk_eoi))
         next_token();
 }
 

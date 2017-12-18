@@ -6,7 +6,6 @@
 #include "ckx_token_set.hpp"
 #include "ckx_error.hpp"
 #include "ckx_env_table.hpp"
-
 #include "ckx_ast_node.hpp"
 
 namespace ckx
@@ -18,8 +17,7 @@ namespace detail
 class ckx_typename_table final
 {
 public:
-    explicit ckx_typename_table(ckx_typename_table* _parent = nullptr) :
-        parent(_parent) {}
+    explicit ckx_typename_table() = default;
     ~ckx_typename_table() = default;
 
     void add_typename(saber_string_view _name)
@@ -29,20 +27,18 @@ public:
 
     bool query_typename(saber_string_view _name) const
     {
-        const ckx_typename_table *iter = this;
-        while (iter != nullptr)
-        {
-            auto find_it = typenames.find(_name);
-            if (find_it != typenames.end())
-                return true;
-            iter = iter->parent;
-        }
+        if (typenames.find(_name) != typenames.end())
+            return true;
         return false;
+    }
+
+    void cleanup()
+    {
+        typenames.clear();
     }
 
 private:
     saber::unordered_set<saber_string_view, string_view_hash> typenames;
-    ckx_typename_table *parent;
 };
 
 
@@ -53,7 +49,7 @@ public:
     ~ckx_parser_impl() = default;
 
     typename ckx_parser::parse_result
-    parse_impl(saber_ptr<ckx_token_stream> _token_stream);
+    parse_impl(ckx_token_stream* _token_stream);
 
 protected:
     /// @brief General parsing functions
@@ -104,7 +100,7 @@ protected:
     /// simply encapsuled token-stream again.
     inline  ckx_token  current_token();
     inline  ckx_token  peek_next_token();
-    inline  void                  next_token();
+    inline  void       next_token();
 
     inline  bool  expect_n_eat(ckx_token::type _token_type,
                                bool _can_skip = true);
@@ -118,13 +114,13 @@ protected:
     void skip2_token(const ckx_token_set& _token_set);
 
 protected:
-    saber_ptr<ckx_token_stream> token_stream;
+    ckx_token_stream *token_stream;
 
-    saber::list<ckx_error> *error_list = nullptr;
-    saber::list<ckx_error> *warn_list = nullptr;
+    saber::list<ckx_error> error_list;
+    saber::list<ckx_error> warn_list;
 
     /// @note still we need a table for storing types occured in parsing
-    ckx_typename_table *typename_table;
+    ckx_typename_table typename_table;
 };
 
 

@@ -30,18 +30,13 @@ ckx_token ckx_ast_node::get_at_token()
 { return at_token; }
 
 ckx_ast_translation_unit::ckx_ast_translation_unit(ckx_token _at_token) :
-    ckx_ast_node(_at_token),
-    global_table(new ckx_env(nullptr))
+    ckx_ast_node(_at_token)
 {}
 
 ckx_ast_translation_unit::~ckx_ast_translation_unit()
 {
     for (auto it = stmts.begin(); it != stmts.end(); ++it)
-    {
         delete *it;
-    }
-
-    delete global_table;
 }
 
 void

@@ -54,9 +54,9 @@ void set_export(FILE* _fp);
 
 #define stl_panic(_DESC)\
     {\
-    std::fprintf(fp_export(), "At file %s, line %d\n", __FILE__, __LINE__);\
-    std::fprintf(fp_export(), "STL panic called : %s\n", _DESC);\
-    std::fflush(fp_export());\
+    std::fprintf(saber::fp_export(), "At file %s, line %d\n", __FILE__, __LINE__);\
+    std::fprintf(saber::fp_export(), "STL panic called : %s\n", _DESC);\
+    std::fflush(saber::fp_export());\
     std::abort();\
     }
 

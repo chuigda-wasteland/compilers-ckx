@@ -20,6 +20,7 @@
 
 #include "ckx_parser_impl.hpp"
 #include "memory.hpp"
+#include "c8assert.hpp"
 
 using namespace ckx;
 
@@ -82,8 +83,8 @@ ckx_parser_impl_test::test_parse_func_decl()
         func->ast_dump(writer, 0);
         delete func;
 
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -98,8 +99,8 @@ ckx_parser_impl_test::test_parse_func_decl()
         func->ast_dump(writer, 0);
         delete func;
 
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -111,15 +112,15 @@ ckx_parser_impl_test::test_parse_func_decl()
               "                  vi8 math) : Student* const;" };
         base::token_stream = new ckx_token_stream(reader);
         initialize_test();
-        base::typename_table->add_typename(
+        base::typename_table.add_typename(
             saber_string_pool::create_view("Student"));
 
         ckx_ast_func_stmt *func = base::parse_func_stmt();
         func->ast_dump(writer, 0);
         delete func;
 
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -145,15 +146,15 @@ R"cpp(
         ckx_test_filereader reader { str };
         base::token_stream = new ckx_token_stream(reader);
         initialize_test();
-        base::typename_table->add_typename(
+        base::typename_table.add_typename(
             saber_string_pool::create_view("Student"));
 
         ckx_ast_func_stmt *func = base::parse_func_stmt();
         func->ast_dump(writer, 0);
         delete func;
 
-        assert(base::error_list->empty());
-        assert(base::warn_list->empty());
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
         cleanup_test();
         base::token_stream = nullptr;
     }
@@ -163,16 +164,12 @@ R"cpp(
 void
 ckx_parser_impl_test::initialize_test()
 {
-    base::error_list = new saber::list<ckx_error>;
-    base::warn_list = new saber::list<ckx_error>;
-    base::typename_table = new detail::ckx_typename_table;
 }
 
 
 void
 ckx_parser_impl_test::cleanup_test()
 {
-    delete base::error_list;
-    delete base::warn_list;
-    delete base::typename_table;
+    base::typename_table.cleanup();
+    delete base::token_stream;
 }

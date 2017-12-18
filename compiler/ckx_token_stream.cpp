@@ -20,6 +20,7 @@
 
 #include "file_reader.hpp"
 #include "vector.hpp"
+#include "c8assert.hpp"
 
 namespace ckx
 {
@@ -33,14 +34,18 @@ public:
     static qpair<ckx_token::type, bool> lookup(saber_string_view _name);
 
 private:
-    static void initialize();
-
     static saber::unordered_map<saber_string, ckx_token::type> map;
-    static bool initialized;
 };
 
-bool ckx_identifier_table::initialized = false;
-saber::unordered_map<saber_string, ckx_token::type> ckx_identifier_table::map;
+saber::unordered_map<saber_string, ckx_token::type> ckx_identifier_table::map
+{
+#define GGLEX(X, Y)\
+    qpair<saber_string, ckx_token::type>(X, ckx_token::type::tk_##Y),
+#include "gg.h"
+#undef GGLEX
+    qpair<saber_string, ckx_token::type>("{-# ice1000 #-}",
+                                         ckx_token::type::tk_eoi)
+};
 
 
 
@@ -106,7 +111,7 @@ ckx_token_stream::~ckx_token_stream()
 }
 
 ckx_token
-ckx_token_stream::operator [](int _offset)
+ckx_token_stream::operator[] (int _offset)
 {
     return impl->operator_index_impl(_offset);
 }
@@ -116,7 +121,7 @@ saber::vector<ckx_error>& ckx_token_stream::get_error()
     return impl->get_error_impl();
 }
 
-void ckx_token_stream::operator ++ ()
+void ckx_token_stream::operator++ ()
 {
     impl->operator_incr_impl();
 }
@@ -129,11 +134,6 @@ namespace detail
 qpair<ckx_token::type, bool>
 ckx_identifier_table::lookup(saber_string_view _name)
 {
-    if (!initialized)
-    {
-        initialize();
-        initialized = true;
-    }
 
     if (map.find(_name.get()) != map.end())
     {
@@ -143,15 +143,6 @@ ckx_identifier_table::lookup(saber_string_view _name)
     {
         return qpair<ckx_token::type, bool>(ckx_token::type::tk_eoi, false);
     }
-}
-
-void ckx_identifier_table::initialize()
-{
-#define GGLEX(X, Y)\
-    map.insert(\
-        qpair<saber_string, ckx_token::type>(X, ckx_token::type::tk_##Y));
-#include "gg.h"
-#undef GGLEX
 }
 
 
@@ -425,7 +416,7 @@ void ckx_token_stream_impl::solve_bitwise_or_logic_op()
         break;
 
     default:
-        assert(false); // what the fuck!
+        C8ASSERT(false); // what the fuck!
     }
 
     token_buffer.emplace_back(char_coord(), new_token_type);
@@ -444,7 +435,7 @@ void ckx_token_stream_impl::solve_add_n_sub()
         {
         case '+': new_token_type = ckx_token::type::tk_inc; break;
         case '-': new_token_type = ckx_token::type::tk_dec; break;
-        default: assert(false); // What the fuck!
+        default: C8ASSERT(false); // What the fuck!
         }
         next_char();
     }
@@ -454,7 +445,7 @@ void ckx_token_stream_impl::solve_add_n_sub()
         {
         case '+': new_token_type = ckx_token::type::tk_add_assign; break;
         case '-': new_token_type = ckx_token::type::tk_sub_assign; break;
-        default: assert(false); // What the fuck!
+        default: C8ASSERT(false); // What the fuck!
         }
         next_char();
     }
@@ -464,7 +455,7 @@ void ckx_token_stream_impl::solve_add_n_sub()
         {
         case '+': new_token_type = ckx_token::type::tk_add; break;
         case '-': new_token_type = ckx_token::type::tk_sub; break;
-        default: assert(false); // What the fuck!
+        default: C8ASSERT(false); // What the fuck!
         }
     }
 
@@ -555,7 +546,7 @@ void ckx_token_stream_impl::solve_ordinary_op()
         break;
     default:
         // What the fuck!
-        assert(false);
+        C8ASSERT(false);
     }
 
     token_buffer.emplace_back(char_coord(), new_token_type);

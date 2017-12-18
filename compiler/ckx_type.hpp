@@ -75,7 +75,7 @@ public:
         qual_mask = qual_const | qual_volatile | qual_restrict
     };
 
-    ckx_type(category _category);
+    explicit ckx_type(category _category);
     virtual ~ckx_type() = 0;
     virtual saber_string to_string() const = 0;
 
@@ -112,7 +112,7 @@ protected:
 class ckx_basic_type final implements ckx_type
 {
 public:
-    ckx_basic_type(category _basic_category);
+    explicit ckx_basic_type(category _basic_category);
     ~ckx_basic_type() override final = default;
 
     saber_string to_string() const override final;
@@ -121,7 +121,7 @@ public:
 class ckx_id_type final implements ckx_type
 {
 public:
-    ckx_id_type(saber_string_view _name);
+    explicit ckx_id_type(saber_string_view _name);
     ~ckx_id_type() override final = default;
 
     saber_string to_string() const override final;
@@ -152,7 +152,7 @@ public:
             : name(_name), type(_type) {}
     };
 
-    ckx_struct_type(saber_string_view _struct_name);
+    explicit ckx_struct_type(saber_string_view _struct_name);
     ~ckx_struct_type() override final = default;
 
     saber_string to_string() const override final;
@@ -185,7 +185,7 @@ public:
             : name(saber::move(_name)), type(_type) {}
     };
 
-    ckx_variant_type(saber_string_view _variant_name);
+    explicit ckx_variant_type(saber_string_view _variant_name);
     ~ckx_variant_type() override final = default;
 
     saber_string to_string() const override final;
@@ -216,7 +216,7 @@ public:
             : name(_name), value(_value) {}
     };
 
-    ckx_enum_type(saber_string_view _enum_name);
+    explicit ckx_enum_type(saber_string_view _enum_name);
     ~ckx_enum_type() override final = default;
 
     saber_string to_string() const override final;
@@ -249,7 +249,7 @@ private:
 class ckx_pointer_type final implements ckx_type
 {
 public:
-    ckx_pointer_type(saber_ptr<ckx_type> _target);
+    explicit ckx_pointer_type(saber_ptr<ckx_type> _target);
     ~ckx_pointer_type() override final = default;
 
     saber_string to_string() const override final;
@@ -263,7 +263,7 @@ private:
 class ckx_array_type final implements ckx_type
 {
 public:
-    ckx_array_type(saber_ptr<ckx_type> _element);
+    explicit ckx_array_type(saber_ptr<ckx_type> _element);
     ~ckx_array_type() override final = default;
 
     saber_string to_string() const override final;
@@ -277,7 +277,7 @@ private:
 class ckx_type_alias final implements ckx_type
 {
 public:
-    ckx_type_alias(saber_ptr<ckx_type> _origin);
+    explicit ckx_type_alias(saber_ptr<ckx_type> _origin);
     ~ckx_type_alias() override final = default;
 
     saber_string to_string() const override final;

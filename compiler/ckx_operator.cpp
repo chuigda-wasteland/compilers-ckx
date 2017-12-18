@@ -1,4 +1,5 @@
 ﻿#include "ckx_operator.hpp"
+#include "c8assert.hpp"
 
 namespace ckx
 {
@@ -125,7 +126,7 @@ quint8 ckx_op_helper::precedence(ckx_op _op)
         return 24;
 
     default:
-        assert(false); // What the fuck!
+        C8ASSERT(false); // What the fuck!
     }
 }
 

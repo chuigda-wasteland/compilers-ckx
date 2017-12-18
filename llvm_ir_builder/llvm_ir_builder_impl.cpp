@@ -19,6 +19,7 @@
 
 #include "llvm_ir_builder_impl.hpp"
 #include "llvm_value_detail.hpp"
+#include "c8assert.hpp"
 
 namespace faker
 {
@@ -65,9 +66,9 @@ void llvm_ir_builder_impl::create_n_enter_func(
         saber::vector<saber_string_view> _param_name_list,
         llvm_func_attrs _attrs)
 {
-    assert(local_temp_var_counter == 0);
-    assert(local_temp_label_counter == 0);
-    assert(stashed_global_insertion_point == nullptr);
+    C8ASSERT(local_temp_var_counter == 0);
+    C8ASSERT(local_temp_label_counter == 0);
+    C8ASSERT(stashed_global_insertion_point == nullptr);
     auto fndef = new llvm_func_def(_return_type, _name,
                                    saber::move(_param_type_list),
                                    saber::move(_param_name_list),
