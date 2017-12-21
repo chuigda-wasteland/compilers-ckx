@@ -16,7 +16,8 @@ SOURCES += main.cpp \
     ckx_type_dump.cpp \
     ckx_operator.cpp \
     ../shared/src/file_reader.cpp \
-    ../shared/src/file_writer.cpp
+    ../shared/src/file_writer.cpp \
+    ckx_prelexed_type.cpp
 
 HEADERS += \
     we_file_reader.hpp \
@@ -58,7 +59,8 @@ HEADERS += \
     ../saber/include/string_pool.hpp \
     we::we_file_writer.hpp \
     ckx_operator.hpp \
-    ckx_parser_impl.hpp
+    ckx_parser_impl.hpp \
+    ckx_prelexed_type.hpp
 
 INCLUDEPATH += ../saber/include/
 INCLUDEPATH += ../shared/include/

@@ -77,6 +77,7 @@ open_class ckx_token
         tk_rbrace,             // }
         tk_lbracket,           // [
         tk_rbracket,           // ]
+        tk_arr,                // []
         tk_lparen,             // (
         tk_rparen,             // )
 
@@ -92,12 +93,12 @@ open_class ckx_token
         tk_vu32,             // vu32
         tk_vu64,             // vu64
 
-        tk_vch,               // vch
+        tk_vch,              // vch
 
         tk_vr32,             // vr32
         tk_vr64,             // vr64
 
-        tk_void,               // void
+        tk_void,             // void
 
         tk_function,           // function
 

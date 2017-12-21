@@ -157,10 +157,10 @@ ckx_ast_return_stmt::~ckx_ast_return_stmt()
 ckx_ast_decl_stmt::init_decl::~init_decl() { delete init; }
 
 ckx_ast_decl_stmt::ckx_ast_decl_stmt(ckx_token _at_token,
-        saber_ptr<ckx_type> _type,
+        ckx_prelexed_type _type,
         saber::vector<init_decl> &&_decls) :
     ckx_ast_stmt(_at_token),
-    type(_type),
+    type(saber::move(_type)),
     decls(saber::move(_decls))
 {}
 
@@ -178,16 +178,15 @@ ckx_ast_expr_stmt::~ckx_ast_expr_stmt()
 
 
 
-ckx_ast_func_stmt::ckx_ast_func_stmt(
-        ckx_token _at_token,
+ckx_ast_func_stmt::ckx_ast_func_stmt(ckx_token _at_token,
         saber_string_view _name,
         saber::vector<ckx_ast_func_stmt::param_decl> &&_param_decls,
-        saber_ptr<ckx_type> _ret_type,
+        ckx_prelexed_type _ret_type,
         ckx_ast_compound_stmt *_fnbody) :
     ckx_ast_stmt(_at_token),
     name(_name),
     param_decls(saber::move(_param_decls)),
-    ret_type(_ret_type),
+    ret_type(saber::move(_ret_type)),
     fnbody(_fnbody)
 {}
 
@@ -234,10 +233,10 @@ ckx_ast_variant_stmt::get_fields() const
 
 ckx_ast_alias_stmt::ckx_ast_alias_stmt(ckx_token _at_token,
                                        saber_string_view _name,
-                                       saber_ptr<ckx_type> _type) :
+                                       ckx_prelexed_type _type) :
     ckx_ast_stmt(_at_token),
     name(_name),
-    type(_type)
+    type(saber::move(_type))
 {}
 
 
@@ -372,11 +371,11 @@ ckx_ast_id_expr::~ckx_ast_id_expr()
 
 ckx_ast_cast_expr::ckx_ast_cast_expr(ckx_token _at_token,
                                      castop _op,
-                                     saber_ptr<ckx_type> _desired_type,
+                                     ckx_prelexed_type _desired_type,
                                      ckx_ast_expr *_expr) :
     ckx_ast_expr(_at_token),
     op(_op),
-    desired_type(_desired_type),
+    desired_type(saber::move(_desired_type)),
     expr(_expr)
 {}
 
@@ -386,9 +385,9 @@ ckx_ast_cast_expr::~ckx_ast_cast_expr()
 }
 
 ckx_ast_sizeof_expr::ckx_ast_sizeof_expr(ckx_token _at_token,
-                                         saber_ptr<ckx_type> _type) :
+                                         ckx_prelexed_type _type) :
     ckx_ast_expr(_at_token),
-    type(_type)
+    type(saber::move(_type))
 {}
 
 ckx_ast_vi_literal_expr::ckx_ast_vi_literal_expr(ckx_token _at_token,
@@ -404,9 +403,9 @@ ckx_ast_vr_literal_expr::ckx_ast_vr_literal_expr(ckx_token _at_token,
 {}
 
 ckx_ast_array_expr::ckx_ast_array_expr(ckx_token _at_token,
-                                       saber_ptr<ckx_type> _array_of_type) :
+                                       ckx_prelexed_type _array_of_type) :
     ckx_ast_expr(_at_token),
-    array_of_type(_array_of_type)
+    array_of_type(saber::move(_array_of_type))
 {}
 
 ckx_ast_array_expr::~ckx_ast_array_expr()

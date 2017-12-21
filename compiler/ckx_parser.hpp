@@ -52,6 +52,9 @@ public:
     ckx_parser();
     ~ckx_parser();
 
+    ckx_parser(const ckx_parser&) = delete;
+    ckx_parser(ckx_parser&&) = delete;
+
     parse_result parse(ckx_token_stream *_token_stream);
 
 private:

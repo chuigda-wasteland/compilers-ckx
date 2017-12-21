@@ -239,7 +239,7 @@ ckx_parser_impl::parse_expr_stmt()
 ckx_ast_decl_stmt*
 ckx_parser_impl::parse_decl_stmt()
 {
-    saber_ptr<ckx_type> type = parse_type();
+    ckx_prelexed_type type = parse_type();
     saber::vector<ckx_ast_decl_stmt::init_decl> decls;
     while (1)
     {
@@ -257,7 +257,9 @@ ckx_parser_impl::parse_decl_stmt()
         expect_n_eat(ckx_token::type::tk_comma);
     }
     expect_n_eat(ckx_token::type::tk_semicolon);
-    return new ckx_ast_decl_stmt(current_token(), type, saber::move(decls));
+    return new ckx_ast_decl_stmt(current_token(),
+                                 saber::move(type),
+                                 saber::move(decls));
 }
 
 
@@ -277,10 +279,10 @@ ckx_parser_impl::parse_func_stmt()
 
     while (1)
     {
-        saber_ptr<ckx_type> param_type = parse_type();
+        ckx_prelexed_type param_type = parse_type();
         saber_string_view param_name = current_token().str;
         next_token();
-        param_decl_list.emplace_back(param_type, param_name);
+        param_decl_list.emplace_back(saber::move(param_type), param_name);
 
         if (current_token().token_type == ckx_token::type::tk_comma)
         {
@@ -293,7 +295,7 @@ ckx_parser_impl::parse_func_stmt()
     }
     expect_n_eat(ckx_token::type::tk_rparen);
     expect_n_eat(ckx_token::type::tk_colon);
-    saber_ptr<ckx_type> ret_type = parse_type();
+    ckx_prelexed_type ret_type = parse_type();
 
     ckx_ast_compound_stmt *fnbody = nullptr;
     if (current_token().token_type == ckx_token::type::tk_lbrace)
@@ -301,8 +303,9 @@ ckx_parser_impl::parse_func_stmt()
     else
         expect_n_eat(ckx_token::type::tk_semicolon);
 
-    return new ckx_ast_func_stmt(
-        at_token, func_name, saber::move(param_decl_list), ret_type, fnbody);
+    return new ckx_ast_func_stmt(at_token, func_name,
+                                 saber::move(param_decl_list),
+                                 saber::move(ret_type), fnbody);
 }
 
 
@@ -329,11 +332,11 @@ ckx_parser_impl::parse_record_stmt()
     saber::vector<typename CkxAstRecordStmt::field> fields;
     while (1)
     {
-        saber_ptr<ckx_type> decl_type = parse_type();
+        ckx_prelexed_type decl_type = parse_type();
         while (1)
         {
             saber_string_view dclr_name = current_token().str;
-            fields.emplace_back(decl_type, dclr_name);
+            fields.emplace_back(saber::move(decl_type), dclr_name);
             next_token();
             if (current_token().token_type == ckx_token::type::tk_comma)
                 { next_token(); }
@@ -392,11 +395,11 @@ ckx_ast_alias_stmt *ckx_parser_impl::parse_alias_stmt()
     saber_string_view name = current_token().str;
     next_token();
     expect_n_eat(ckx_token::type::tk_assign);
-    saber_ptr<ckx_type> type = parse_type();
+    ckx_prelexed_type type = parse_type();
     expect_n_eat(ckx_token::type::tk_semicolon);
 
     typename_table.add_typename(name);
-    return new ckx_ast_alias_stmt(at_token, name, type);
+    return new ckx_ast_alias_stmt(at_token, name, saber::move(type));
 }
 
 
@@ -578,10 +581,11 @@ ckx_ast_expr*
 ckx_parser_impl::parse_array_expr()
 {
     ckx_token at_token = current_token();
-    saber_ptr<ckx_type> array_type = parse_type();
-    C8ASSERT(array_type != nullptr);
+    ckx_prelexed_type array_type = parse_type();
+    C8ASSERT(!array_type.get_prelexed_tokens().empty());
 
-    ckx_ast_array_expr *ret = new ckx_ast_array_expr(at_token, array_type);
+    ckx_ast_array_expr *ret = new ckx_ast_array_expr(at_token,
+                                                     saber::move(array_type));
 
     expect_n_eat(ckx_token::type::tk_lparen);
     if (current_token().token_type == ckx_token::type::tk_vi_literal)
@@ -705,13 +709,14 @@ ckx_parser_impl::parse_cast_expr()
     }
     next_token();
     expect_n_eat(ckx_token::type::tk_lt);
-    saber_ptr<ckx_type> desired_type = parse_type();
+    ckx_prelexed_type desired_type = parse_type();
     expect_n_eat(ckx_token::type::tk_gt);
     expect_n_eat(ckx_token::type::tk_lparen);
     ckx_ast_expr *expr = parse_expr();
     expect_n_eat(ckx_token::type::tk_rparen);
 
-    return new ckx_ast_cast_expr(at_token, castop, desired_type, expr);
+    return new ckx_ast_cast_expr(at_token, castop,
+                                 saber::move(desired_type), expr);
 }
 
 
@@ -857,9 +862,9 @@ ckx_parser_impl::parse_basic_expr()
         {
             next_token();
             expect_n_eat(ckx_token::type::tk_lparen);
-            saber_ptr<ckx_type> type = parse_type();
+            ckx_prelexed_type type = parse_type();
             expect_n_eat(ckx_token::type::tk_rparen);
-            return new ckx_ast_sizeof_expr(at_token, type);
+            return new ckx_ast_sizeof_expr(at_token, saber::move(type));
         }
 
     default:
@@ -868,38 +873,50 @@ ckx_parser_impl::parse_basic_expr()
 }
 
 
-saber_ptr<ckx_type>
+ckx_prelexed_type
 ckx_parser_impl::parse_type()
 {
-    saber_ptr<ckx_type> type;
-    if (current_token().token_type == ckx_token::type::tk_id)
+    saber::vector<ckx_token> prelexed_tokens;
+    if (current_token().token_type == ckx_token::type::tk_id
+        || (current_token().token_type >= ckx_token::type::tk_vi8
+           && current_token().token_type <= ckx_token::type::tk_void))
     {
-        type = new ckx_id_type(current_token().str);
+        prelexed_tokens.push_back(current_token());
+        next_token();
     }
     else
     {
-        type = ckx_type_helper::get_type( current_token().token_type );
+        return ckx_prelexed_type(saber::move(prelexed_tokens));
     }
-    next_token();
 
     while (1)
     {
         switch ( current_token().token_type )
         {
         case ckx_token::type::tk_const:
-            type = ckx_type_helper::qual_const(type); next_token(); break;
-
         case ckx_token::type::tk_mul:
-            type = ckx_type_helper::pointer_to(type); next_token(); break;
-
-        case ckx_token::type::tk_lbracket:
-            type = ckx_type_helper::array_of(type);
+            prelexed_tokens.push_back(current_token());
             next_token();
-            expect_n_eat(ckx_token::type::tk_rbracket, true);
             break;
 
+        case ckx_token::type::tk_lbracket:
+            if (peek_next_token().token_type == ckx_token::type::tk_rbracket)
+            {
+                ckx_token lbracket_at_token = current_token();
+                next_token();
+                next_token();
+                prelexed_tokens.push_back(ckx_token(lbracket_at_token.position,
+                                                    ckx_token::type::tk_arr));
+                break;
+            }
+            else
+            {
+                /// @attention error recovery
+                /// currently fallthrough
+            }
+
         default:
-            return type;
+            return ckx_prelexed_type(saber::move(prelexed_tokens));
         }
     }
 }

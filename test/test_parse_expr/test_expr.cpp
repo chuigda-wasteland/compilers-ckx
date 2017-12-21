@@ -131,8 +131,8 @@ ckx_parser_impl_test::test_parse_type()
         base::token_stream = new ckx_token_stream(reader);
         initialize_test();
 
-        saber_ptr<ckx_type> type = base::parse_type();
-        writer.write(type->to_string());
+        ckx_prelexed_type type = base::parse_type();
+        writer.write(type.to_string());
         writer.write("\n");
 
         C8ASSERT(base::error_list.empty());
@@ -148,8 +148,8 @@ ckx_parser_impl_test::test_parse_type()
 
         C8ASSERT(base::error_list.empty());
         C8ASSERT(base::warn_list.empty());
-        saber_ptr<ckx_type> type = base::parse_type();
-        writer.write(type->to_string());
+        ckx_prelexed_type type = base::parse_type();
+        writer.write(type.to_string());
         writer.write("\n");
 
         cleanup_test();
@@ -163,8 +163,8 @@ ckx_parser_impl_test::test_parse_type()
 
         C8ASSERT(base::error_list.empty());
         C8ASSERT(base::warn_list.empty());
-        saber_ptr<ckx_type> type = base::parse_type();
-        writer.write(type->to_string());
+        ckx_prelexed_type type = base::parse_type();
+        writer.write(type.to_string());
         writer.write("\n");
 
         cleanup_test();
@@ -178,8 +178,8 @@ ckx_parser_impl_test::test_parse_type()
         base::typename_table.add_typename(
             saber_string_pool::create_view("st"));
 
-        saber_ptr<ckx_type> type = base::parse_type();
-        writer.write(type->to_string());
+        ckx_prelexed_type type = base::parse_type();
+        writer.write(type.to_string());
         writer.write("\n");
 
         C8ASSERT(base::error_list.empty());

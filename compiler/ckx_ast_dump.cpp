@@ -144,14 +144,13 @@ void ckx_ast_return_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
     }
 }
 
-
 void ckx_ast_decl_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Declaration\n");
     _writer.write_whitespace((_level+1)*indent_size);
     _writer.write("Type [[");
-    _writer.write(type->to_string());
+    _writer.write(type.to_string());
     _writer.write("]]\n");
     for (auto &decl : decls)
     {
@@ -194,12 +193,12 @@ void ckx_ast_func_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
         _writer.write("\"");
         _writer.write(param_decl.name);
         _writer.write("\" Of type [[");
-        _writer.write(param_decl.type->to_string());
+        _writer.write(param_decl.type.to_string());
         _writer.write("]] \n");
     }
     _writer.write_whitespace((_level+1)*indent_size);
     _writer.write("Returns [[");
-    _writer.write(ret_type->to_string());
+    _writer.write(ret_type.to_string());
     _writer.write("]]\n");
     if (fnbody != nullptr)
     {
@@ -222,7 +221,7 @@ void ckx_ast_struct_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
         _writer.write("Field \"");
         _writer.write(field.name);
         _writer.write("\" of type [[");
-        _writer.write(field.type->to_string());
+        _writer.write(field.type.to_string());
         _writer.write("]]\n");
     }
 }
@@ -240,7 +239,7 @@ void ckx_ast_variant_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
         _writer.write("Field \"");
         _writer.write(field.name);
         _writer.write("\" of type [[");
-        _writer.write(field.type->to_string());
+        _writer.write(field.type.to_string());
         _writer.write("]]\n");
     }
 }
@@ -252,7 +251,7 @@ void ckx_ast_alias_stmt::ast_dump(we::we_file_writer &_writer, quint16 _level)
     _writer.write("Alias \"");
     _writer.write(name);
     _writer.write("\" to [[");
-    _writer.write(type->to_string());
+    _writer.write(type.to_string());
     _writer.write("]]\n");
 }
 
@@ -465,7 +464,7 @@ void ckx_ast_cast_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
     _writer.write(reinterpret_cast<const qchar*>("To\n"));
     _writer.write_whitespace((_level+2)*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("[["));
-    _writer.write(this->desired_type->to_string());
+    _writer.write(this->desired_type.to_string());
     _writer.write(reinterpret_cast<const qchar*>("]]\n"));
 
 }
@@ -475,7 +474,7 @@ void ckx_ast_sizeof_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Sizeof [["));
-    _writer.write(type->to_string());
+    _writer.write(type.to_string());
     _writer.write(reinterpret_cast<const qchar*>("]]\n"));
 }
 

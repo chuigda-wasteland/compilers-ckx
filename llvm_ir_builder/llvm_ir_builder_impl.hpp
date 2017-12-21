@@ -36,6 +36,7 @@ class llvm_ir_builder_impl final
 public:
     llvm_ir_builder_impl() = default;
     ~llvm_ir_builder_impl();
+
     llvm_ir_builder_impl(const llvm_ir_builder_impl&) = delete;
     llvm_ir_builder_impl(llvm_ir_builder_impl&&) = delete;
     llvm_ir_builder_impl& operator= (const llvm_ir_builder_impl&) = delete;

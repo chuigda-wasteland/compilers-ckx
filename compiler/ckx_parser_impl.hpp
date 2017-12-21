@@ -48,6 +48,9 @@ public:
     explicit ckx_parser_impl() = default;
     ~ckx_parser_impl() = default;
 
+    ckx_parser_impl(const ckx_parser_impl&) = delete;
+    ckx_parser_impl(ckx_parser_impl&&) = delete;
+
     typename ckx_parser::parse_result
     parse_impl(ckx_token_stream* _token_stream);
 
@@ -91,7 +94,7 @@ protected:
 protected:
 
     /// @fn we need this function to ease the type resolving.
-    saber_ptr<ckx_type> parse_type();
+    ckx_prelexed_type parse_type();
 
     /// @brief utility functions
     bool id_is_typename(ckx_token _token);

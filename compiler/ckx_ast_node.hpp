@@ -26,7 +26,7 @@
 #include "memory.hpp"
 #include "list.hpp"
 
-#include "ckx_type.hpp"
+#include "ckx_prelexed_type.hpp"
 #include "ckx_token.hpp"
 #include "ckx_operator.hpp"
 #include "ckx_env_table.hpp"
@@ -209,14 +209,14 @@ public:
     };
 
     explicit ckx_ast_decl_stmt(ckx_token _at_token,
-                               saber_ptr<ckx_type> _type,
+                               ckx_prelexed_type _type,
                                saber::vector<init_decl>&& _decls);
     ~ckx_ast_decl_stmt() override final = default;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
 
 private:
-    saber_ptr<ckx_type> type;
+    ckx_prelexed_type type;
     saber::vector<init_decl> decls;
 };
 
@@ -237,16 +237,16 @@ class ckx_ast_func_stmt implements ckx_ast_stmt
 public:
     open_class param_decl
     {
-        param_decl(saber_ptr<ckx_type> _type, saber_string_view _name) :
-            type(_type), name(_name) {}
-        saber_ptr<ckx_type> type;
+        param_decl(ckx_prelexed_type _type, saber_string_view _name) :
+            type(saber::move(_type)), name(_name) {}
+        ckx_prelexed_type type;
         saber_string_view name;
     };
 
     ckx_ast_func_stmt(ckx_token _at_token,
                       saber_string_view _name,
                       saber::vector<param_decl>&& _param_decls,
-                      saber_ptr<ckx_type> _ret_type,
+                      ckx_prelexed_type _ret_type,
                       ckx_ast_compound_stmt *_fnbody = nullptr);
     ~ckx_ast_func_stmt();
 
@@ -255,7 +255,7 @@ public:
 private:
     saber_string_view name;
     saber::vector<param_decl> param_decls;
-    saber_ptr<ckx_type> ret_type;
+    ckx_prelexed_type ret_type;
     ckx_ast_compound_stmt *fnbody;
 };
 
@@ -264,9 +264,9 @@ class ckx_ast_struct_stmt final implements ckx_ast_stmt
 public:
     open_class field
     {
-        field(saber_ptr<ckx_type> _type, saber_string_view _name) :
-            type(_type), name(_name) {}
-        saber_ptr<ckx_type> type;
+        field(ckx_prelexed_type _type, saber_string_view _name) :
+            type(saber::move(_type)), name(_name) {}
+        ckx_prelexed_type type;
         saber_string_view name;
     };
 
@@ -288,9 +288,9 @@ class ckx_ast_variant_stmt final implements ckx_ast_stmt
 public:
     open_class field
     {
-        field(saber_ptr<ckx_type> _type, saber_string_view _name) :
-            type(_type), name(_name) {}
-        saber_ptr<ckx_type> type;
+        field(ckx_prelexed_type _type, saber_string_view _name) :
+            type(saber::move(_type)), name(_name) {}
+        ckx_prelexed_type type;
         saber_string_view name;
     };
 
@@ -336,14 +336,14 @@ class ckx_ast_alias_stmt final implements ckx_ast_stmt
 public:
     ckx_ast_alias_stmt(ckx_token _at_token,
                        saber_string_view _name,
-                       saber_ptr<ckx_type> _type);
+                       ckx_prelexed_type _type);
     ~ckx_ast_alias_stmt() override final = default;
 
     void ast_dump(we::we_file_writer &_writer, quint16 _level) override final;
 
 private:
     saber_string_view name;
-    saber_ptr<ckx_type> type;
+    ckx_prelexed_type type;
 };
 
 interface ckx_ast_expr implements ckx_ast_node
@@ -484,7 +484,7 @@ public:
 
     ckx_ast_cast_expr(ckx_token _at_token,
                       castop _op,
-                      saber_ptr<ckx_type> _desired_type,
+                      ckx_prelexed_type _desired_type,
                       ckx_ast_expr* _expr);
     ~ckx_ast_cast_expr() override final;
 
@@ -492,7 +492,7 @@ public:
 
 private:
     castop op;
-    saber_ptr<ckx_type> desired_type;
+    ckx_prelexed_type desired_type;
     ckx_ast_expr *expr;
 };
 
@@ -500,13 +500,13 @@ class ckx_ast_sizeof_expr final implements ckx_ast_expr
 {
 public:
     ckx_ast_sizeof_expr(ckx_token _at_token,
-                        saber_ptr<ckx_type> _type);
+                        ckx_prelexed_type _type);
     ~ckx_ast_sizeof_expr() override final = default;
 
     void ast_dump(we::we_file_writer &_writer, quint16 _level) override final;
 
 private:
-    saber_ptr<ckx_type> type;
+    ckx_prelexed_type type;
 };
 
 class ckx_ast_vi_literal_expr final implements ckx_ast_expr
@@ -537,7 +537,7 @@ class ckx_ast_array_expr final implements ckx_ast_expr
 {
 public:
     ckx_ast_array_expr(ckx_token _at_token,
-                       saber_ptr<ckx_type> _array_of_type);
+                       ckx_prelexed_type _array_of_type);
     ~ckx_ast_array_expr() override final;
 
     void set_size(qint32 _size);
@@ -546,7 +546,7 @@ public:
     void ast_dump(we::we_file_writer &_writer, quint16 _level) override final;
 
 private:
-    saber_ptr<ckx_type> array_of_type;
+    ckx_prelexed_type array_of_type;
     qint32 size = -1;
     ckx_ast_expr *start = nullptr;
     ckx_ast_expr *finish = nullptr;
