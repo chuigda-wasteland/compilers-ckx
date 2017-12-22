@@ -68,6 +68,7 @@ private:
     void solve_add_n_sub();
     void solve_op_or_opassign();
     void solve_colon_or_scope();
+    void solve_array_or_lbracket();
     void solve_ordinary_op();
     void scan_full_id_string();
     bool solve_keyword();
@@ -223,9 +224,11 @@ void ckx_token_stream_impl::do_split_tokens()
             solve_colon_or_scope(); break;
 
         case '~': case ';': case ',': case '.': case '{':
-        case '}': case '[': case ']': case '(': case ')':
-        case '?':
+        case '}': case ']': case '(': case ')': case '?':
             solve_ordinary_op(); break;
+
+        case '[':
+            solve_array_or_lbracket(); break;
 
         case 'a': case 'b': case 'c': case 'd': case 'e':
         case 'f': case 'i': case 'o': case 'r': case 's':
@@ -523,6 +526,20 @@ void ckx_token_stream_impl::solve_colon_or_scope()
     else
     {
         token_buffer.emplace_back(char_coord(), ckx_token::type::tk_colon);
+    }
+}
+
+void ckx_token_stream_impl::solve_array_or_lbracket()
+{
+    next_char();
+    if (ch() == ']')
+    {
+        next_char();
+        token_buffer.emplace_back(char_coord(), ckx_token::type::tk_arr);
+    }
+    else
+    {
+        token_buffer.emplace_back(char_coord(), ckx_token::type::tk_lbracket);
     }
 }
 

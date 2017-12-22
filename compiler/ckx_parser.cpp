@@ -895,25 +895,10 @@ ckx_parser_impl::parse_type()
         {
         case ckx_token::type::tk_const:
         case ckx_token::type::tk_mul:
+        case ckx_token::type::tk_arr:
             prelexed_tokens.push_back(current_token());
             next_token();
             break;
-
-        case ckx_token::type::tk_lbracket:
-            if (peek_next_token().token_type == ckx_token::type::tk_rbracket)
-            {
-                ckx_token lbracket_at_token = current_token();
-                next_token();
-                next_token();
-                prelexed_tokens.push_back(ckx_token(lbracket_at_token.position,
-                                                    ckx_token::type::tk_arr));
-                break;
-            }
-            else
-            {
-                /// @attention error recovery
-                /// currently fallthrough
-            }
 
         default:
             return ckx_prelexed_type(saber::move(prelexed_tokens));
