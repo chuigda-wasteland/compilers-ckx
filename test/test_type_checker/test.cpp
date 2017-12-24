@@ -36,8 +36,8 @@ void assert_printlog(bool _condition, const char* _desc)
 
 void testcase1()
 {
-    saber_ptr<ckx_type> sktt1 = ckx_type_helper::get_vi8_type();
-    saber_ptr<ckx_type> sktt2 = ckx_type_helper::get_vi8_type();
+    ckx_type* sktt1 = ckx_type_helper::get_vi8_type();
+    ckx_type* sktt2 = ckx_type_helper::get_vi8_type();
 
     auto relation = ckx_type_helper::resolve_relation(sktt1, sktt2);
     assert_printlog(relation == ckx_type_helper::relation::rel_equal,
@@ -46,8 +46,8 @@ void testcase1()
 
 void testcase2()
 {
-    saber_ptr<ckx_type> sktt1 = ckx_type_helper::get_vi8_type();
-    saber_ptr<ckx_type> sktt2 = ckx_type_helper::get_vi16_type();
+    ckx_type* sktt1 = ckx_type_helper::get_vi8_type();
+    ckx_type* sktt2 = ckx_type_helper::get_vi16_type();
 
     auto relation = ckx_type_helper::resolve_relation(sktt1, sktt2);
     assert_printlog(relation == ckx_type_helper::relation::rel_comptiable,
@@ -56,8 +56,8 @@ void testcase2()
 
 void testcase3()
 {
-    saber_ptr<ckx_type> sktt1 = ckx_type_helper::get_vi8_type();
-    saber_ptr<ckx_type> sktt2 = ckx_type_helper::get_vu8_type();
+    ckx_type* sktt1 = ckx_type_helper::get_vi8_type();
+    ckx_type* sktt2 = ckx_type_helper::get_vu8_type();
     auto relation = ckx_type_helper::resolve_relation(sktt1, sktt2);
     assert_printlog(relation == ckx_type_helper::relation::rel_can_cast,
                     "cannot make static cast from vi8 to vu8");
@@ -65,8 +65,8 @@ void testcase3()
 
 void testcase4()
 {
-    saber_ptr<ckx_type> sktt1 = ckx_type_helper::get_vi8_type();
-    saber_ptr<ckx_type> sktt2 =
+    ckx_type* sktt1 = ckx_type_helper::get_vi8_type();
+    ckx_type* sktt2 =
         ckx_type_helper::qual_const(ckx_type_helper::get_vu8_type());
 
     auto relation = ckx_type_helper::resolve_relation(sktt1, sktt2);
@@ -76,20 +76,20 @@ void testcase4()
 
 void testcase5()
 {
-    saber_ptr<ckx_type> vu8_type = ckx_type_helper::get_vu8_type();
-    saber::vector<saber_ptr<ckx_type>> vecparam
+    ckx_type* vu8_type = ckx_type_helper::get_vu8_type();
+    saber::vector<ckx_type*> vecparam
     {
         ckx_type_helper::get_vu8_type(),
         ckx_type_helper::get_vu16_type(),
         ckx_type_helper::get_vr64_type(),
     };
 
-    saber::vector<saber_ptr<ckx_type>> vecparam1 = vecparam;
+    saber::vector<ckx_type*> vecparam1 = vecparam;
 
-    saber_ptr<ckx_type> func1 =
-        new ckx_func_type(vu8_type, saber::move(vecparam));
-    saber_ptr<ckx_type> func2 =
-        new ckx_func_type(vu8_type, saber::move(vecparam1));
+    ckx_type* func1 =
+        ckx_type_helper::create_func_type(vu8_type, saber::move(vecparam));
+    ckx_type* func2 =
+        ckx_type_helper::create_func_type(vu8_type, saber::move(vecparam1));
 
     auto relation = ckx_type_helper::resolve_func_relation(func1, func2);
     assert_printlog(relation == ckx_type_helper::func_relation::rel_same,
@@ -98,22 +98,21 @@ void testcase5()
 
 void testcase6()
 {
-    saber_ptr<ckx_type> vu8_type = ckx_type_helper::get_vu8_type();
-    saber_ptr<ckx_type> vi8_type = ckx_type_helper::get_vi8_type();
+    ckx_type* vu8_type = ckx_type_helper::get_vu8_type();
 
-    saber::vector<saber_ptr<ckx_type>> vecparam
+    saber::vector<ckx_type*> vecparam
     {
         ckx_type_helper::get_vu8_type(),
         ckx_type_helper::get_vu16_type(),
         ckx_type_helper::get_vr64_type(),
     };
 
-    saber::vector<saber_ptr<ckx_type>> vecparam1 = vecparam;
+    saber::vector<ckx_type*> vecparam1 = vecparam;
 
-    saber_ptr<ckx_type> func1 =
-        new ckx_func_type(vu8_type, saber::move(vecparam));
-    saber_ptr<ckx_type> func2 =
-        new ckx_func_type(vu8_type, saber::move(vecparam1));
+    ckx_type* func1 =
+        ckx_type_helper::create_func_type(vu8_type, saber::move(vecparam));
+    ckx_type* func2 =
+        ckx_type_helper::create_func_type(vu8_type, saber::move(vecparam1));
 
     auto relation = ckx_type_helper::resolve_func_relation(func1, func2);
     assert_printlog(relation==ckx_type_helper::func_relation::rel_incomptiable,
@@ -123,25 +122,25 @@ void testcase6()
 
 void testcase7()
 {
-    saber_ptr<ckx_type> vu8_type = ckx_type_helper::get_vu8_type();
-    saber::vector<saber_ptr<ckx_type>> vecparam
+    ckx_type* vu8_type = ckx_type_helper::get_vu8_type();
+    saber::vector<ckx_type*> vecparam
     {
         ckx_type_helper::get_vu8_type(),
         ckx_type_helper::get_vu16_type(),
         ckx_type_helper::get_vr64_type(),
     };
 
-    saber::vector<saber_ptr<ckx_type>> vecparam1
+    saber::vector<ckx_type*> vecparam1
     {
         ckx_type_helper::get_vu16_type(),
         ckx_type_helper::get_vu32_type(),
         ckx_type_helper::get_vr32_type(),
     };
 
-    saber_ptr<ckx_type> func1 =
-        new ckx_func_type(vu8_type, saber::move(vecparam));
-    saber_ptr<ckx_type> func2 =
-        new ckx_func_type(vu8_type, saber::move(vecparam1));
+    ckx_type* func1 =
+        ckx_type_helper::create_func_type(vu8_type, saber::move(vecparam));
+    ckx_type* func2 =
+        ckx_type_helper::create_func_type(vu8_type, saber::move(vecparam1));
 
     auto relation = ckx_type_helper::resolve_func_relation(func1, func2);
     assert_printlog(relation==ckx_type_helper::func_relation::rel_incomptiable,
@@ -151,25 +150,25 @@ void testcase7()
 
 void testcase8()
 {
-    saber_ptr<ckx_type> vu8_type = ckx_type_helper::get_vu8_type();
-    saber::vector<saber_ptr<ckx_type>> vecparam
+    ckx_type* vu8_type = ckx_type_helper::get_vu8_type();
+    saber::vector<ckx_type*> vecparam
     {
         ckx_type_helper::get_vu8_type(),
         ckx_type_helper::get_vu16_type(),
         ckx_type_helper::get_vr64_type(),
     };
 
-    saber::vector<saber_ptr<ckx_type>> vecparam1
+    saber::vector<ckx_type*> vecparam1
     {
         ckx_type_helper::get_vch_type(),
         ckx_type_helper::get_vu16_type(),
         ckx_type_helper::get_vr64_type(),
     };
 
-    saber_ptr<ckx_type> func1 =
-        new ckx_func_type(vu8_type, saber::move(vecparam));
-    saber_ptr<ckx_type> func2 =
-        new ckx_func_type(vu8_type, saber::move(vecparam1));
+    ckx_type* func1 =
+        ckx_type_helper::create_func_type(vu8_type, saber::move(vecparam));
+    ckx_type* func2 =
+        ckx_type_helper::create_func_type(vu8_type, saber::move(vecparam1));
 
     auto relation = ckx_type_helper::resolve_func_relation(func1, func2);
     assert_printlog(relation == ckx_type_helper::func_relation::rel_overload,

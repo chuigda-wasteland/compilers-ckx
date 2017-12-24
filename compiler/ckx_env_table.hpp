@@ -39,14 +39,14 @@ open_class ckx_env_var_entry
 {
     ckx_token decl_at;
     saber_string_view name;
-    saber_ptr<ckx_type> type;
+    ckx_type* type;
 
     /// @note we are not sure that this is correct.
     faker::llvm_value *llvm_value_bind;
 
     ckx_env_var_entry(ckx_token _decl_at,
                       saber_string_view _name,
-                      saber_ptr<ckx_type> _type) :
+                      ckx_type* _type) :
         decl_at(_decl_at),
         name(_name),
         type(_type)
@@ -57,14 +57,14 @@ open_class ckx_env_type_entry
 {
     ckx_token decl_at;
     saber_string_view name;
-    saber_ptr<ckx_type> type;
+    ckx_type* type;
 
     /// @note we are not sure that is this correct.
     faker::llvm_type *llvm_type_bind;
 
     ckx_env_type_entry(ckx_token _decl_at,
                        saber_string_view _name,
-                       saber_ptr<ckx_type> _type) :
+                       ckx_type* _type) :
         decl_at(_decl_at),
         name(_name),
         type(_type)
@@ -75,12 +75,12 @@ open_class ckx_env_func_entry
 {
     ckx_token decl_at;
     saber_string_view name;
-    saber_ptr<ckx_type> type;
+    ckx_type* type;
     saber_string llvm_name;
 
     ckx_env_func_entry(ckx_token _decl_at,
                        saber_string_view _name,
-                       saber_ptr<ckx_type> _type,
+                       ckx_type* _type,
                        saber_string&& _llvm_name) :
         decl_at(_decl_at),
         name(_name),
@@ -139,15 +139,15 @@ public:
 
     result_add_var add_var(ckx_token _decl_at,
                            saber_string_view _name,
-                           saber_ptr<ckx_type> _type);
+                           ckx_type* _type);
 
     result_add_type add_type(ckx_token _decl_at,
                              saber_string_view _name,
-                             saber_ptr<ckx_type> _type);
+                             ckx_type* _type);
 
     result_add_func add_func(ckx_token _decl_at,
                              saber_string_view _name,
-                             saber_ptr<ckx_type> _type);
+                             ckx_type* _type);
 
 private:
     /// just for shortening identifiers

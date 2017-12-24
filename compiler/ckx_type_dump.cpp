@@ -44,12 +44,6 @@ ckx_basic_type::to_string() const
 }
 
 saber_string
-ckx_id_type::to_string() const
-{
-    return name.get();
-}
-
-saber_string
 ckx_struct_type::to_string() const
 {
     return "StructType[[" + struct_name.get() + "]]" + qual_to_string();
@@ -71,7 +65,7 @@ saber_string
 ckx_func_type::to_string() const
 {
     saber_string ret = "fn (";
-    for (const saber_ptr<ckx_type>& type : param_type_list)
+    for (const ckx_type* type : param_type_list)
         ret += type->to_string() + saber_string(",");
     ret += saber_string(") -> ");
     ret += return_type->to_string();
@@ -88,6 +82,11 @@ saber_string
 ckx_array_type::to_string() const
 {
     return element_type->to_string() + "[]"  + qual_to_string();
+}
+
+saber_string ckx_type_alias::to_string() const
+{
+    return "AliasTo[[" + origin->to_string() + "]]" + qual_to_string();
 }
 
 } // namespace ckx

@@ -33,6 +33,8 @@ namespace ckx
 
 using saber::saber_ptr;
 
+class ckx_type_helper;
+
 interface ckx_type
 {
 public:
@@ -56,7 +58,6 @@ public:
 
         type_function,
 
-        type_id,
         type_struct,
         type_variant,
         type_enum,
@@ -112,24 +113,12 @@ protected:
 class ckx_basic_type final implements ckx_type
 {
 public:
-    explicit ckx_basic_type(category _basic_category);
     ~ckx_basic_type() override final = default;
-
     saber_string to_string() const override final;
-};
-
-class ckx_id_type final implements ckx_type
-{
-public:
-    explicit ckx_id_type(saber_string_view _name);
-    ~ckx_id_type() override final = default;
-
-    saber_string to_string() const override final;
-
-    saber_string_view get_name() const;
 
 private:
-    saber_string_view name;
+    friend class ckx_type_helper;
+    explicit ckx_basic_type(category _basic_category);
 };
 
 class ckx_struct_type final implements ckx_type
@@ -144,23 +133,25 @@ public:
     open_class field
     {
         saber_string_view name;
-        saber_ptr<ckx_type> type;
+        ckx_type* type;
         qsizet offset;
 
         field(saber_string_view _name,
-              saber_ptr<ckx_type> _type)
+              ckx_type* _type)
             : name(_name), type(_type) {}
     };
 
-    explicit ckx_struct_type(saber_string_view _struct_name);
     ~ckx_struct_type() override final = default;
 
     saber_string to_string() const override final;
 
     saber_string_view get_name() const;
-    add_status add_field(saber_string_view _name, saber_ptr<ckx_type> _type);
+    add_status add_field(saber_string_view _name, ckx_type* _type);
 
 private:
+    friend class ckx_type_helper;
+    explicit ckx_struct_type(saber_string_view _struct_name);
+
     saber::vector<field> fields;
     saber_string_view struct_name;
 };
@@ -177,23 +168,25 @@ public:
     open_class field
     {
         saber_string_view name;
-        saber_ptr<ckx_type> type;
+        ckx_type* type;
         qsizet offset;
 
         field(saber_string_view _name,
-              saber_ptr<ckx_type> _type)
+              ckx_type* _type)
             : name(saber::move(_name)), type(_type) {}
     };
 
-    explicit ckx_variant_type(saber_string_view _variant_name);
     ~ckx_variant_type() override final = default;
 
     saber_string to_string() const override final;
 
     saber_string_view get_name() const;
-    add_status add_field(saber_string_view _name, saber_ptr<ckx_type> _type);
+    add_status add_field(saber_string_view _name, ckx_type* _type);
 
 private:
+    friend class ckx_type_helper;
+    explicit ckx_variant_type(saber_string_view _variant_name);
+
     saber::vector<field> fields;
     saber_string_view variant_name;
 };
@@ -216,7 +209,6 @@ public:
             : name(_name), value(_value) {}
     };
 
-    explicit ckx_enum_type(saber_string_view _enum_name);
     ~ckx_enum_type() override final = default;
 
     saber_string to_string() const override final;
@@ -225,6 +217,9 @@ public:
     add_status add_enumerator(saber_string_view _name, qint64 _value);
 
 private:
+    friend class ckx_type_helper;
+    explicit ckx_enum_type(saber_string_view _enum_name);
+
     saber::vector<enumerator> enumerators;
     saber_string_view enum_name;
 };
@@ -232,104 +227,105 @@ private:
 class ckx_func_type final implements ckx_type
 {
 public:
-    ckx_func_type(saber_ptr<ckx_type> _return_type,
-                  saber::vector<saber_ptr<ckx_type>>&& _param_type_list);
     ~ckx_func_type() override final = default;
 
     saber_string to_string() const override final;
 
-    saber_ptr<ckx_type> get_return_type();
-    const saber::vector<saber_ptr<ckx_type>>& get_param_type_list();
+    ckx_type* get_return_type();
+    const saber::vector<ckx_type*>& get_param_type_list();
 
 private:
-    saber_ptr<ckx_type> return_type;
-    saber::vector<saber_ptr<ckx_type>> param_type_list;
+    friend class ckx_type_helper;
+    ckx_func_type(ckx_type* _return_type,
+                  saber::vector<ckx_type*>&& _param_type_list);
+
+    ckx_type* return_type;
+    saber::vector<ckx_type*> param_type_list;
 };
 
 class ckx_pointer_type final implements ckx_type
 {
 public:
-    explicit ckx_pointer_type(saber_ptr<ckx_type> _target);
     ~ckx_pointer_type() override final = default;
 
     saber_string to_string() const override final;
-
-    saber_ptr<ckx_type> get_pointee();
+    ckx_type* get_pointee();
 
 private:
-    saber_ptr<ckx_type> target;
+    friend class ckx_type_helper;
+    explicit ckx_pointer_type(ckx_type* _target);
+
+    ckx_type* target;
 };
 
 class ckx_array_type final implements ckx_type
 {
 public:
-    explicit ckx_array_type(saber_ptr<ckx_type> _element);
     ~ckx_array_type() override final = default;
 
     saber_string to_string() const override final;
-
-    saber_ptr<ckx_type> get_element_type();
+    ckx_type* get_element_type();
 
 private:
-    saber_ptr<ckx_type> element_type;
+    friend class ckx_type_helper;
+    explicit ckx_array_type(ckx_type* _element);
+
+    ckx_type* element_type;
 };
 
 class ckx_type_alias final implements ckx_type
 {
 public:
-    explicit ckx_type_alias(saber_ptr<ckx_type> _origin);
     ~ckx_type_alias() override final = default;
 
     saber_string to_string() const override final;
-
-    saber_ptr<ckx_type> get_aliasee();
+    ckx_type* get_aliasee();
 
 private:
-    saber_ptr<ckx_type> origin;
+    friend class ckx_type_helper;
+    explicit ckx_type_alias(ckx_type* _origin);
+
+    ckx_type* origin;
 };
 
 
-
-open_class ckx_type_cast_step
-{
-    enum class castop : qchar
-    { cst_static, cst_const, cst_reinterpret, cst_ckx };
-
-    castop op;
-    saber_ptr<ckx_type> from;
-    saber_ptr<ckx_type> to;
-
-    ckx_type_cast_step(castop _op,
-                       saber_ptr<ckx_type> from,
-                       saber_ptr<ckx_type> to);
-    ~ckx_type_cast_step() = default;
-};
 
 class ckx_type_helper
 {
 public:
-    static saber_ptr<ckx_type> get_type(ckx_token::type _basic_type_token);
-    static saber_ptr<ckx_type> qual_const(saber_ptr<ckx_type> _base);
-    static saber_ptr<ckx_type> pointer_to(saber_ptr<ckx_type> _base);
-    static saber_ptr<ckx_type> array_of(saber_ptr<ckx_type> _base);
+    static ckx_type* get_type(ckx_token::type _basic_type_token);
+
+    static ckx_struct_type*  create_struct_type(saber_string_view _name);
+    static ckx_variant_type* create_variant_type(saber_string_view _name);
+    static ckx_enum_type*    create_enum_type(saber_string_view _name);
+    static ckx_type_alias*   create_alias(ckx_type *_type);
+    static ckx_func_type*    create_func_type(ckx_type *_ret_type,
+                                            saber::vector<ckx_type*> &&_params);
+    static ckx_array_type*   create_array_type(ckx_type *_elem_type);
+    static ckx_pointer_type* pointer_to(ckx_type* _base);
+
+    static ckx_type*         qual_const(ckx_type* _base);
+
+    static void gc_cleanall();
 
     /// @note made public may benefit testing a lot.
 
-    static saber_ptr<ckx_type> get_vi8_type();
-    static saber_ptr<ckx_type> get_vi16_type();
-    static saber_ptr<ckx_type> get_vi32_type();
-    static saber_ptr<ckx_type> get_vi64_type();
+    static ckx_type* get_vi8_type();
+    static ckx_type* get_vi16_type();
+    static ckx_type* get_vi32_type();
+    static ckx_type* get_vi64_type();
 
-    static saber_ptr<ckx_type> get_vu8_type();
-    static saber_ptr<ckx_type> get_vu16_type();
-    static saber_ptr<ckx_type> get_vu32_type();
-    static saber_ptr<ckx_type> get_vu64_type();
+    static ckx_type* get_vu8_type();
+    static ckx_type* get_vu16_type();
+    static ckx_type* get_vu32_type();
+    static ckx_type* get_vu64_type();
 
-    static saber_ptr<ckx_type> get_vch_type();
-    static saber_ptr<ckx_type> get_vr32_type();
-    static saber_ptr<ckx_type> get_vr64_type();
+    static ckx_type* get_vch_type();
+    static ckx_type* get_vr32_type();
+    static ckx_type* get_vr64_type();
 
-    static saber_ptr<ckx_type> get_void_type();
+    static ckx_type* get_void_type();
+
 
     /// @brief Type comparing
     /// There are 5 kinds of relations between two types in compilers-ckx
@@ -349,7 +345,7 @@ public:
     };
 
     static relation
-    resolve_relation(saber_ptr<ckx_type> _ty1, saber_ptr<ckx_type> _ty2);
+    resolve_relation(ckx_type* _ty1, ckx_type* _ty2);
 
     /// @brief Function comparing
     /// There are 3 kinds of relations between two function/func-types
@@ -365,7 +361,16 @@ public:
     };
 
     static func_relation
-    resolve_func_relation(saber_ptr<ckx_type> _ty1, saber_ptr<ckx_type> _ty2);
+    resolve_func_relation(ckx_type* _ty1, ckx_type* _ty2);
+
+private:
+    thread_local static saber::vector<ckx_struct_type>  struct_type_pool;
+    thread_local static saber::vector<ckx_variant_type> variant_type_pool;
+    thread_local static saber::vector<ckx_enum_type>    enum_type_pool;
+    thread_local static saber::vector<ckx_type_alias>   type_alias_pool;
+    thread_local static saber::vector<ckx_func_type>    func_type_pool;
+    thread_local static saber::vector<ckx_array_type>   array_type_pool;
+    thread_local static saber::vector<ckx_pointer_type> pointer_type_pool;
 };
 
 } // namespace ckx

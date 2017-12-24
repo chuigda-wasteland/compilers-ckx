@@ -110,7 +110,7 @@ ckx_env::lookup_func_local(saber_string_view _name)
 ckx_env::result_add_var
 ckx_env::add_var(ckx_token _decl_at,
                  saber_string_view _name,
-                 saber_ptr<ckx_type> _type)
+                 ckx_type* _type)
 {
     ckx_env_var_entry *entry = lookup_var_local(_name);
     if (entry != nullptr)
@@ -126,7 +126,7 @@ ckx_env::add_var(ckx_token _decl_at,
 ckx_env::result_add_type
 ckx_env::add_type(ckx_token _decl_at,
                   saber_string_view _name,
-                  saber_ptr<ckx_type> _type)
+                  ckx_type* _type)
 {
     ckx_env_type_entry *entry = lookup_type(_name);
     if (entry != nullptr)
@@ -142,7 +142,7 @@ ckx_env::add_type(ckx_token _decl_at,
 ckx_env::result_add_func
 ckx_env::add_func(ckx_token _decl_at,
                   saber_string_view _name,
-                  saber_ptr<ckx_type> _type)
+                  ckx_type* _type)
 {
     saber::vector<ckx_env_func_entry>* seen_funcs = lookup_func_local(_name);
     if (seen_funcs != nullptr)
