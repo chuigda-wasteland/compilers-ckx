@@ -3,7 +3,7 @@
 
 #include "memory.hpp"
 #include "utility.hpp"
-#include "algorithm"
+#include "algorithm.hpp"
 
 namespace saber
 {
@@ -18,9 +18,9 @@ class internal_stack
 public:
     internal_stack()
     {
-        storgae_usage = storage_begin = 
+        storage_usage = storage_begin = 
             allocator_traits<Allocator>::allocate(
-                alloc, initial_allocate_size, nullptr);
+			    alloc, initial_allocate_size);
         storage_end = storage_begin + initial_allocate_size;
     }
 
@@ -41,7 +41,7 @@ public:
     {
         if (storage_usage == storage_end) 
             reallocate_buffer();
-        *storage_usage = T;
+        *storage_usage = _t;
         storage_usage++;
     }
 
@@ -51,8 +51,7 @@ private:
         size_t capacity = storage_end - storage_begin;
         size_t size = storage_usage - storage_begin;
         T* new_storage_begin = 
-            allocator_traits<Allocator>::allocate(
-                alloc, 2*capacity, nullptr);
+            allocator_traits<Allocator>::allocate(alloc, 2*capacity);
         copy(storage_begin, storage_end, new_storage_begin);
         allocator_traits<Allocator>::deallocate(
             alloc, storage_begin, size);
@@ -61,12 +60,12 @@ private:
         storage_end = new_storage_begin + 2*capacity;
     }
 
-    constexpr size_t initial_allocate_size = 32;
+	static constexpr size_t initial_allocate_size = 32;
     Allocator alloc;
     T* storage_begin;
     T* storage_usage;
     T* storage_end;
-}
+};
 
 } // namespace detail
 
@@ -97,7 +96,7 @@ public:
     void gc() 
     {
         blocks.for_each(
-            [last_object, last_block, block_size] (mem_block* block) -> void 
+            [this] (mem_block* block) -> void 
             {
                 T* block_begin = reinterpret_cast<T*>(block);
                 T* block_end = 
@@ -126,7 +125,7 @@ public:
     }
 
 private:
-    void add_block_byneed()
+    void add_block_by_need()
     {
         if (last_object == (reinterpret_cast<T*>(last_block)+block_size))
         {
@@ -137,9 +136,9 @@ private:
         }
     }
 
-    constexpr size_t block_size = 12;
-    using mem_block = aligned_storage_t<sizeof(T) * bock_size, alignof(T)>;
-    typename detail::internal_stack template<mem_block*> blocks;
+    static constexpr size_t block_size = 12;
+    using mem_block = aligned_storage_t<sizeof(T) * block_size, alignof(T)>;
+    typename detail::internal_stack<mem_block*> blocks;
     T* last_object;
     mem_block* last_block;
 };
