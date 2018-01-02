@@ -68,7 +68,7 @@ private:
         }
     }
 
-    static constexpr size_t block_size = 12;
+    static constexpr size_t block_size = 4096;
     using mem_block = aligned_storage_t<sizeof(T) * block_size, alignof(T)>;
     using block_alloc_type =
         typename  Allocator:: template rebind<mem_block>::other;
