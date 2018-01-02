@@ -22,7 +22,7 @@
 #include "memory.hpp"
 #include "utility.hpp"
 #include "string.hpp"
-#include "vector.hpp"
+#include "object_pool.hpp"
 
 #include "ckx_token.hpp"
 #include "defs.hpp"
@@ -306,8 +306,6 @@ public:
 
     static ckx_type*         qual_const(ckx_type* _base);
 
-    static void gc_cleanall();
-
     /// @note made public may benefit testing a lot.
 
     static ckx_type* get_vi8_type();
@@ -364,13 +362,13 @@ public:
     resolve_func_relation(ckx_type* _ty1, ckx_type* _ty2);
 
 private:
-    thread_local static saber::vector<ckx_struct_type>  struct_type_pool;
-    thread_local static saber::vector<ckx_variant_type> variant_type_pool;
-    thread_local static saber::vector<ckx_enum_type>    enum_type_pool;
-    thread_local static saber::vector<ckx_type_alias>   type_alias_pool;
-    thread_local static saber::vector<ckx_func_type>    func_type_pool;
-    thread_local static saber::vector<ckx_array_type>   array_type_pool;
-    thread_local static saber::vector<ckx_pointer_type> pointer_type_pool;
+    thread_local static saber::object_pool<ckx_struct_type>  struct_type_pool;
+    thread_local static saber::object_pool<ckx_variant_type> variant_type_pool;
+    thread_local static saber::object_pool<ckx_enum_type>    enum_type_pool;
+    thread_local static saber::object_pool<ckx_type_alias>   type_alias_pool;
+    thread_local static saber::object_pool<ckx_func_type>    func_type_pool;
+    thread_local static saber::object_pool<ckx_array_type>   array_type_pool;
+    thread_local static saber::object_pool<ckx_pointer_type> pointer_type_pool;
 };
 
 } // namespace ckx

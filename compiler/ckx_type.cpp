@@ -262,78 +262,67 @@ ckx_type_helper::get_type(ckx_token::type _basic_type_token)
 
 
 
-thread_local saber::vector<ckx_struct_type>  ckx_type_helper::struct_type_pool;
-thread_local saber::vector<ckx_variant_type> ckx_type_helper::variant_type_pool;
-thread_local saber::vector<ckx_enum_type>    ckx_type_helper::enum_type_pool;
-thread_local saber::vector<ckx_type_alias>   ckx_type_helper::type_alias_pool;
-thread_local saber::vector<ckx_func_type>    ckx_type_helper::func_type_pool;
-thread_local saber::vector<ckx_array_type>   ckx_type_helper::array_type_pool;
-thread_local saber::vector<ckx_pointer_type> ckx_type_helper::pointer_type_pool;
+thread_local saber::object_pool<ckx_struct_type>
+ckx_type_helper::struct_type_pool;
+thread_local saber::object_pool<ckx_variant_type>
+ckx_type_helper::variant_type_pool;
+thread_local saber::object_pool<ckx_enum_type>
+ckx_type_helper::enum_type_pool;
+thread_local saber::object_pool<ckx_type_alias>
+ckx_type_helper::type_alias_pool;
+thread_local saber::object_pool<ckx_func_type>
+ckx_type_helper::func_type_pool;
+thread_local saber::object_pool<ckx_array_type>
+ckx_type_helper::array_type_pool;
+thread_local saber::object_pool<ckx_pointer_type>
+ckx_type_helper::pointer_type_pool;
 
 ckx_struct_type*
 ckx_type_helper::create_struct_type(saber_string_view _name)
 {
-    struct_type_pool.push_back(ckx_struct_type(_name));
-    return &struct_type_pool.back();
+    return struct_type_pool.store(ckx_struct_type(_name));
 }
 
 ckx_variant_type*
 ckx_type_helper::create_variant_type(saber_string_view _name)
 {
-    variant_type_pool.push_back(ckx_variant_type(_name));
-    return &variant_type_pool.back();
+    return variant_type_pool.store(ckx_variant_type(_name));
 }
 
 ckx_enum_type*
 ckx_type_helper::create_enum_type(saber_string_view _name)
 {
-    enum_type_pool.push_back(ckx_enum_type(_name));
-    return &enum_type_pool.back();
+    return enum_type_pool.store(ckx_enum_type(_name));
 }
 
 ckx_type_alias*
 ckx_type_helper::create_alias(ckx_type *_type)
 {
-    type_alias_pool.push_back(ckx_type_alias(_type));
-    return &type_alias_pool.back();
+    return type_alias_pool.store(ckx_type_alias(_type));
 }
 
 ckx_func_type*
 ckx_type_helper::create_func_type(ckx_type *_ret_type,
                                   saber::vector<ckx_type*> &&_params)
 {
-    func_type_pool.push_back(ckx_func_type(_ret_type, saber::move(_params)));
-    return &func_type_pool.back();
+    return func_type_pool.store(ckx_func_type(_ret_type, saber::move(_params)));
 }
 
 ckx_array_type*
 ckx_type_helper::create_array_type(ckx_type *_elem_type)
 {
-    array_type_pool.push_back(ckx_array_type(_elem_type));
-    return &array_type_pool.back();
+    return array_type_pool.store(ckx_array_type(_elem_type));
 }
 
 ckx_pointer_type *ckx_type_helper::pointer_to(ckx_type* _base)
 {
-    pointer_type_pool.push_back(ckx_pointer_type(_base));
-    return &pointer_type_pool.back();
+    return pointer_type_pool.store(ckx_pointer_type(_base));
 }
 
 ckx_type*
 ckx_type_helper::qual_const(ckx_type* _base)
 {
     _base->add_const(); return _base;
-}
-
-void ckx_type_helper::gc_cleanall()
-{
-    struct_type_pool.clear();
-    variant_type_pool.clear();
-    enum_type_pool.clear();
-    type_alias_pool.clear();
-    func_type_pool.clear();
-    array_type_pool.clear();
-    pointer_type_pool.clear();
 }
 
 ckx_type*

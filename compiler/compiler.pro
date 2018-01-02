@@ -38,6 +38,7 @@ HEADERS += \
     ../saber/include/strings.defs.h \
     ../saber/include/type_traits.hpp \
     ../saber/include/utility.hpp \
+    ../saber/include/object_pool.hpp \
     ../saber/include/vector.hpp \
     ../saber/include/string.hpp \
     ../saber/include/result.hpp \
