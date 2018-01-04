@@ -324,43 +324,6 @@ public:
 
     static ckx_type* get_void_type();
 
-
-    /// @brief Type comparing
-    /// There are 5 kinds of relations between two types in compilers-ckx
-    ///     0. exact-equal: the type itself and the qualifier is all the same
-    ///     1. can-implicit-static-cast, without casting away const quals.
-    ///     2. can-implicit-const-cast
-    ///     3. can-cast-to
-    ///     4. incomptiable: only reinterpret_cast can make up the gap
-    ///                      between two types
-    enum class relation : qchar
-    {
-        rel_equal,
-        rel_comptiable,
-        rel_const_cast,
-        rel_can_cast,
-        rel_incomptialble
-    };
-
-    static relation
-    resolve_relation(ckx_type* _ty1, ckx_type* _ty2);
-
-    /// @brief Function comparing
-    /// There are 3 kinds of relations between two function/func-types
-    ///     0. same: two functions are identical.
-    ///     1. incomptiable: all paramaters of two functions are comptiable
-    ///                      so the two functions cannot be overloaded.
-    ///     2. overloaded: two functions can be overloaded.
-    enum class func_relation : qchar
-    {
-        rel_same,
-        rel_incomptiable,
-        rel_overload
-    };
-
-    static func_relation
-    resolve_func_relation(ckx_type* _ty1, ckx_type* _ty2);
-
 private:
     thread_local static saber::object_pool<ckx_struct_type>  struct_type_pool;
     thread_local static saber::object_pool<ckx_variant_type> variant_type_pool;

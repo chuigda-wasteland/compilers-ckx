@@ -8,7 +8,7 @@ SUBDIRS += \
     test/test_parse_udt \
     test/test_parse_stmt \
     test/test_parser \
-    test/test_type_checker \
+#    test/test_type_checker \
     llvm_ir_builder
 
 HEADERS += \

@@ -149,10 +149,7 @@ ckx_env::add_func(ckx_token _decl_at,
     {
         for (ckx_env_func_entry &func : *seen_funcs)
         {
-            if (ckx_type_helper::resolve_func_relation(func.type, _type)
-                == ckx_type_helper::func_relation::rel_incomptiable)
-                return result_add_func{.status=result_add_func::conflict,
-                                       .v.conflict_func=&func};
+            /// @todo overload resolver
         }
     }
 
