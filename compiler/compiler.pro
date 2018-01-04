@@ -61,7 +61,9 @@ HEADERS += \
     we::we_file_writer.hpp \
     ckx_operator.hpp \
     ckx_parser_impl.hpp \
-    ckx_prelexed_type.hpp
+    ckx_prelexed_type.hpp \
+    ckx_sema.hpp \
+    ckx_sema_result.hpp
 
 INCLUDEPATH += ../saber/include/
 INCLUDEPATH += ../shared/include/
