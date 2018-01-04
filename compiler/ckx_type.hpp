@@ -83,9 +83,16 @@ public:
     category get_category() const;
 
     bool is_basic() const;
-    bool is_signed_int() const;
-    bool is_unsigned_int() const;
-    bool is_float() const;
+    bool is_scalar() const;
+    bool is_signed() const;
+    bool is_unsigned() const;
+    bool is_integral() const;
+    bool is_floating() const;
+    bool is_pointer() const;
+    bool is_function() const;
+    bool is_record() const;
+    bool is_enum() const;
+    bool is_alias() const;
 
     bool is_const() const;
     bool is_volatile() const;

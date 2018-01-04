@@ -39,25 +39,62 @@ ckx_type::get_category() const
 bool ckx_type::is_basic() const
 {
     return get_category() >= category::type_vi8
-           && get_category() <= category::type_void;
+            && get_category() <= category::type_void;
 }
 
-bool ckx_type::is_signed_int() const
+bool ckx_type::is_scalar() const
+{
+    /// @details basic types are all scalar types and vice versa, currently.
+    return is_basic();
+}
+
+bool ckx_type::is_signed() const
 {
     return get_category() >= category::type_vi8
            && get_category() <= category::type_vi64;
 }
 
-bool ckx_type::is_unsigned_int() const
+bool ckx_type::is_unsigned() const
 {
-    return get_category() >= category::type_vi8
-           && get_category() <= category::type_void;
+    return get_category() >= category::type_vu8
+            && get_category() <= category::type_vu64;
 }
 
-bool ckx_type::is_float() const
+bool ckx_type::is_integral() const
+{
+    return is_signed() || is_unsigned();
+}
+
+bool ckx_type::is_floating() const
 {
     return get_category() == category::type_vr32
-           || get_category() == category::type_vr64;
+            || get_category() == category::type_vr64;
+}
+
+bool ckx_type::is_pointer() const
+{
+    return get_category() == ckx_type::category::type_pointer;
+}
+
+bool ckx_type::is_function() const
+{
+    return get_category() == ckx_type::category::type_function;
+}
+
+bool ckx_type::is_record() const
+{
+    return get_category() == ckx_type::category::type_struct
+            || get_category() == ckx_type::category::type_variant;
+}
+
+bool ckx_type::is_enum() const
+{
+    return get_category() == ckx_type::category::type_enum;
+}
+
+bool ckx_type::is_alias() const
+{
+    return get_category() == ckx_type::category::type_alias;
 }
 
 bool ckx_type::is_const() const
