@@ -77,6 +77,4 @@ inline saber::string to_string_helper(const qcoord& _coord)
 
 #define COMMENT(COMMENTS)
 
-#define $ *
-
 #endif // DEFS_HPP

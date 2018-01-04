@@ -25,13 +25,15 @@
 #include "vector.hpp"
 #include "memory.hpp"
 #include "list.hpp"
-
-#include "ckx_prelexed_type.hpp"
-#include "ckx_token.hpp"
-#include "ckx_operator.hpp"
-#include "ckx_env_table.hpp"
 #include "file_writer.hpp"
+
+#include "ckx_token.hpp"
+#include "ckx_prelexed_type.hpp"
+#include "ckx_operator.hpp"
 #include "ckx_ast_node_fwd.hpp"
+
+#include "ckx_sema_result_fwd.hpp"
+#include "ckx_sema.hpp"
 
 namespace ckx
 {
@@ -72,12 +74,7 @@ public:
 
     virtual void ast_dump(we::we_file_writer& _writer, quint16 _level) = 0;
 
-    /// @attention all AST-Nodes can be dumped
-    /// But only Statements can be translated into intermediate codes.
-    /// Expression system will have another translating system.
-    /// This function will be finished after we get a proper intermediate
-    /// representation and start to write syntax-directed translation
-    Q_ON_HOLD(virtual void translate(saber::list<ckx_ir_instance>& ret) = 0;)
+    Q_ON_HOLD(virtual void accept(ckx_sema_engine& sema) = 0;)
 };
 
 class ckx_ast_compound_stmt final implements ckx_ast_stmt
@@ -353,6 +350,9 @@ public:
     virtual ~ckx_ast_expr() = 0;
 
     virtual void ast_dump(we::we_file_writer& _writer, quint16 _level) = 0;
+
+    Q_ON_HOLD(\
+            virtual ckx_expr_result_storage accept(ckx_sema_engine& _sema) = 0;)
 };
 
 class ckx_ast_binary_expr final implements ckx_ast_expr

@@ -1,20 +1,19 @@
 ﻿#ifndef CKX_SEMA_HPP
 #define CKX_SEMA_HPP
 
-#include "../llvm_ir_builder/llvm_ir_builder.hpp"
-#include "ckx_env_table.hpp"
-
 namespace ckx
 {
 
+namespace detail
+{
+class ckx_sema_engine_impl;
+} // namespace detail
 
 class ckx_sema_engine
 {
 public:
-
 private:
-    faker::llvm_ir_builder ir_builder;
-    ckx_env env_holder;
+    detail::ckx_sema_engine_impl *pimpl;
 };
 
 } // namespace ckx

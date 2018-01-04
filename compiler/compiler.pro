@@ -63,7 +63,8 @@ HEADERS += \
     ckx_parser_impl.hpp \
     ckx_prelexed_type.hpp \
     ckx_sema.hpp \
-    ckx_sema_result.hpp
+    ckx_sema_result.hpp \
+    ckx_sema_result_fwd.hpp
 
 INCLUDEPATH += ../saber/include/
 INCLUDEPATH += ../shared/include/
