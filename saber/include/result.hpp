@@ -3,6 +3,7 @@
 
 #include "memory.hpp"
 #include <cstdlib>
+#include "c8assert.hpp"
 
 namespace saber
 {
@@ -19,12 +20,12 @@ public:
         if (_another.is_type())
         {
             contains_value = true;
-            construct(reinterpret_cast<T*>(&storage), _another.value());
+            construct(reinterpret_cast<T*>(&storage), move(_another.value()));
         }
         else
         {
             contains_value = false;
-            construct(reinterpret_cast<T*>(&storage), _another.err());
+            construct(reinterpret_cast<T*>(&storage), move(_another.err()));
         }
     }
 
@@ -94,11 +95,13 @@ public:
 
     T& value()
     {
+        C8ASSERT(is_type());
         return *reinterpret_cast<T*>(&storage);
     }
 
     E& err()
     {
+        C8ASSERT(is_err());
         return *reinterpret_cast<T*>(&storage);
     }
 
