@@ -33,7 +33,9 @@
 #include "ckx_ast_node_fwd.hpp"
 
 #include "ckx_sema_result_fwd.hpp"
-#include "ckx_sema.hpp"
+#include "ckx_sema_fwd.hpp"
+
+#include "optional.hpp"
 
 namespace ckx
 {
@@ -73,8 +75,7 @@ public:
     virtual ~ckx_ast_stmt() = 0;
 
     virtual void ast_dump(we::we_file_writer& _writer, quint16 _level) = 0;
-
-    Q_ON_HOLD(virtual void accept(ckx_sema_engine& sema) = 0;)
+    virtual void accept(ckx_sema_engine& sema) = 0;
 };
 
 class ckx_ast_compound_stmt final implements ckx_ast_stmt
@@ -84,7 +85,9 @@ public:
     ~ckx_ast_compound_stmt() override final;
 
     void add_new_stmt(ckx_ast_stmt *_stmt);
+
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 
 private:
     saber::vector<ckx_ast_stmt*> stmts;
@@ -100,6 +103,7 @@ public:
     ~ckx_ast_if_stmt() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 
 private:
     ckx_ast_expr *condition;
@@ -116,6 +120,7 @@ public:
     ~ckx_ast_while_stmt() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 
 private:
     ckx_ast_expr *condition;
@@ -131,6 +136,7 @@ public:
     ~ckx_ast_do_while_stmt() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 
 private:
     ckx_ast_expr *condition;
@@ -148,6 +154,7 @@ public:
     ~ckx_ast_for_stmt();
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 
 private:
     ckx_ast_expr *init;
@@ -163,6 +170,7 @@ public:
     ~ckx_ast_break_stmt() override final = default;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 };
 
 class ckx_ast_continue_stmt final implements ckx_ast_stmt
@@ -172,6 +180,7 @@ public:
     ~ckx_ast_continue_stmt() override final = default;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 };
 
 class ckx_ast_return_stmt final implements ckx_ast_stmt
@@ -182,6 +191,7 @@ public:
     ~ckx_ast_return_stmt() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 
 private:
     ckx_ast_expr *return_expr;
@@ -211,6 +221,7 @@ public:
     ~ckx_ast_decl_stmt() override final = default;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 
 private:
     ckx_prelexed_type type;
@@ -224,6 +235,7 @@ public:
     ~ckx_ast_expr_stmt() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 
 private:
     ckx_ast_expr *expr;
@@ -248,6 +260,7 @@ public:
     ~ckx_ast_func_stmt();
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 
 private:
     saber_string_view name;
@@ -274,6 +287,7 @@ public:
 
     const saber::vector<field>& get_fields() const;
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 
 private:
     saber_string_view name;
@@ -298,6 +312,7 @@ public:
 
     const saber::vector<field>& get_fields() const;
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 
 private:
     saber_string_view name;
@@ -322,6 +337,7 @@ public:
 
     const saber::vector<enumerator>& get_enumerators() const;
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 
 private:
     saber_string_view name;
@@ -337,6 +353,7 @@ public:
     ~ckx_ast_alias_stmt() override final = default;
 
     void ast_dump(we::we_file_writer &_writer, quint16 _level) override final;
+    void accept(ckx_sema_engine &sema) override final;
 
 private:
     saber_string_view name;
@@ -350,9 +367,7 @@ public:
     virtual ~ckx_ast_expr() = 0;
 
     virtual void ast_dump(we::we_file_writer& _writer, quint16 _level) = 0;
-
-    Q_ON_HOLD(\
-            virtual ckx_expr_result_storage accept(ckx_sema_engine& _sema) = 0;)
+    virtual saber::optional<ckx_expr_result> accept(ckx_sema_engine& _sema) = 0;
 };
 
 class ckx_ast_binary_expr final implements ckx_ast_expr
@@ -365,6 +380,8 @@ public:
     ~ckx_ast_binary_expr() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
 
 private:
     ckx_op opercode;
@@ -381,6 +398,8 @@ public:
     ~ckx_ast_unary_expr() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
 
 private:
     ckx_op opercode;
@@ -396,6 +415,8 @@ public:
     ~ckx_ast_subscript_expr() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
 
 private:
     ckx_ast_expr *base;
@@ -411,6 +432,8 @@ public:
     ~ckx_ast_invoke_expr() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
 
 private:
     ckx_ast_expr *invokable;
@@ -426,6 +449,8 @@ public:
     ~ckx_ast_extract_expr() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
 
 private:
     ckx_ast_expr *extracted;
@@ -441,6 +466,8 @@ public:
     ~ckx_ast_enumerator_expr() override final = default;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
 
 private:
     saber_string_view enum_name;
@@ -457,6 +484,8 @@ public:
     ~ckx_ast_cond_expr() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
 
 private:
     ckx_ast_expr* cond_expr;
@@ -471,6 +500,8 @@ public:
     ~ckx_ast_id_expr() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
 
 private:
     saber_string_view name;
@@ -489,6 +520,8 @@ public:
     ~ckx_ast_cast_expr() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
 
 private:
     castop op;
@@ -504,6 +537,8 @@ public:
     ~ckx_ast_sizeof_expr() override final = default;
 
     void ast_dump(we::we_file_writer &_writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
 
 private:
     ckx_prelexed_type type;
@@ -516,6 +551,8 @@ public:
     ~ckx_ast_vi_literal_expr() override final = default;
 
     void ast_dump(we::we_file_writer &_writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
 
 private:
     qint64 val;
@@ -528,6 +565,8 @@ public:
     ~ckx_ast_vr_literal_expr() override final = default;
 
     void ast_dump(we::we_file_writer &_writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
 
 private:
     qreal val;
@@ -544,6 +583,8 @@ public:
     void set_range(ckx_ast_expr* _start, ckx_ast_expr* _finish);
     void set_init_list(saber::vector<ckx_ast_expr*> &&_init_list);
     void ast_dump(we::we_file_writer &_writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
 
 private:
     ckx_prelexed_type array_of_type;

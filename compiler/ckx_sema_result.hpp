@@ -4,8 +4,6 @@
 #include "../llvm_ir_builder/llvm_ir_builder.hpp"
 #include "ckx_env_table.hpp"
 
-#include "ckx_sema_result_fwd.hpp"
-
 namespace ckx
 {
 
@@ -27,8 +25,6 @@ open_class ckx_expr_result
         type(_type), categ(_categ),
         llvm_value_bind(_llvm_value_bind) {}
 };
-
-static_assert(sizeof(ckx_expr_result) <= sizeof(ckx_expr_result_storage), "");
 
 } // namespace ckx
 

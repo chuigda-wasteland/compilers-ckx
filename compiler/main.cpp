@@ -7,6 +7,5 @@
 int main()
 {
     using namespace ckx;
-
     return 0;
 }

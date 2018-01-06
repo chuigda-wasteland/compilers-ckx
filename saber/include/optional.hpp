@@ -47,7 +47,7 @@ public:
 
 private:
     bool contains_value;
-    aligned_storage_t<sizeof(T), alignof(T)> storgae;
+    aligned_storage_t<sizeof(T), alignof(T)> storage;
 };
 
 } // namespace saber

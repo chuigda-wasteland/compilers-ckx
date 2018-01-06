@@ -17,7 +17,8 @@ SOURCES += main.cpp \
     ckx_operator.cpp \
     ../shared/src/file_reader.cpp \
     ../shared/src/file_writer.cpp \
-    ckx_prelexed_type.cpp
+    ckx_prelexed_type.cpp \
+    ckx_translate.cpp
 
 HEADERS += \
     we_file_reader.hpp \
@@ -42,6 +43,7 @@ HEADERS += \
     ../saber/include/vector.hpp \
     ../saber/include/string.hpp \
     ../saber/include/result.hpp \
+    ../saber/include/optional.hpp \
     ../saber/include/unordered_map.hpp \
     ../shared/include/file_reader.hpp \
     ../shared/include/file_writer.hpp \
@@ -64,7 +66,8 @@ HEADERS += \
     ckx_prelexed_type.hpp \
     ckx_sema.hpp \
     ckx_sema_result.hpp \
-    ckx_sema_result_fwd.hpp
+    ckx_sema_result_fwd.hpp \
+    ckx_sema_fwd.hpp
 
 INCLUDEPATH += ../saber/include/
 INCLUDEPATH += ../shared/include/
