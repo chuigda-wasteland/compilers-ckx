@@ -16,7 +16,8 @@ SOURCES += \
     ../../compiler/ckx_parser.cpp \
     ../../compiler/ckx_token.cpp \
     ../../compiler/ckx_token_set.cpp \
-    ../../compiler/ckx_token_stream.cpp
+    ../../compiler/ckx_token_stream.cpp \
+    ../../compiler/ckx_translate.cpp
 
 INCLUDEPATH += \
     ../../saber/include/ \

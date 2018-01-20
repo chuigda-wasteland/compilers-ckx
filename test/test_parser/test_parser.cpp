@@ -49,7 +49,7 @@ int main(int argc, const char* argv[])
 
     for (auto &error : parse_result.error_list)
     {
-        std::printf("At (%lu,%lu):", error.pos.first, error.pos.second);
+        std::printf("At (%lu,%lu):", error.rng.begin_line, error.rng.begin_col);
         std::printf("Error -- %s \n", error.desc.get().c_str());
     }
 

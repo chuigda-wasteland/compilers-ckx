@@ -22,7 +22,7 @@
 
 #include "defs.hpp"
 #include "string_pool.hpp"
-#include "memory.hpp"
+#include "c8assert.hpp"
 
 namespace ckx
 {
@@ -40,8 +40,16 @@ open_class ckx_source_range
           end_line(_end_line), end_col(_end_col) {}
 
     ckx_source_range(qcoord _begin_coord, qcoord _end_coord)
-        : begin_line(_begin_coord.line), begin_col(_begin_coord.col),
-          end_line(_end_coord.col), end_col(_end_coord.col) {}
+        : ckx_source_range(_begin_coord.line, _begin_coord.col,
+                           _end_coord.line, _end_coord.col) {}
+
+    static ckx_source_range concat(ckx_source_range r1, ckx_source_range r2)
+    {
+        C8ASSERT(r2.end_line == r1.end_line ?
+                 r2.end_col >= r1.end_col : r2.end_line > r1.end_line);
+        return ckx_source_range(r1.begin_line, r1.begin_col,
+                                r2.end_line, r2.end_col);
+    }
 };
 
 open_class ckx_token
