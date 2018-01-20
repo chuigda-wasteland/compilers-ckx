@@ -25,8 +25,8 @@ namespace ckx
 
 
 ckx_parser::parse_result::parse_result(ckx_ast_translation_unit *_trans_unit,
-        saber::list<ckx::ckx_error> &&_error_list,
-        saber::list<ckx::ckx_error> &&_warn_list) :
+        saber::list<ckx::ckx_syntax_error> &&_error_list,
+        saber::list<ckx::ckx_syntax_error> &&_warn_list) :
     trans_unit(saber::move(_trans_unit)),
     error_list(saber::move(_error_list)),
     warn_list(saber::move(_warn_list))
@@ -146,7 +146,7 @@ ckx_parser_impl::parse_global_stmt()
 
     default:
     parse_decl_with_id_typename_failed:
-        syntax_error(current_token().position,
+        syntax_error(current_token().rng,
                      saber_string_pool::create_view(
                      "Expected : typename, 'fn', 'struct', 'variant' or 'enum'"
                      " as the commemce of global declaration."));
@@ -212,13 +212,13 @@ ckx_parser_impl::parse_stmt()
     case ckx_token::type::tk_lbrace:    return parse_compound_stmt();
 
     case ckx_token::type::tk_semicolon:
-        syntax_warn(current_token().position,
+        syntax_warn(current_token().rng,
                     saber_string_pool::create_view("Empty declaration"));
         next_token();
         break;
 
     default:
-        syntax_error(current_token().position,
+        syntax_error(current_token().rng,
                      saber_string_pool::create_view("Ill-formed statement"));
         return nullptr;
     }
@@ -937,7 +937,7 @@ ckx_parser_impl::expect_n_eat(ckx_token::type _token_type,
         next_token();
         return true;
     }
-    syntax_error(current_token().position,
+    syntax_error(current_token().rng,
                  saber_string_pool::create_view("Unexpected token"));
     if (_can_skip) next_token();
     return false;
@@ -948,7 +948,7 @@ inline bool ckx_parser_impl::expect(ckx_token::type _token_type)
 {
     if (current_token().token_type == _token_type) return true;
 
-    syntax_error(current_token().position,
+    syntax_error(current_token().rng,
                  saber_string_pool::create_view("Unexpected token"));
     return false;
 }
@@ -963,18 +963,18 @@ ckx_parser_impl::id_is_typename(ckx_token _token)
 
 
 void
-ckx_parser_impl::syntax_error(const qcoord &_coord,
+ckx_parser_impl::syntax_error(ckx_source_range _rng,
                               saber_string_view _desc)
 {
-    error_list.emplace_back(_coord, _desc);
+    error_list.emplace_back(_rng, _desc);
 }
 
 
 void
-ckx_parser_impl::syntax_warn(const qcoord &_coord,
+ckx_parser_impl::syntax_warn(ckx_source_range _rng,
                              saber_string_view _desc)
 {
-    warn_list.emplace_back(_coord, _desc);
+    warn_list.emplace_back(_rng, _desc);
 }
 
 

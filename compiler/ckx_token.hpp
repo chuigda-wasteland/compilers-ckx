@@ -27,7 +27,22 @@
 namespace ckx
 {
 
-using saber::saber_ptr;
+open_class ckx_source_range
+{
+    const quint16 begin_line;
+    const quint16 begin_col;
+    const quint16 end_line;
+    const quint16 end_col;
+
+    ckx_source_range(quint16 _begin_line, quint16 _begin_col,
+                     quint16 _end_line, quint16 _end_col)
+        : begin_line(_begin_line), begin_col(_begin_col),
+          end_line(_end_line), end_col(_end_col) {}
+
+    ckx_source_range(qcoord _begin_coord, qcoord _end_coord)
+        : begin_line(_begin_coord.line), begin_col(_begin_coord.col),
+          end_line(_end_coord.col), end_col(_end_coord.col) {}
+};
 
 open_class ckx_token
 {
@@ -142,18 +157,19 @@ open_class ckx_token
         tk_eoi                 // EOI
     };
 
-    ckx_token(const qcoord& _pos, type _operator);
-    ckx_token(const qcoord& _pos, qint64 _int_literal);
-    ckx_token(const qcoord& _pos, quint64 _unsigned_literal);
-    ckx_token(const qcoord& _pos, qreal _real_literal);
-    ckx_token(const qcoord& _pos, qchar _char_literal);
-    ckx_token(const qcoord& _pos, saber_string_view _id);
+    ckx_token(ckx_source_range _rng, type _operator);
+    ckx_token(ckx_source_range _rng, qint64 _int_literal);
+    ckx_token(ckx_source_range _rng, quint64 _unsigned_literal);
+    ckx_token(ckx_source_range _rng, qreal _real_literal);
+    ckx_token(ckx_source_range _rng, qchar _char_literal);
+    ckx_token(ckx_source_range _rng, saber_string_view _id);
 
     ckx_token() = delete;
-    ~ckx_token();
+    ~ckx_token() = default;
+
+    const ckx_source_range rng;
 
     type token_type;
-
     variant token_value
     {
         const qchar ch;
@@ -162,8 +178,6 @@ open_class ckx_token
         const qreal r;
     } v;
     const saber_string_view str = saber_string_pool::create_view("");
-
-    const qcoord position;
 };
 
 struct ckx_token_type_hash

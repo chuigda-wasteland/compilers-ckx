@@ -25,45 +25,43 @@
 namespace ckx
 {
 
-ckx_token::ckx_token(const qcoord &_pos, type _operator) :
+ckx_token::ckx_token(ckx_source_range _rng, type _operator) :
+    rng(_rng),
     token_type(_operator),
-    v{.i64=0},
-    position(_pos)
+    v{.i64=0}
 {}
 
-ckx_token::ckx_token(const qcoord &_pos, qint64 _int_literal) :
+ckx_token::ckx_token(ckx_source_range _rng, qint64 _int_literal) :
+    rng(_rng),
     token_type(type::tk_vi_literal),
-    v{.i64=_int_literal},
-    position(_pos)
+    v{.i64=_int_literal}
 {}
 
-ckx_token::ckx_token(const qcoord &_pos, quint64 _unsigned_literal) :
+ckx_token::ckx_token(ckx_source_range _rng, quint64 _unsigned_literal) :
+    rng(_rng),
     token_type(type::tk_vr_literal),
-    v{.u64=_unsigned_literal},
-    position(_pos)
+    v{.u64=_unsigned_literal}
 {}
 
-ckx_token::ckx_token(const qcoord &_pos, qreal _real_literal) :
+ckx_token::ckx_token(ckx_source_range _rng, qreal _real_literal) :
+    rng(_rng),
     token_type(type::tk_vr_literal),
-    v{.r=_real_literal},
-    position(_pos)
+    v{.r=_real_literal}
 {}
 
-ckx_token::ckx_token(const qcoord &_pos, qchar _char_literal) :
+ckx_token::ckx_token(ckx_source_range _rng, qchar _char_literal) :
+    rng(_rng),
     token_type(type::tk_vchar_literal),
-    v{.ch=_char_literal},
-    position(_pos)
+    v{.ch=_char_literal}
 {}
 
-ckx_token::ckx_token(const qcoord &_pos, saber_string_view _id) :
+ckx_token::ckx_token(ckx_source_range _rng, saber_string_view _id) :
+    rng(_rng),
     token_type(type::tk_id),
     v{.i64=0},
-    str(_id),
-    position(_pos)
+    str(_id)
 {}
 
-ckx_token::~ckx_token()
-{}
 
 
 saber_string to_string_helper(ckx_token _token)

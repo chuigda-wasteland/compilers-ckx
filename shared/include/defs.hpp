@@ -43,7 +43,12 @@ using qsizet = size_t;
 
 using qreal = double;
 
-using qcoord = std::pair<qsizet, qsizet>;
+struct qcoord
+{
+    quint16 line;
+    quint16 col;
+    qcoord(quint16 _line, quint16 _col) : line(_line), col(_col) {}
+};
 
 template <typename T1, typename T2>
 using qpair = std::pair<T1, T2>;
@@ -59,10 +64,10 @@ constexpr qsizet countof(const ArrayType& _array)
     return sizeof(_array) / sizeof(_array[0]);
 }
 
-inline saber::string to_string_helper(const qcoord& _coord)
+inline saber::string to_string_helper(qcoord _coord)
 {
-    return saber::to_string_helper(quint64(_coord.first))
-           + saber::to_string_helper(quint64(_coord.second));
+    return saber::to_string_helper(quint64(_coord.line))
+           + saber::to_string_helper(quint64(_coord.col));
 }
 
 #define interface class

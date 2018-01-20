@@ -110,8 +110,8 @@ protected:
     inline  bool  expect(ckx_token::type _token_type);
 
     /// @brief functions for reporting problem.
-    void syntax_error(const qcoord& _coord, saber_string_view _desc);
-    void syntax_warn(const qcoord& _coord, saber_string_view _desc);
+    void syntax_error(ckx_source_range _rng, saber_string_view _desc);
+    void syntax_warn(ckx_source_range _rng, saber_string_view _desc);
 
     /// @brief and here are functions for recovering from a syntax error.
     void skip2_token(const ckx_token_set& _token_set);
@@ -119,8 +119,8 @@ protected:
 protected:
     ckx_token_stream *token_stream;
 
-    saber::list<ckx_error> error_list;
-    saber::list<ckx_error> warn_list;
+    saber::list<ckx_syntax_error> error_list;
+    saber::list<ckx_syntax_error> warn_list;
 
     /// @note still we need a table for storing types occured in parsing
     ckx_typename_table typename_table;
