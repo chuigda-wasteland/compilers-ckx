@@ -27,27 +27,27 @@
 namespace ckx
 {
 
-open_class ckx_source_range
+open_class ckx_src_rng
 {
     const quint16 begin_line;
     const quint16 begin_col;
     const quint16 end_line;
     const quint16 end_col;
 
-    ckx_source_range(quint16 _begin_line, quint16 _begin_col,
+    ckx_src_rng(quint16 _begin_line, quint16 _begin_col,
                      quint16 _end_line, quint16 _end_col)
         : begin_line(_begin_line), begin_col(_begin_col),
           end_line(_end_line), end_col(_end_col) {}
 
-    ckx_source_range(qcoord _begin_coord, qcoord _end_coord)
-        : ckx_source_range(_begin_coord.line, _begin_coord.col,
+    ckx_src_rng(qcoord _begin_coord, qcoord _end_coord)
+        : ckx_src_rng(_begin_coord.line, _begin_coord.col,
                            _end_coord.line, _end_coord.col) {}
 
-    static ckx_source_range concat(ckx_source_range r1, ckx_source_range r2)
+    static ckx_src_rng concat(ckx_src_rng r1, ckx_src_rng r2)
     {
         C8ASSERT(r2.end_line == r1.end_line ?
                  r2.end_col >= r1.end_col : r2.end_line > r1.end_line);
-        return ckx_source_range(r1.begin_line, r1.begin_col,
+        return ckx_src_rng(r1.begin_line, r1.begin_col,
                                 r2.end_line, r2.end_col);
     }
 };
@@ -165,17 +165,17 @@ open_class ckx_token
         tk_eoi                 // EOI
     };
 
-    ckx_token(ckx_source_range _rng, type _operator);
-    ckx_token(ckx_source_range _rng, qint64 _int_literal);
-    ckx_token(ckx_source_range _rng, quint64 _unsigned_literal);
-    ckx_token(ckx_source_range _rng, qreal _real_literal);
-    ckx_token(ckx_source_range _rng, qchar _char_literal);
-    ckx_token(ckx_source_range _rng, saber_string_view _id);
+    ckx_token(ckx_src_rng _rng, type _operator);
+    ckx_token(ckx_src_rng _rng, qint64 _int_literal);
+    ckx_token(ckx_src_rng _rng, quint64 _unsigned_literal);
+    ckx_token(ckx_src_rng _rng, qreal _real_literal);
+    ckx_token(ckx_src_rng _rng, qchar _char_literal);
+    ckx_token(ckx_src_rng _rng, saber_string_view _id);
 
     ckx_token() = delete;
     ~ckx_token() = default;
 
-    const ckx_source_range rng;
+    const ckx_src_rng rng;
 
     type token_type;
     variant token_value

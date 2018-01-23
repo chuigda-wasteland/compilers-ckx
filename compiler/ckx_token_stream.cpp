@@ -70,9 +70,9 @@ private:
     void solve_colon_or_scope();
     void solve_array_or_lbracket();
     void solve_ordinary_op();
-    saber::pair<saber_string_view, ckx_source_range> scan_full_id_string();
-    bool solve_keyword(saber_string_view _str, ckx_source_range _rng);
-    void solve_identifier(saber_string_view _str, ckx_source_range _rng);
+    saber::pair<saber_string_view, ckx_src_rng> scan_full_id_string();
+    bool solve_keyword(saber_string_view _str, ckx_src_rng _rng);
+    void solve_identifier(saber_string_view _str, ckx_src_rng _rng);
 
     qint64 scan_integer();
     qreal scan_floating_part();
@@ -168,7 +168,7 @@ ckx_token_stream_impl::operator_index_impl(int _offset)
     }
     else
     {
-        return ckx_token(ckx_source_range(char_coord(), char_coord()),
+        return ckx_token(ckx_src_rng(char_coord(), char_coord()),
                                           ckx_token::type::tk_eoi);
     }
 }
@@ -261,7 +261,7 @@ void ckx_token_stream_impl::do_split_tokens()
         }
     }
 
-    token_buffer.emplace_back(ckx_source_range(char_coord(), char_coord()),
+    token_buffer.emplace_back(ckx_src_rng(char_coord(), char_coord()),
                               ckx_token::type::tk_eoi);
 }
 
@@ -379,12 +379,12 @@ void ckx_token_stream_impl::solve_numbers()
     if (is_real)
     {
         token_buffer.emplace_back(
-            ckx_source_range(begin_coord, char_coord()), r);
+            ckx_src_rng(begin_coord, char_coord()), r);
     }
     else
     {
         token_buffer.emplace_back(
-            ckx_source_range(begin_coord, char_coord()), i);
+            ckx_src_rng(begin_coord, char_coord()), i);
     }
 }
 
@@ -402,7 +402,7 @@ void ckx_token_stream_impl::solve_char_literal()
     }
 
     token_buffer.emplace_back(
-        ckx_source_range(begin_coord, char_coord()), result);
+        ckx_src_rng(begin_coord, char_coord()), result);
     next_char();
 }
 
@@ -437,7 +437,7 @@ void ckx_token_stream_impl::solve_bitwise_or_logic_op()
         C8ASSERT(false); // what the fuck!
     }
 
-    token_buffer.emplace_back(ckx_source_range(begin_coord, char_coord()),
+    token_buffer.emplace_back(ckx_src_rng(begin_coord, char_coord()),
                                                new_token_type);
     if (is_logic) next_char();
 }
@@ -480,7 +480,7 @@ void ckx_token_stream_impl::solve_add_n_sub()
         }
     }
 
-    token_buffer.emplace_back(ckx_source_range(begin_coord, char_coord()),
+    token_buffer.emplace_back(ckx_src_rng(begin_coord, char_coord()),
                                                new_token_type);
 }
 
@@ -532,7 +532,7 @@ void ckx_token_stream_impl::solve_op_or_opassign()
         break;
     }
 
-    token_buffer.emplace_back(ckx_source_range(begin_coord, char_coord()),
+    token_buffer.emplace_back(ckx_src_rng(begin_coord, char_coord()),
                                                new_token_type);
     if (is_opassign) next_char();
 }
@@ -545,12 +545,12 @@ void ckx_token_stream_impl::solve_colon_or_scope()
     if (ch() == ':')
     {
         next_char();
-        token_buffer.emplace_back(ckx_source_range(begin_coord, char_coord()),
+        token_buffer.emplace_back(ckx_src_rng(begin_coord, char_coord()),
                                                    ckx_token::type::tk_scope);
     }
     else
     {
-        token_buffer.emplace_back(ckx_source_range(begin_coord, char_coord()),
+        token_buffer.emplace_back(ckx_src_rng(begin_coord, char_coord()),
                                   ckx_token::type::tk_colon);
     }
 }
@@ -563,12 +563,12 @@ void ckx_token_stream_impl::solve_array_or_lbracket()
     if (ch() == ']')
     {
         next_char();
-        token_buffer.emplace_back(ckx_source_range(begin_coord, char_coord()),
+        token_buffer.emplace_back(ckx_src_rng(begin_coord, char_coord()),
                                                    ckx_token::type::tk_arr);
     }
     else
     {
-        token_buffer.emplace_back(ckx_source_range(begin_coord, char_coord()),
+        token_buffer.emplace_back(ckx_src_rng(begin_coord, char_coord()),
                                                   ckx_token::type::tk_lbracket);
     }
 }
@@ -598,7 +598,7 @@ void ckx_token_stream_impl::solve_ordinary_op()
         C8ASSERT(false);
     }
 
-    token_buffer.emplace_back(ckx_source_range(begin_coord, char_coord()),
+    token_buffer.emplace_back(ckx_src_rng(begin_coord, char_coord()),
                                                new_token_type);
     next_char();
 }
@@ -610,7 +610,7 @@ void ckx_token_stream_impl::solve_ordinary_op()
     And other functions will have to retrieve the lexical value from str().
     Not elegant at all.
  */
-saber::pair<saber_string_view, ckx_source_range>
+saber::pair<saber_string_view, ckx_src_rng>
 ckx_token_stream_impl::scan_full_id_string()
 {
     qcoord begin_coord = char_coord();
@@ -627,12 +627,12 @@ ckx_token_stream_impl::scan_full_id_string()
     }
 
     return make_pair(saber_string_pool::create_view(saber::move(strtemp)),
-                     ckx_source_range(begin_coord, char_coord()));
+                     ckx_src_rng(begin_coord, char_coord()));
 
 }
 
 bool ckx_token_stream_impl::solve_keyword(saber_string_view _str,
-                                          ckx_source_range _rng)
+                                          ckx_src_rng _rng)
 {
     ckx_token::type type;
     bool is_identifier;
@@ -651,7 +651,7 @@ bool ckx_token_stream_impl::solve_keyword(saber_string_view _str,
 }
 
 void ckx_token_stream_impl::solve_identifier(saber_string_view _str,
-                                             ckx_source_range _rng)
+                                             ckx_src_rng _rng)
 {
     token_buffer.emplace_back(_rng, _str);
 }

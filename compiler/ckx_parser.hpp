@@ -34,10 +34,10 @@ class ckx_parser_impl;
 class ckx_syntax_error
 {
 public:
-    ckx_syntax_error(ckx_source_range _rng, saber_string_view _desc) :
+    ckx_syntax_error(ckx_src_rng _rng, saber_string_view _desc) :
         rng(_rng), desc(_desc) {}
 
-    ckx_source_range rng;
+    ckx_src_rng rng;
     saber_string_view desc;
 };
 

@@ -106,15 +106,15 @@ protected:
     inline  ckx_token  peek_next_token();
     inline  void       next_token();
 
-    inline saber::optional<ckx_source_range>
+    inline saber::optional<ckx_src_rng>
     expect_n_eat(ckx_token::type _token_type);
 
-    inline saber::optional<ckx_source_range>
+    inline saber::optional<ckx_src_rng>
     expect(ckx_token::type _token_type);
 
     /// @brief functions for reporting problem.
-    void syntax_error(ckx_source_range _rng, saber_string_view _desc);
-    void syntax_warn(ckx_source_range _rng, saber_string_view _desc);
+    void syntax_error(ckx_src_rng _rng, saber_string_view _desc);
+    void syntax_warn(ckx_src_rng _rng, saber_string_view _desc);
 
     /// @brief and here are functions for recovering from a syntax error.
     void skip2_token(const ckx_token_set& _token_set);

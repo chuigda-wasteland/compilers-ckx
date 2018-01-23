@@ -237,7 +237,7 @@ ckx_parser_impl::parse_decl_stmt()
     saber::vector<ckx_ast_decl_stmt::init_decl> decls;
     while (1)
     {
-        ckx_source_range id_range = current_token().rng;
+        ckx_src_rng id_range = current_token().rng;
         saber_string_view id_string = current_token().str;
 
         ckx_ast_expr *init = nullptr;
@@ -262,7 +262,7 @@ ckx_parser_impl::parse_func_stmt()
 {
     C8ASSERT(current_token().token_type == ckx_token::type::tk_function);
 
-    ckx_source_range start_source_range = current_token().rng;
+    ckx_src_rng start_source_range = current_token().rng;
     next_token();
 
     saber_string_view func_name = current_token().str;
@@ -273,7 +273,7 @@ ckx_parser_impl::parse_func_stmt()
 
     while (1)
     {
-        ckx_source_range param_rng = current_token().rng;
+        ckx_src_rng param_rng = current_token().rng;
         ckx_prelexed_type param_type = parse_type();
         saber_string_view param_name = current_token().str;
         next_token();
@@ -316,16 +316,15 @@ ckx_parser_impl::parse_record_stmt()
             ckx_ast_record_stmt::record_tag::rt_struct :
             ckx_ast_record_stmt::record_tag::rt_variant;
 
-    ckx_source_range kwd_rng = current_token().rng;
+    ckx_src_rng kwd_rng = current_token().rng;
     next_token();
 
-    ckx_source_range id_rng = current_token().rng;
+    ckx_src_rng id_rng = current_token().rng;
     saber_string_view record_name = current_token().str;
     typename_table.add_typename(record_name);
 
     next_token();
-    ckx_source_range lbrace_rng =
-        expect_n_eat(ckx_token::type::tk_lbrace).get();
+    ckx_src_rng lbrace_rng = expect_n_eat(ckx_token::type::tk_lbrace).get();
     saber::vector<ckx_ast_record_stmt::field_row> field_rows;
     while (1)
     {
@@ -333,7 +332,7 @@ ckx_parser_impl::parse_record_stmt()
         saber::vector<ckx_ast_record_stmt::field> fields;
         while (1)
         {
-            ckx_source_range dclr_rng = current_token().rng;
+            ckx_src_rng dclr_rng = current_token().rng;
             saber_string_view dclr_name = current_token().str;
             fields.emplace_back(dclr_rng, dclr_name);
             next_token();
@@ -348,8 +347,7 @@ ckx_parser_impl::parse_record_stmt()
         if ( current_token().token_type == ckx_token::type::tk_rbrace )
             break;
     }
-    ckx_source_range rbrace_rng =
-        expect_n_eat(ckx_token::type::tk_rbrace).get();
+    ckx_src_rng rbrace_rng = expect_n_eat(ckx_token::type::tk_rbrace).get();
     return new ckx_ast_record_stmt(kwd_rng, id_rng, lbrace_rng, rbrace_rng,
                                    tag, record_name, saber::move(field_rows));
 }
@@ -359,25 +357,24 @@ ckx_ast_enum_stmt*
 ckx_parser_impl::parse_enum_stmt()
 {
     C8ASSERT(current_token().token_type == ckx_token::type::tk_enum);
-    ckx_source_range kwd_rng = current_token().rng;
+    ckx_src_rng kwd_rng = current_token().rng;
     next_token();
 
-    ckx_source_range id_rng = current_token().rng;
+    ckx_src_rng id_rng = current_token().rng;
     saber_string_view enum_name = current_token().str;
     typename_table.add_typename(enum_name);
     next_token();
 
-    ckx_source_range lbrace_rng =
-        expect_n_eat(ckx_token::type::tk_lbrace).get();
+    ckx_src_rng lbrace_rng = expect_n_eat(ckx_token::type::tk_lbrace).get();
 
     saber::vector<ckx_ast_enum_stmt::enumerator> enumerators;
     while (1)
     {
-        ckx_source_range id_rng = current_token().rng;
+        ckx_src_rng id_rng = current_token().rng;
         saber_string_view enumerator_name = current_token().str;
         next_token();
         expect_n_eat(ckx_token::type::tk_assign);
-        ckx_source_range value_rng = current_token().rng;
+        ckx_src_rng value_rng = current_token().rng;
         qint64 enumerator_value = current_token().v.i64;
 
         enumerators.emplace_back(id_rng, value_rng,
@@ -390,8 +387,7 @@ ckx_parser_impl::parse_enum_stmt()
         if (current_token().token_type == ckx_token::type::tk_rbrace)
             break;
     }
-    ckx_source_range rbrace_rng =
-        expect_n_eat(ckx_token::type::tk_rbrace).get();
+    ckx_src_rng rbrace_rng = expect_n_eat(ckx_token::type::tk_rbrace).get();
     return new ckx_ast_enum_stmt(kwd_rng, id_rng, lbrace_rng, rbrace_rng,
                                  enum_name, saber::move(enumerators));
 }
@@ -400,11 +396,11 @@ ckx_parser_impl::parse_enum_stmt()
 ckx_ast_alias_stmt *ckx_parser_impl::parse_alias_stmt()
 {
     C8ASSERT(current_token().token_type == ckx_token::type::tk_alias);
-    ckx_source_range kwd_rng = current_token().rng;
+    ckx_src_rng kwd_rng = current_token().rng;
     next_token();
 
     expect(ckx_token::type::tk_id);
-    ckx_source_range id_rng = current_token().rng;
+    ckx_src_rng id_rng = current_token().rng;
     saber_string_view name = current_token().str;
     next_token();
     expect_n_eat(ckx_token::type::tk_assign);
@@ -420,7 +416,7 @@ ckx_ast_if_stmt*
 ckx_parser_impl::parse_if_stmt()
 {
     C8ASSERT(current_token().token_type == ckx_token::type::tk_if);
-    ckx_source_range if_rng = current_token().rng;
+    ckx_src_rng if_rng = current_token().rng;
     next_token();
 
     expect_n_eat(ckx_token::type::tk_lparen);
@@ -431,7 +427,7 @@ ckx_parser_impl::parse_if_stmt()
 
     if (current_token().token_type == ckx_token::type::tk_else)
     {
-        ckx_source_range else_rng = current_token().rng;
+        ckx_src_rng else_rng = current_token().rng;
         next_token();
         ckx_ast_stmt *else_clause = parse_stmt();
         return new ckx_ast_if_stmt(
@@ -448,7 +444,7 @@ ckx_ast_while_stmt*
 ckx_parser_impl::parse_while_stmt()
 {
     C8ASSERT(current_token().token_type == ckx_token::type::tk_while);
-    ckx_source_range while_rng = current_token().rng;
+    ckx_src_rng while_rng = current_token().rng;
     next_token();
 
     expect_n_eat(ckx_token::type::tk_lparen);
@@ -464,12 +460,11 @@ ckx_ast_do_while_stmt*
 ckx_parser_impl::parse_do_while_stmt()
 {
     C8ASSERT(current_token().token_type == ckx_token::type::tk_do);
-    ckx_source_range do_rng = current_token().rng;
+    ckx_src_rng do_rng = current_token().rng;
     next_token();
 
     ckx_ast_stmt *clause = parse_stmt();
-    ckx_source_range while_rng =
-        expect_n_eat(ckx_token::type::tk_while).get();
+    ckx_src_rng while_rng = expect_n_eat(ckx_token::type::tk_while).get();
     expect_n_eat(ckx_token::type::tk_lparen);
     ckx_ast_expr *condition = parse_expr();
     expect_n_eat(ckx_token::type::tk_rparen);
@@ -483,7 +478,7 @@ ckx_ast_for_stmt*
 ckx_parser_impl::parse_for_stmt()
 {
     C8ASSERT(current_token().token_type == ckx_token::type::tk_for);
-    ckx_source_range for_rng = current_token().rng;
+    ckx_src_rng for_rng = current_token().rng;
     next_token();
 
     expect_n_eat(ckx_token::type::tk_lparen);
@@ -509,7 +504,7 @@ ckx_ast_break_stmt*
 ckx_parser_impl::parse_break_stmt()
 {
     C8ASSERT(current_token().token_type == ckx_token::type::tk_break);
-    ckx_source_range src_rng = current_token().rng;
+    ckx_src_rng src_rng = current_token().rng;
     next_token();
     expect_n_eat(ckx_token::type::tk_semicolon);
 
@@ -522,7 +517,7 @@ ckx_ast_continue_stmt*
 ckx_parser_impl::parse_continue_stmt()
 {
     C8ASSERT(current_token().token_type == ckx_token::type::tk_continue);
-    ckx_source_range src_rng = current_token().rng;
+    ckx_src_rng src_rng = current_token().rng;
     next_token();
     expect_n_eat(ckx_token::type::tk_semicolon);
 
@@ -534,7 +529,7 @@ ckx_ast_return_stmt*
 ckx_parser_impl::parse_return_stmt()
 {
     C8ASSERT(current_token().token_type == ckx_token::type::tk_return);
-    ckx_source_range src_rng = current_token().rng;
+    ckx_src_rng src_rng = current_token().rng;
     next_token();
 
     ckx_ast_expr *expr = nullptr;
@@ -549,15 +544,13 @@ ckx_parser_impl::parse_return_stmt()
 ckx_ast_compound_stmt*
 ckx_parser_impl::parse_compound_stmt()
 {
-    ckx_source_range lbrace_rng =
-        expect_n_eat(ckx_token::type::tk_lbrace).get();
+    ckx_src_rng lbrace_rng = expect_n_eat(ckx_token::type::tk_lbrace).get();
     saber::vector<ckx_ast_stmt*> stmts;
     while (current_token().token_type != ckx_token::type::tk_rbrace)
     {
         stmts.push_back(parse_stmt());
     }
-    ckx_source_range rbrace_rng =
-        expect_n_eat(ckx_token::type::tk_rbrace).get();
+    ckx_src_rng rbrace_rng = expect_n_eat(ckx_token::type::tk_rbrace).get();
 
     return new ckx_ast_compound_stmt(lbrace_rng,rbrace_rng, saber::move(stmts));
 }
@@ -652,11 +645,10 @@ ckx_parser_impl::parse_cond_expr()
 
     if (current_token().token_type == ckx_token::type::tk_ques)
     {
-        ckx_source_range ques_rng = current_token().rng;
+        ckx_src_rng ques_rng = current_token().rng;
         next_token();
         ckx_ast_expr *then_expr = parse_expr();
-        ckx_source_range colon_rng =
-            expect_n_eat(ckx_token::type::tk_colon).get();
+        ckx_src_rng colon_rng = expect_n_eat(ckx_token::type::tk_colon).get();
         ckx_ast_expr *else_expr = parse_expr();
 
         return new ckx_ast_cond_expr(
@@ -675,7 +667,7 @@ ckx_parser_impl::parse_binary_expr(quint8 _prec)
     while (ckx_op_helper::is_binary(op)
            && (new_prec=ckx_op_helper::precedence(op)) >= _prec)
     {
-        ckx_source_range operator_rng = current_token().rng;
+        ckx_src_rng operator_rng = current_token().rng;
         next_token();
         ckx_ast_expr *rhs_expr = parse_binary_expr(new_prec+1);
         ckx_ast_expr *binary_expr =
@@ -695,7 +687,7 @@ ckx_parser_impl::parse_assign_expr()
     ckx_op current_op = ckx_op_helper::token2binary(current_token().token_type);
     if (ckx_op_helper::is_assign(current_op))
     {
-        ckx_source_range operator_rng = current_token().rng;
+        ckx_src_rng operator_rng = current_token().rng;
         next_token();
         return new ckx_ast_binary_expr(
             operator_rng, current_op, expr, parse_assign_expr());
@@ -707,7 +699,7 @@ ckx_parser_impl::parse_assign_expr()
 ckx_ast_cast_expr*
 ckx_parser_impl::parse_cast_expr()
 {
-    ckx_source_range begin_source_rng = current_token().rng;
+    ckx_src_rng begin_source_rng = current_token().rng;
 
     ckx_ast_cast_expr::castop castop;
     switch (current_token().token_type)
@@ -722,7 +714,7 @@ ckx_parser_impl::parse_cast_expr()
         castop = ckx_ast_cast_expr::castop::cst_ckx; break;
     default: C8ASSERT(false); // What the fuck!
     }
-    ckx_source_range kwd_rng = current_token().rng;
+    ckx_src_rng kwd_rng = current_token().rng;
     next_token();
     expect_n_eat(ckx_token::type::tk_lt);
     ckx_prelexed_type desired_type = parse_type();
@@ -740,7 +732,7 @@ ckx_ast_expr*
 ckx_parser_impl::parse_unary_expr()
 {
     ckx_token at_token = current_token();
-    ckx_source_range operator_rng = at_token.rng;
+    ckx_src_rng operator_rng = at_token.rng;
 
     switch (current_token().token_type)
     {
@@ -773,7 +765,7 @@ ckx_parser_impl::parse_unary_expr()
 ckx_ast_expr*
 ckx_parser_impl::parse_postfix_expr()
 {
-    ckx_source_range begin_source_rng = current_token().rng;
+    ckx_src_rng begin_source_rng = current_token().rng;
     ckx_ast_expr *ret = parse_basic_expr();
 
     while (1)
@@ -782,7 +774,7 @@ ckx_parser_impl::parse_postfix_expr()
         {
         case ckx_token::type::tk_lparen:
             {
-                ckx_source_range lparen_rng = current_token().rng;
+                ckx_src_rng lparen_rng = current_token().rng;
                 next_token();
                 saber::vector<ckx_ast_expr*> args;
                 while (current_token().token_type
@@ -793,7 +785,7 @@ ckx_parser_impl::parse_postfix_expr()
                     if (current_token().token_type == ckx_token::type::tk_comma)
                         next_token();
                 }
-                ckx_source_range rparen_rng =
+                ckx_src_rng rparen_rng =
                     expect_n_eat(ckx_token::type::tk_rparen).get();
                 ret = new ckx_ast_invoke_expr(lparen_rng, rparen_rng,
                                               ret, saber::move(args));
@@ -802,13 +794,13 @@ ckx_parser_impl::parse_postfix_expr()
 
         case ckx_token::type::tk_lbracket:
             {
-                ckx_source_range lbracket_rng = current_token().rng;
+                ckx_src_rng lbracket_rng = current_token().rng;
                 next_token();
                 ckx_ast_expr *subscript_expr = parse_expr();
-                ckx_source_range rbracket_rng =
-                     expect_n_eat(ckx_token::type::tk_rbracket).get();
+                ckx_src_rng rbracket_rng =
+                    expect_n_eat(ckx_token::type::tk_rbracket).get();
                 ret = new ckx_ast_subscript_expr(lbracket_rng, rbracket_rng,
-                                                 ret, parse_expr());
+                                                 ret, subscript_expr);
                 break;
             }
 
@@ -852,7 +844,7 @@ ckx_parser_impl::parse_basic_expr()
 
     case ckx_token::type::tk_id:
         {
-            ckx_source_range id_rng = current_token().rng;
+            ckx_src_rng id_rng = current_token().rng;
             saber_string_view name = current_token().str;
             if (id_is_typename(current_token()))
             {
@@ -861,7 +853,7 @@ ckx_parser_impl::parse_basic_expr()
                     next_token();
                     next_token();
                     expect(ckx_token::type::tk_id);
-                    ckx_source_range enumerator_rng = current_token().rng;
+                    ckx_src_rng enumerator_rng = current_token().rng;
                     saber_string_view enumer = current_token().str;
                     ckx_ast_expr *ret =
                         new ckx_ast_enumerator_expr(
@@ -884,14 +876,14 @@ ckx_parser_impl::parse_basic_expr()
 
     case ckx_token::type::tk_sizeof:
         {
-            ckx_source_range begin_source_range = current_token().rng;
+            ckx_src_rng begin_source_range = current_token().rng;
 
             next_token();
             expect_n_eat(ckx_token::type::tk_lparen);
             ckx_prelexed_type type = parse_type();
             expect_n_eat(ckx_token::type::tk_rparen);
             return new ckx_ast_sizeof_expr(
-                ckx_source_range::concat(begin_source_range,
+                ckx_src_rng::concat(begin_source_range,
                                          current_token().rng),
                 saber::move(type));
         }
@@ -956,30 +948,30 @@ ckx_parser_impl::next_token()
     return token_stream->operator++();
 }
 
-inline saber::optional<ckx_source_range>
+inline saber::optional<ckx_src_rng>
 ckx_parser_impl::expect_n_eat(ckx_token::type _token_type)
 {
     if (current_token().token_type == _token_type)
     {
-        ckx_source_range rng = current_token().rng;
+        ckx_src_rng rng = current_token().rng;
         next_token();
-        return saber::optional<ckx_source_range>(rng);
+        return saber::optional<ckx_src_rng>(rng);
     }
     syntax_error(current_token().rng,
                  saber_string_pool::create_view("Unexpected token"));
-    return saber::optional<ckx_source_range>();
+    return saber::optional<ckx_src_rng>();
 }
 
 
-inline saber::optional<ckx_source_range>
+inline saber::optional<ckx_src_rng>
 ckx_parser_impl::expect(ckx_token::type _token_type)
 {
     if (current_token().token_type == _token_type)
-        return saber::optional<ckx_source_range>(current_token().rng);
+        return saber::optional<ckx_src_rng>(current_token().rng);
 
     syntax_error(current_token().rng,
                  saber_string_pool::create_view("Unexpected token"));
-    return saber::optional<ckx_source_range>();
+    return saber::optional<ckx_src_rng>();
 }
 
 
@@ -992,7 +984,7 @@ ckx_parser_impl::id_is_typename(ckx_token _token)
 
 
 void
-ckx_parser_impl::syntax_error(ckx_source_range _rng,
+ckx_parser_impl::syntax_error(ckx_src_rng _rng,
                               saber_string_view _desc)
 {
     error_list.emplace_back(_rng, _desc);
@@ -1000,7 +992,7 @@ ckx_parser_impl::syntax_error(ckx_source_range _rng,
 
 
 void
-ckx_parser_impl::syntax_warn(ckx_source_range _rng,
+ckx_parser_impl::syntax_warn(ckx_src_rng _rng,
                              saber_string_view _desc)
 {
     warn_list.emplace_back(_rng, _desc);

@@ -282,7 +282,6 @@ void ckx_ast_record_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 
 void ckx_ast_record_stmt::accept(ckx_sema_engine &sema)
 {
-
 }
 
 

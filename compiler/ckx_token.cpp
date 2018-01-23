@@ -25,37 +25,37 @@
 namespace ckx
 {
 
-ckx_token::ckx_token(ckx_source_range _rng, type _operator) :
+ckx_token::ckx_token(ckx_src_rng _rng, type _operator) :
     rng(_rng),
     token_type(_operator),
     v{.i64=0}
 {}
 
-ckx_token::ckx_token(ckx_source_range _rng, qint64 _int_literal) :
+ckx_token::ckx_token(ckx_src_rng _rng, qint64 _int_literal) :
     rng(_rng),
     token_type(type::tk_vi_literal),
     v{.i64=_int_literal}
 {}
 
-ckx_token::ckx_token(ckx_source_range _rng, quint64 _unsigned_literal) :
+ckx_token::ckx_token(ckx_src_rng _rng, quint64 _unsigned_literal) :
     rng(_rng),
     token_type(type::tk_vr_literal),
     v{.u64=_unsigned_literal}
 {}
 
-ckx_token::ckx_token(ckx_source_range _rng, qreal _real_literal) :
+ckx_token::ckx_token(ckx_src_rng _rng, qreal _real_literal) :
     rng(_rng),
     token_type(type::tk_vr_literal),
     v{.r=_real_literal}
 {}
 
-ckx_token::ckx_token(ckx_source_range _rng, qchar _char_literal) :
+ckx_token::ckx_token(ckx_src_rng _rng, qchar _char_literal) :
     rng(_rng),
     token_type(type::tk_vchar_literal),
     v{.ch=_char_literal}
 {}
 
-ckx_token::ckx_token(ckx_source_range _rng, saber_string_view _id) :
+ckx_token::ckx_token(ckx_src_rng _rng, saber_string_view _id) :
     rng(_rng),
     token_type(type::tk_id),
     v{.i64=0},
