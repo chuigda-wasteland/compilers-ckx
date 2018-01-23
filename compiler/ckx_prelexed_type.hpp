@@ -13,15 +13,15 @@ class ckx_prelexed_type
 {
 public:
     /// @note once determined, it's immutable.
-    ckx_prelexed_type(saber::vector<ckx_token>&& _prelexed_tokens) :
-        prelexed_tokens(_prelexed_tokens) {}
+    explicit ckx_prelexed_type(saber::vector<ckx_token>&& _prelexed_tokens) :
+        prelexed_tokens(saber::move(_prelexed_tokens)) {}
     ~ckx_prelexed_type() = default;
     ckx_prelexed_type(ckx_prelexed_type&& _another) :
         prelexed_tokens(saber::move(_another.prelexed_tokens)) {}
 
     ckx_prelexed_type(const ckx_prelexed_type&) = delete;
 
-    const saber::vector<ckx_token> get_prelexed_tokens() const
+    const saber::vector<ckx_token>& get_prelexed_tokens() const
     {
         return prelexed_tokens;
     }
@@ -35,7 +35,7 @@ public:
     }
 
 private:
-    saber::vector<ckx_token> prelexed_tokens;
+    const saber::vector<ckx_token> prelexed_tokens;
 };
 
 }
