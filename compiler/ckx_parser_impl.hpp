@@ -102,9 +102,9 @@ protected:
 
     /// @brief token-access functions
     /// simply encapsuled token-stream again.
-    inline  ckx_token  current_token();
-    inline  ckx_token  peek_next_token();
-    inline  void       next_token();
+    inline  ckx_token&  current_token();
+    inline  ckx_token&  peek_next_token();
+    inline  void        next_token();
 
     inline saber::optional<ckx_src_rng>
     expect_n_eat(ckx_token::type _token_type);

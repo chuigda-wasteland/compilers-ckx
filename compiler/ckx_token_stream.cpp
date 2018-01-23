@@ -55,7 +55,7 @@ public:
     explicit ckx_token_stream_impl(we::we_file_reader &_file_reader);
     ~ckx_token_stream_impl();
 
-    ckx_token operator_index_impl(int _offset);
+    ckx_token& operator_index_impl(int _offset);
     saber::vector<ckx_error>& get_error_impl(void);
     void operator_incr_impl(void);
 
@@ -109,7 +109,7 @@ ckx_token_stream::~ckx_token_stream()
     delete impl;
 }
 
-ckx_token
+ckx_token&
 ckx_token_stream::operator[] (int _offset)
 {
     return impl->operator_index_impl(_offset);
@@ -159,7 +159,7 @@ ckx_token_stream_impl::ckx_token_stream_impl(
 ckx_token_stream_impl::~ckx_token_stream_impl()
 {}
 
-ckx_token
+ckx_token&
 ckx_token_stream_impl::operator_index_impl(int _offset)
 {
     if ( _offset + current_pos < token_buffer.size() )
@@ -168,8 +168,7 @@ ckx_token_stream_impl::operator_index_impl(int _offset)
     }
     else
     {
-        return ckx_token(ckx_src_rng(char_coord(), char_coord()),
-                                          ckx_token::type::tk_eoi);
+        return token_buffer.back();
     }
 }
 

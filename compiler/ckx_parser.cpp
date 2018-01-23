@@ -928,14 +928,14 @@ ckx_parser_impl::parse_type()
 }
 
 
-inline ckx_token
+inline ckx_token&
 ckx_parser_impl::current_token()
 {
     return token_stream->operator[](0);
 }
 
 
-inline ckx_token
+inline ckx_token&
 ckx_parser_impl::peek_next_token()
 {
     return token_stream->operator[](1);
