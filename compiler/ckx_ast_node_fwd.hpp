@@ -35,8 +35,7 @@ class ckx_ast_stmt;
     class ckx_ast_continue_stmt;
     class ckx_ast_return_stmt;
 
-    class ckx_ast_struct_stmt;
-    class ckx_ast_variant_stmt;
+    class ckx_ast_record_stmt;
     class ckx_ast_enum_stmt;
     class ckx_ast_alias_stmt;
     class ckx_ast_decl_stmt;

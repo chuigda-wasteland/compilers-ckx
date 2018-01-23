@@ -36,10 +36,6 @@ ckx_ast_translation_unit::add_new_stmt(ckx_ast_stmt *_stmt)
     stmts.push_back(_stmt);
 }
 
-ckx_ast_stmt::ckx_ast_stmt(ckx_source_range _rng) :
-    ckx_ast_node(_rng)
-{}
-
 void ckx_ast_stmt::accept(ckx_sema_engine &sema)
 {
 }
@@ -69,6 +65,15 @@ ckx_ast_if_stmt::ckx_ast_if_stmt(ckx_source_range _if_rng,
     condition(_condition),
     then_clause(_then_clause),
     else_clause(_else_clause) {}
+
+ckx_ast_if_stmt::ckx_ast_if_stmt(ckx_source_range _if_rng,
+                                 ckx_ast_expr *_condition,
+                                 ckx_ast_stmt *_then_clause) :
+    if_rng(_if_rng),
+    else_rng(ckx_source_range(-1, -1, -1, -1)),
+    condition(_condition),
+    then_clause(_then_clause),
+    else_clause(nullptr) {}
 
 ckx_ast_if_stmt::~ckx_ast_if_stmt()
 {
@@ -124,12 +129,10 @@ ckx_ast_for_stmt::~ckx_ast_for_stmt()
 }
 
 
-ckx_ast_break_stmt::ckx_ast_break_stmt(ckx_source_range _rng) :
-    ckx_ast_stmt(_rng) {}
+ckx_ast_break_stmt::ckx_ast_break_stmt(ckx_source_range _rng) : rng(_rng) {}
 
 
-ckx_ast_continue_stmt::ckx_ast_continue_stmt(ckx_source_range _rng) :
-    ckx_ast_stmt(_rng) {}
+ckx_ast_continue_stmt::ckx_ast_continue_stmt(ckx_source_range _rng) : rng(_rng) {}
 
 
 ckx_ast_return_stmt::ckx_ast_return_stmt(ckx_source_range _return_rng,
@@ -144,10 +147,9 @@ ckx_ast_return_stmt::~ckx_ast_return_stmt()
 
 ckx_ast_decl_stmt::init_decl::~init_decl() { delete init; }
 
-ckx_ast_decl_stmt::ckx_ast_decl_stmt(ckx_prelexed_type _type,
-                                     saber::vector<init_decl> &&_decls) :
-    type(saber::move(_type)),
-    decls(saber::move(_decls)) {}
+ckx_ast_decl_stmt::ckx_ast_decl_stmt(ckx_prelexed_type&& _type,
+                                     saber::vector<init_decl>&& _decls) :
+    type(saber::move(_type)), decls(saber::move(_decls)) {}
 
 
 ckx_ast_expr_stmt::ckx_ast_expr_stmt(ckx_ast_expr *_expr) :
@@ -185,7 +187,7 @@ ckx_ast_record_stmt::ckx_ast_record_stmt(ckx_source_range _kwd_rng,
                                          ckx_source_range _rbrace_rng,
                                          record_tag _tag,
                                          saber_string_view _name,
-                                         saber::vector<field> &&_fields) :
+                                         saber::vector<field_row> &&_fields) :
     kwd_rng(_kwd_rng), id_rng(_id_rng),
     lbrace_rng(_lbrace_rng), rbrace_rng(_rbrace_rng),
     tag(_tag), name(_name), fields(saber::move(_fields)) {}
@@ -283,8 +285,12 @@ ckx_ast_extract_expr::~ckx_ast_extract_expr()
 }
 
 ckx_ast_enumerator_expr::ckx_ast_enumerator_expr(
+        ckx_source_range _enum_rng,
+        ckx_source_range _enumerator_rng,
         saber_string_view _enum_name,
         saber_string_view _enumerator_name) :
+    enum_rng(_enum_rng),
+    enumerator_rng(_enumerator_rng),
     enum_name(_enum_name),
     enumerator_name(_enumerator_name) {}
 
@@ -336,9 +342,8 @@ ckx_ast_vr_literal_expr::ckx_ast_vr_literal_expr(ckx_source_range _rng,
                                                  qreal _val) :
     rng(_rng), val(_val) {}
 
-ckx_ast_array_expr::ckx_ast_array_expr(ckx_source_range _rng,
-                                       ckx_prelexed_type _array_of_type) :
-    ckx_ast_expr(_rng), array_of_type(saber::move(_array_of_type)) {}
+ckx_ast_array_expr::ckx_ast_array_expr(ckx_prelexed_type _array_of_type) :
+    array_of_type(saber::move(_array_of_type)) {}
 
 ckx_ast_array_expr::~ckx_ast_array_expr()
 {

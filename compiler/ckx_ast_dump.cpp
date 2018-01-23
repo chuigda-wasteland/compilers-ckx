@@ -256,47 +256,31 @@ void ckx_ast_func_stmt::accept(ckx_sema_engine &sema)
 }
 
 
-void ckx_ast_struct_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
+void ckx_ast_record_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
-    _writer.write("Struct \"");
+    if (tag == record_tag::rt_struct)
+        _writer.write("Struct \"");
+    else
+        _writer.write("Variant \"");
     _writer.write(name);
     _writer.write("\" contains\n");
-    for (auto &field : fields)
+    for (auto &field_row : fields)
     {
         _writer.write_whitespace((_level+1)*indent_size);
         _writer.write("Field \"");
-        _writer.write(field.name);
+        for (auto& field : field_row.fields)
+        {
+            _writer.write(field.name);
+            _writer.write(", ");
+        }
         _writer.write("\" of type [[");
-        _writer.write(field.type.to_string());
+        _writer.write(field_row.type.to_string());
         _writer.write("]]\n");
     }
 }
 
-void ckx_ast_struct_stmt::accept(ckx_sema_engine &sema)
-{
-
-}
-
-
-void ckx_ast_variant_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
-{
-    _writer.write_whitespace(_level*indent_size);
-    _writer.write("Variant \"");
-    _writer.write(name);
-    _writer.write("\" contains\n");
-    for (auto &field : fields)
-    {
-        _writer.write_whitespace((_level+1)*indent_size);
-        _writer.write("Field \"");
-        _writer.write(field.name);
-        _writer.write("\" of type [[");
-        _writer.write(field.type.to_string());
-        _writer.write("]]\n");
-    }
-}
-
-void ckx_ast_variant_stmt::accept(ckx_sema_engine &sema)
+void ckx_ast_record_stmt::accept(ckx_sema_engine &sema)
 {
 
 }

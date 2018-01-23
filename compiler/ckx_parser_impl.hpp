@@ -8,6 +8,8 @@
 #include "ckx_env_table.hpp"
 #include "ckx_ast_node.hpp"
 
+#include "optional.hpp"
+
 namespace ckx
 {
 
@@ -62,6 +64,7 @@ protected:
 
     ckx_ast_decl_stmt*      parse_decl_stmt();
     ckx_ast_func_stmt*      parse_func_stmt();
+    ckx_ast_record_stmt*    parse_record_stmt();
     ckx_ast_enum_stmt*      parse_enum_stmt();
     ckx_ast_alias_stmt*     parse_alias_stmt();
 
@@ -89,8 +92,6 @@ protected:
     ckx_ast_expr*            parse_basic_expr();
     ckx_ast_id_expr*         parse_id();
 
-    template <typename CkxAstRecordStmt> CkxAstRecordStmt* parse_record_stmt();
-
 protected:
 
     /// @fn we need this function to ease the type resolving.
@@ -105,9 +106,11 @@ protected:
     inline  ckx_token  peek_next_token();
     inline  void       next_token();
 
-    inline  bool  expect_n_eat(ckx_token::type _token_type,
-                               bool _can_skip = true);
-    inline  bool  expect(ckx_token::type _token_type);
+    inline saber::optional<ckx_source_range>
+    expect_n_eat(ckx_token::type _token_type);
+
+    inline saber::optional<ckx_source_range>
+    expect(ckx_token::type _token_type);
 
     /// @brief functions for reporting problem.
     void syntax_error(ckx_source_range _rng, saber_string_view _desc);

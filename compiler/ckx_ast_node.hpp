@@ -99,6 +99,11 @@ public:
                     ckx_ast_expr* _condition,
                     ckx_ast_stmt* _then_clause,
                     ckx_ast_stmt* _else_clause);
+
+    ckx_ast_if_stmt(ckx_source_range _if_rng,
+                    ckx_ast_expr* _condition,
+                    ckx_ast_stmt* _then_clause);
+
     ~ckx_ast_if_stmt() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
@@ -260,13 +265,13 @@ class ckx_ast_func_stmt implements ckx_ast_stmt
 public:
     open_class param_decl
     {
-        param_decl(ckx_prelexed_type&& _type, saber_string_view _name,
-                   ckx_source_range _id_source_rng) :
-            type(saber::move(_type)), name(_name),
-            id_source_rng(_id_source_rng) {}
+        param_decl(ckx_source_range _rng,
+                   ckx_prelexed_type&& _type,
+                   saber_string_view _name) :
+            rng(_rng), type(saber::move(_type)), name(_name) {}
+        ckx_source_range rng;
         ckx_prelexed_type type;
         saber_string_view name;
-        ckx_source_range id_source_rng;
     };
 
     ckx_ast_func_stmt(ckx_source_range _kwd_rng,
@@ -320,7 +325,7 @@ public:
                         ckx_source_range _rbrace_rng,
                         record_tag _tag,
                         saber_string_view _name,
-                        saber::vector<field>&& _fields);
+                        saber::vector<field_row>&& _fields);
     ~ckx_ast_record_stmt() override final = default;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
@@ -334,7 +339,7 @@ private:
 
     record_tag tag;
     saber_string_view name;
-    saber::vector<field> fields;
+    saber::vector<field_row> fields;
 };
 
 class ckx_ast_enum_stmt final implements ckx_ast_stmt
@@ -498,7 +503,9 @@ private:
 class ckx_ast_enumerator_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_enumerator_expr(saber_string_view _enum_name,
+    ckx_ast_enumerator_expr(ckx_source_range _enum_rng,
+                            ckx_source_range _enumerator_rng,
+                            saber_string_view _enum_name,
                             saber_string_view _enumerator_name);
     ~ckx_ast_enumerator_expr() override final = default;
 
@@ -507,6 +514,8 @@ public:
     accept(ckx_sema_engine& _sema) override final;
 
 private:
+    ckx_source_range enum_rng;
+    ckx_source_range enumerator_rng;
     saber_string_view enum_name;
     saber_string_view enumerator_name;
 };
@@ -620,8 +629,7 @@ private:
 class ckx_ast_array_expr final implements ckx_ast_expr
 {
 public:
-    ckx_ast_array_expr(ckx_source_range _rng,
-                       ckx_prelexed_type _array_of_type);
+    ckx_ast_array_expr(ckx_prelexed_type _array_of_type);
     ~ckx_ast_array_expr() override final;
 
     void set_size(qint32 _size);

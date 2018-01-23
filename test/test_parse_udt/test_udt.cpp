@@ -84,17 +84,14 @@ ckx_parser_impl_test::test_parse_struct()
 R"noip(
         struct student {
             vi8 const* name;
-            vu8 chinese;
-            vu8 math;
-            vu8 english;
+            vu8 chinese, math, english;
         }
 )noip";
 
         ckx_test_filereader reader { str };
         base::token_stream = new ckx_token_stream(reader);
         initialize_test();
-        ckx_ast_struct_stmt *stmt =
-            base::template parse_record_stmt<ckx_ast_struct_stmt>();
+        ckx_ast_record_stmt *stmt = base::parse_record_stmt();
         stmt->ast_dump(writer, 0);
         delete stmt;
         C8ASSERT(base::error_list.empty());
@@ -114,8 +111,7 @@ R"noip(
         ckx_test_filereader reader { str };
         base::token_stream = new ckx_token_stream(reader);
         initialize_test();
-        ckx_ast_struct_stmt *stmt =
-                base::template parse_record_stmt<ckx_ast_struct_stmt>();
+        ckx_ast_record_stmt *stmt = base::parse_record_stmt();
         stmt->ast_dump(writer, 0);
         delete stmt;
         C8ASSERT(base::error_list.empty());
