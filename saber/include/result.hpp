@@ -25,7 +25,7 @@ public:
         else
         {
             contains_value = false;
-            construct(reinterpret_cast<T*>(&storage), move(_another.err()));
+            construct(reinterpret_cast<E*>(&storage), move(_another.err()));
         }
     }
 
@@ -102,7 +102,7 @@ public:
     E& err()
     {
         C8ASSERT(is_err());
-        return *reinterpret_cast<T*>(&storage);
+        return *reinterpret_cast<E*>(&storage);
     }
 
 private:

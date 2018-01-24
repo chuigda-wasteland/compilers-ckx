@@ -23,6 +23,7 @@
 #include "vector.hpp"
 #include "unordered_map.hpp"
 #include "result.hpp"
+#include "optional.hpp"
 #include "defs.hpp"
 
 #include "ckx_type.hpp"
@@ -93,27 +94,25 @@ open_class ckx_env_func_entry
 class ckx_env
 {
 public:
-    struct result_add_var
+    open_class err_add_var
     {
-        enum { success, conflict, fail } status;
-        variant value
-        {
-            ckx_env_var_entry* added_decl;
-            ckx_env_var_entry* conflict_decl;
-        } v;
+        enum class err_status : qchar { conflict, fail } status;
+        saber::optional<ckx_env_var_entry*> conflict_decl;
+        err_add_var(err_status _status,
+                    ckx_env_var_entry* _conflict_decl = nullptr) :
+            status(_status), conflict_decl(_conflict_decl) {}
     };
 
-    struct result_add_type
+    open_class err_add_type
     {
-        enum { success, conflict, fail } status;
-        variant value
-        {
-            ckx_env_type_entry* added_type;
-            ckx_env_type_entry* conflict_type;
-        } v;
+        enum class err_status : qchar{ conflict, fail } status;
+        saber::optional<ckx_env_type_entry*> conflict_decl;
+        err_add_type(err_status _status,
+                     ckx_env_type_entry* _conflict_decl = nullptr):
+            status(_status), conflict_decl(_conflict_decl) {}
     };
 
-    struct result_add_func
+    open_class result_add_func
     {
         enum { declare, redeclare, define, overload, conflict, fail } status;
         variant value
@@ -137,13 +136,11 @@ public:
     saber::vector<ckx_env_func_entry>*
     lookup_func_local(saber_string_view _name);
 
-    result_add_var add_var(ckx_token _decl_at,
-                           saber_string_view _name,
-                           ckx_type* _type);
+    saber::result<ckx_env_var_entry*, err_add_var>
+    add_var(ckx_token _decl_at, saber_string_view _name, ckx_type* _type);
 
-    result_add_type add_type(ckx_token _decl_at,
-                             saber_string_view _name,
-                             ckx_type* _type);
+    saber::result<ckx_env_type_entry*, err_add_type>
+    add_type(ckx_token _decl_at, saber_string_view _name, ckx_type* _type);
 
     result_add_func add_func(ckx_token _decl_at,
                              saber_string_view _name,
@@ -155,6 +152,7 @@ private:
     using svhash = string_view_hash;
 
     saber::unordered_map<sv, ckx_env_var_entry, svhash> vars;
+    saber::unordered_map<sv, quint16, svhash> var_mangle_counts;
     saber::unordered_map<sv, ckx_env_type_entry, svhash> types;
     saber::unordered_map<sv, saber::vector<ckx_env_func_entry>, svhash> funcs;
 
