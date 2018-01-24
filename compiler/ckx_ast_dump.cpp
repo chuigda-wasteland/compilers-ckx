@@ -65,11 +65,6 @@ void ckx_ast_if_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
     }
 }
 
-void ckx_ast_if_stmt::accept(ckx_sema_engine &sema)
-{
-
-}
-
 
 void ckx_ast_while_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
@@ -83,11 +78,6 @@ void ckx_ast_while_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
     clause->ast_dump(_writer, _level+2);
 }
 
-void ckx_ast_while_stmt::accept(ckx_sema_engine &sema)
-{
-
-}
-
 
 void ckx_ast_do_while_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
@@ -99,11 +89,6 @@ void ckx_ast_do_while_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level
     _writer.write_whitespace((_level+1)*indent_size);
     _writer.write("Loop\n");
     clause->ast_dump(_writer, _level+2);
-}
-
-void ckx_ast_do_while_stmt::accept(ckx_sema_engine &sema)
-{
-
 }
 
 
@@ -134,11 +119,6 @@ void ckx_ast_for_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
     clause->ast_dump(_writer, _level+2);
 }
 
-void ckx_ast_for_stmt::accept(ckx_sema_engine &sema)
-{
-
-}
-
 
 void ckx_ast_break_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
@@ -146,21 +126,11 @@ void ckx_ast_break_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
     _writer.write("Break-statement\n");
 }
 
-void ckx_ast_break_stmt::accept(ckx_sema_engine &sema)
-{
-
-}
-
 
 void ckx_ast_continue_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Continue-statement\n");
-}
-
-void ckx_ast_continue_stmt::accept(ckx_sema_engine &sema)
-{
-
 }
 
 
@@ -202,22 +172,12 @@ void ckx_ast_decl_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
     }
 }
 
-void ckx_ast_decl_stmt::accept(ckx_sema_engine &sema)
-{
-
-}
-
 
 void ckx_ast_expr_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Expression-statement\n");
     expr->ast_dump(_writer, _level+1);
-}
-
-void ckx_ast_expr_stmt::accept(ckx_sema_engine &sema)
-{
-
 }
 
 
@@ -250,11 +210,6 @@ void ckx_ast_func_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
     }
 }
 
-void ckx_ast_func_stmt::accept(ckx_sema_engine &sema)
-{
-
-}
-
 
 void ckx_ast_record_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
@@ -280,10 +235,6 @@ void ckx_ast_record_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
     }
 }
 
-void ckx_ast_record_stmt::accept(ckx_sema_engine &sema)
-{
-}
-
 
 void ckx_ast_alias_stmt::ast_dump(we::we_file_writer &_writer, quint16 _level)
 {
@@ -293,11 +244,6 @@ void ckx_ast_alias_stmt::ast_dump(we::we_file_writer &_writer, quint16 _level)
     _writer.write("\" to [[");
     _writer.write(type.to_string());
     _writer.write("]]\n");
-}
-
-void ckx_ast_alias_stmt::accept(ckx_sema_engine &sema)
-{
-
 }
 
 
@@ -316,11 +262,6 @@ void ckx_ast_enum_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
         _writer.write(enumerator.value);
         _writer.write("\n");
     }
-}
-
-void ckx_ast_enum_stmt::accept(ckx_sema_engine &sema)
-{
-
 }
 
 
@@ -383,11 +324,6 @@ void ckx_ast_binary_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
     roperand->ast_dump(_writer, _level+1);
 }
 
-saber::optional<ckx_expr_result> ckx_ast_binary_expr::accept(ckx_sema_engine &_sema)
-{
-
-}
-
 
 void ckx_ast_unary_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
@@ -417,23 +353,13 @@ void ckx_ast_unary_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
     operand->ast_dump(_writer, _level+1);
 }
 
-saber::optional<ckx_expr_result> ckx_ast_unary_expr::accept(ckx_sema_engine &_sema)
-{
 
-}
-
-
-void ckx_ast_subscript_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
+void ckx_ast_subscript_expr::ast_dump(we::we_file_writer& _writer,quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Array Subscript Operator\n"));
     base->ast_dump(_writer, _level+1);
     subscript->ast_dump(_writer, _level+1);
-}
-
-saber::optional<ckx_expr_result> ckx_ast_subscript_expr::accept(ckx_sema_engine &_sema)
-{
-
 }
 
 
@@ -457,11 +383,6 @@ void ckx_ast_invoke_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
     }
 }
 
-saber::optional<ckx_expr_result> ckx_ast_invoke_expr::accept(ckx_sema_engine &_sema)
-{
-
-}
-
 
 void ckx_ast_extract_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
 {
@@ -474,13 +395,9 @@ void ckx_ast_extract_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
     _writer.write(reinterpret_cast<const qchar*>("\"\n"));
 }
 
-saber::optional<ckx_expr_result> ckx_ast_extract_expr::accept(ckx_sema_engine &_sema)
-{
 
-}
-
-
-void ckx_ast_enumerator_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
+void ckx_ast_enumerator_expr::ast_dump(we::we_file_writer &_writer,
+                                       quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Enumerator\n"));
@@ -489,11 +406,6 @@ void ckx_ast_enumerator_expr::ast_dump(we::we_file_writer &_writer, quint16 _lev
     _writer.write(reinterpret_cast<const qchar*>(" :: "));
     _writer.write(enumerator_name);
     _writer.write(reinterpret_cast<const qchar*>("\n"));
-}
-
-saber::optional<ckx_expr_result> ckx_ast_enumerator_expr::accept(ckx_sema_engine &_sema)
-{
-
 }
 
 
@@ -512,11 +424,6 @@ void ckx_ast_cond_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
     else_expr->ast_dump(_writer, _level+2);
 }
 
-saber::optional<ckx_expr_result> ckx_ast_cond_expr::accept(ckx_sema_engine &_sema)
-{
-
-}
-
 
 void ckx_ast_id_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
 {
@@ -524,11 +431,6 @@ void ckx_ast_id_expr::ast_dump(we::we_file_writer& _writer, quint16 _level)
     _writer.write(reinterpret_cast<const qchar*>("Identifier \""));
     _writer.write(name);
     _writer.write(reinterpret_cast<const qchar*>("\"\n"));
-}
-
-saber::optional<ckx_expr_result> ckx_ast_id_expr::accept(ckx_sema_engine &_sema)
-{
-
 }
 
 
@@ -559,11 +461,6 @@ void ckx_ast_cast_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
 
 }
 
-saber::optional<ckx_expr_result> ckx_ast_cast_expr::accept(ckx_sema_engine &_sema)
-{
-
-}
-
 
 void ckx_ast_sizeof_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
 {
@@ -571,11 +468,6 @@ void ckx_ast_sizeof_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
     _writer.write(reinterpret_cast<const qchar*>("Sizeof [["));
     _writer.write(type.to_string());
     _writer.write(reinterpret_cast<const qchar*>("]]\n"));
-}
-
-saber::optional<ckx_expr_result> ckx_ast_sizeof_expr::accept(ckx_sema_engine &_sema)
-{
-
 }
 
 
@@ -587,11 +479,6 @@ void ckx_ast_vi_literal_expr::ast_dump(we::we_file_writer &_writer, quint16 _lev
     _writer.write(reinterpret_cast<const qchar*>("\n"));
 }
 
-saber::optional<ckx_expr_result> ckx_ast_vi_literal_expr::accept(ckx_sema_engine &_sema)
-{
-
-}
-
 
 void ckx_ast_vr_literal_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
 {
@@ -599,11 +486,6 @@ void ckx_ast_vr_literal_expr::ast_dump(we::we_file_writer &_writer, quint16 _lev
     _writer.write(reinterpret_cast<const qchar*>("Real literal "));
     _writer.write(val);
     _writer.write(reinterpret_cast<const qchar*>("\n"));
-}
-
-saber::optional<ckx_expr_result> ckx_ast_vr_literal_expr::accept(ckx_sema_engine &_sema)
-{
-
 }
 
 
@@ -644,11 +526,6 @@ void ckx_ast_array_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
         _writer.write_whitespace((_level+2)*indent_size);
         _writer.write(reinterpret_cast<const qchar*>("Nothing\n"));
     }
-}
-
-saber::optional<ckx_expr_result> ckx_ast_array_expr::accept(ckx_sema_engine &_sema)
-{
-
 }
 
 } // namespace ckx

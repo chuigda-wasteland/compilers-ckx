@@ -29,16 +29,7 @@ ckx_parser::parse_result::parse_result(ckx_ast_translation_unit *_trans_unit,
         saber::list<ckx::ckx_syntax_error> &&_warn_list) :
     trans_unit(saber::move(_trans_unit)),
     error_list(saber::move(_error_list)),
-    warn_list(saber::move(_warn_list))
-{}
-
-
-ckx_parser::parse_result::~parse_result()
-{
-    /// @todo
-    /// Note that we are still not sure that who's about to release resources.
-    /// We may add several lines of codes here.
-}
+    warn_list(saber::move(_warn_list)) {}
 
 
 ckx_parser::parse_result::parse_result(parse_result &&_another) :
@@ -696,8 +687,6 @@ ckx_parser_impl::parse_assign_expr()
 ckx_ast_cast_expr*
 ckx_parser_impl::parse_cast_expr()
 {
-    ckx_src_rng begin_source_rng = current_token().rng;
-
     ckx_ast_cast_expr::castop castop;
     switch (current_token().token_type)
     {
@@ -762,9 +751,7 @@ ckx_parser_impl::parse_unary_expr()
 ckx_ast_expr*
 ckx_parser_impl::parse_postfix_expr()
 {
-    ckx_src_rng begin_source_rng = current_token().rng;
     ckx_ast_expr *ret = parse_basic_expr();
-
     while (1)
     {
         switch (current_token().token_type)

@@ -36,10 +36,6 @@ ckx_ast_translation_unit::add_new_stmt(ckx_ast_stmt *_stmt)
     stmts.push_back(_stmt);
 }
 
-void ckx_ast_stmt::accept(ckx_sema_engine &sema)
-{
-}
-
 
 ckx_ast_compound_stmt::ckx_ast_compound_stmt(
         ckx_src_rng _lbrace_rng,
@@ -117,8 +113,7 @@ ckx_ast_for_stmt::ckx_ast_for_stmt(ckx_src_rng _for_rng,
                                    ckx_ast_expr *_incr,
                                    ckx_ast_stmt *_clause) :
     for_rng(_for_rng),
-    init(_init), condition(_condition), incr(_incr), clause(_clause)
-{}
+    init(_init), condition(_condition), incr(_incr), clause(_clause) {}
 
 ckx_ast_for_stmt::~ckx_ast_for_stmt()
 {

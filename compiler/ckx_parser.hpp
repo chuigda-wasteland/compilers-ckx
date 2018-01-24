@@ -51,7 +51,7 @@ public:
         parse_result(ckx_ast_translation_unit *_trans_unit,
                      saber::list<ckx_syntax_error> &&_error_list,
                      saber::list<ckx_syntax_error> &&_warn_list);
-        ~parse_result();
+        ~parse_result() = default;
 
         parse_result(const parse_result& _another) = delete;
         parse_result(parse_result&& _another);
