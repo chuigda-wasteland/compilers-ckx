@@ -22,12 +22,35 @@
 
 #include "defs.hpp"
 #include "string_pool.hpp"
-#include "memory.hpp"
+#include "c8assert.hpp"
 
 namespace ckx
 {
 
-using saber::saber_ptr;
+open_class ckx_src_rng
+{
+    const quint16 begin_line;
+    const quint16 begin_col;
+    const quint16 end_line;
+    const quint16 end_col;
+
+    ckx_src_rng(quint16 _begin_line, quint16 _begin_col,
+                     quint16 _end_line, quint16 _end_col)
+        : begin_line(_begin_line), begin_col(_begin_col),
+          end_line(_end_line), end_col(_end_col) {}
+
+    ckx_src_rng(qcoord _begin_coord, qcoord _end_coord)
+        : ckx_src_rng(_begin_coord.line, _begin_coord.col,
+                           _end_coord.line, _end_coord.col) {}
+
+    static ckx_src_rng concat(ckx_src_rng r1, ckx_src_rng r2)
+    {
+        C8ASSERT(r2.end_line == r1.end_line ?
+                 r2.end_col >= r1.end_col : r2.end_line > r1.end_line);
+        return ckx_src_rng(r1.begin_line, r1.begin_col,
+                                r2.end_line, r2.end_col);
+    }
+};
 
 open_class ckx_token
 {
@@ -142,18 +165,19 @@ open_class ckx_token
         tk_eoi                 // EOI
     };
 
-    ckx_token(const qcoord& _pos, type _operator);
-    ckx_token(const qcoord& _pos, qint64 _int_literal);
-    ckx_token(const qcoord& _pos, quint64 _unsigned_literal);
-    ckx_token(const qcoord& _pos, qreal _real_literal);
-    ckx_token(const qcoord& _pos, qchar _char_literal);
-    ckx_token(const qcoord& _pos, saber_string_view _id);
+    ckx_token(ckx_src_rng _rng, type _operator);
+    ckx_token(ckx_src_rng _rng, qint64 _int_literal);
+    ckx_token(ckx_src_rng _rng, quint64 _unsigned_literal);
+    ckx_token(ckx_src_rng _rng, qreal _real_literal);
+    ckx_token(ckx_src_rng _rng, qchar _char_literal);
+    ckx_token(ckx_src_rng _rng, saber_string_view _id);
 
     ckx_token() = delete;
-    ~ckx_token();
+    ~ckx_token() = default;
+
+    const ckx_src_rng rng;
 
     type token_type;
-
     variant token_value
     {
         const qchar ch;
@@ -162,8 +186,6 @@ open_class ckx_token
         const qreal r;
     } v;
     const saber_string_view str = saber_string_pool::create_view("");
-
-    const qcoord position;
 };
 
 struct ckx_token_type_hash

@@ -8,6 +8,8 @@
 #include "ckx_env_table.hpp"
 #include "ckx_ast_node.hpp"
 
+#include "optional.hpp"
+
 namespace ckx
 {
 
@@ -62,6 +64,7 @@ protected:
 
     ckx_ast_decl_stmt*      parse_decl_stmt();
     ckx_ast_func_stmt*      parse_func_stmt();
+    ckx_ast_record_stmt*    parse_record_stmt();
     ckx_ast_enum_stmt*      parse_enum_stmt();
     ckx_ast_alias_stmt*     parse_alias_stmt();
 
@@ -89,8 +92,6 @@ protected:
     ckx_ast_expr*            parse_basic_expr();
     ckx_ast_id_expr*         parse_id();
 
-    template <typename CkxAstRecordStmt> CkxAstRecordStmt* parse_record_stmt();
-
 protected:
 
     /// @fn we need this function to ease the type resolving.
@@ -101,17 +102,19 @@ protected:
 
     /// @brief token-access functions
     /// simply encapsuled token-stream again.
-    inline  ckx_token  current_token();
-    inline  ckx_token  peek_next_token();
-    inline  void       next_token();
+    inline  ckx_token&  current_token();
+    inline  ckx_token&  peek_next_token();
+    inline  void        next_token();
 
-    inline  bool  expect_n_eat(ckx_token::type _token_type,
-                               bool _can_skip = true);
-    inline  bool  expect(ckx_token::type _token_type);
+    inline saber::optional<ckx_src_rng>
+    expect_n_eat(ckx_token::type _token_type);
+
+    inline saber::optional<ckx_src_rng>
+    expect(ckx_token::type _token_type);
 
     /// @brief functions for reporting problem.
-    void syntax_error(const qcoord& _coord, saber_string_view _desc);
-    void syntax_warn(const qcoord& _coord, saber_string_view _desc);
+    void syntax_error(ckx_src_rng _rng, saber_string_view _desc);
+    void syntax_warn(ckx_src_rng _rng, saber_string_view _desc);
 
     /// @brief and here are functions for recovering from a syntax error.
     void skip2_token(const ckx_token_set& _token_set);
@@ -119,8 +122,8 @@ protected:
 protected:
     ckx_token_stream *token_stream;
 
-    saber::list<ckx_error> error_list;
-    saber::list<ckx_error> warn_list;
+    saber::list<ckx_syntax_error> error_list;
+    saber::list<ckx_syntax_error> warn_list;
 
     /// @note still we need a table for storing types occured in parsing
     ckx_typename_table typename_table;

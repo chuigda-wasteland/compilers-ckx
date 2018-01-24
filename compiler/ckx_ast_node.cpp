@@ -22,16 +22,7 @@
 namespace ckx
 {
 
-ckx_ast_node::ckx_ast_node(ckx_token _at_token) :
-    at_token(_at_token)
-{}
-
-ckx_token ckx_ast_node::get_at_token()
-{ return at_token; }
-
-ckx_ast_translation_unit::ckx_ast_translation_unit(ckx_token _at_token) :
-    ckx_ast_node(_at_token)
-{}
+ckx_ast_translation_unit::ckx_ast_translation_unit() {}
 
 ckx_ast_translation_unit::~ckx_ast_translation_unit()
 {
@@ -45,15 +36,14 @@ ckx_ast_translation_unit::add_new_stmt(ckx_ast_stmt *_stmt)
     stmts.push_back(_stmt);
 }
 
-ckx_ast_stmt::ckx_ast_stmt(ckx_token _at_token) :
-    ckx_ast_node(_at_token)
-{}
 
-ckx_ast_stmt::~ckx_ast_stmt() {}
-
-ckx_ast_compound_stmt::ckx_ast_compound_stmt(ckx_token _at_token) :
-    ckx_ast_stmt(_at_token)
-{}
+ckx_ast_compound_stmt::ckx_ast_compound_stmt(
+        ckx_src_rng _lbrace_rng,
+        ckx_src_rng _rbrace_rng,
+        saber::vector<ckx_ast_stmt *> &&_stmts) :
+    lbrace_rng(_lbrace_rng),
+    rbrace_rng(_rbrace_rng),
+    stmts(saber::move(_stmts)) {}
 
 ckx_ast_compound_stmt::~ckx_ast_compound_stmt()
 {
@@ -61,21 +51,25 @@ ckx_ast_compound_stmt::~ckx_ast_compound_stmt()
         delete x;
 }
 
-void
-ckx_ast_compound_stmt::add_new_stmt(ckx_ast_stmt* _stmt)
-{
-    stmts.push_back(_stmt);
-}
 
-ckx_ast_if_stmt::ckx_ast_if_stmt(ckx_token _at_token,
+ckx_ast_if_stmt::ckx_ast_if_stmt(ckx_src_rng _if_rng,
+                                 ckx_src_rng _else_rng,
                                  ckx_ast_expr *_condition,
                                  ckx_ast_stmt *_then_clause,
                                  ckx_ast_stmt *_else_clause) :
-    ckx_ast_stmt(_at_token),
+    if_rng(_if_rng), else_rng(_else_rng),
     condition(_condition),
     then_clause(_then_clause),
-    else_clause(_else_clause)
-{}
+    else_clause(_else_clause) {}
+
+ckx_ast_if_stmt::ckx_ast_if_stmt(ckx_src_rng _if_rng,
+                                 ckx_ast_expr *_condition,
+                                 ckx_ast_stmt *_then_clause) :
+    if_rng(_if_rng),
+    else_rng(ckx_src_rng(-1, -1, -1, -1)),
+    condition(_condition),
+    then_clause(_then_clause),
+    else_clause(nullptr) {}
 
 ckx_ast_if_stmt::~ckx_ast_if_stmt()
 {
@@ -84,13 +78,12 @@ ckx_ast_if_stmt::~ckx_ast_if_stmt()
     delete else_clause;
 }
 
-ckx_ast_while_stmt::ckx_ast_while_stmt(ckx_token _at_token,
+ckx_ast_while_stmt::ckx_ast_while_stmt(ckx_src_rng _while_rng,
                                        ckx_ast_expr *_condition,
                                        ckx_ast_stmt *_clause) :
-    ckx_ast_stmt(_at_token),
+    while_rng(_while_rng),
     condition(_condition),
-    clause(_clause)
-{}
+    clause(_clause) {}
 
 ckx_ast_while_stmt::~ckx_ast_while_stmt()
 {
@@ -98,10 +91,12 @@ ckx_ast_while_stmt::~ckx_ast_while_stmt()
     delete clause;
 }
 
-ckx_ast_do_while_stmt::ckx_ast_do_while_stmt(ckx_token _at_token,
+ckx_ast_do_while_stmt::ckx_ast_do_while_stmt(ckx_src_rng _do_rng,
+                                             ckx_src_rng _while_rng,
                                              ckx_ast_expr *_condition,
                                              ckx_ast_stmt *_clause) :
-    ckx_ast_stmt(_at_token),
+    do_rng(_do_rng),
+    while_rng(_while_rng),
     condition(_condition),
     clause(_clause)
 {}
@@ -112,17 +107,13 @@ ckx_ast_do_while_stmt::~ckx_ast_do_while_stmt()
     delete clause;
 }
 
-ckx_ast_for_stmt::ckx_ast_for_stmt(ckx_token _at_token,
+ckx_ast_for_stmt::ckx_ast_for_stmt(ckx_src_rng _for_rng,
                                    ckx_ast_expr *_init,
                                    ckx_ast_expr *_condition,
                                    ckx_ast_expr *_incr,
                                    ckx_ast_stmt *_clause) :
-    ckx_ast_stmt(_at_token),
-    init(_init),
-    condition(_condition),
-    incr(_incr),
-    clause(_clause)
-{}
+    for_rng(_for_rng),
+    init(_init), condition(_condition), incr(_incr), clause(_clause) {}
 
 ckx_ast_for_stmt::~ckx_ast_for_stmt()
 {
@@ -133,21 +124,16 @@ ckx_ast_for_stmt::~ckx_ast_for_stmt()
 }
 
 
-ckx_ast_break_stmt::ckx_ast_break_stmt(ckx_token _at_token) :
-    ckx_ast_stmt(_at_token)
-{}
+ckx_ast_break_stmt::ckx_ast_break_stmt(ckx_src_rng _rng) : rng(_rng) {}
 
 
-ckx_ast_continue_stmt::ckx_ast_continue_stmt(ckx_token _at_token) :
-    ckx_ast_stmt(_at_token)
-{}
+ckx_ast_continue_stmt::ckx_ast_continue_stmt(ckx_src_rng _rng) : rng(_rng) {}
 
 
-ckx_ast_return_stmt::ckx_ast_return_stmt(ckx_token _at_token,
+ckx_ast_return_stmt::ckx_ast_return_stmt(ckx_src_rng _return_rng,
                                          ckx_ast_expr *_return_expr) :
-    ckx_ast_stmt(_at_token),
-    return_expr(_return_expr)
-{}
+    return_rng(_return_rng),
+    return_expr(_return_expr) {}
 
 ckx_ast_return_stmt::~ckx_ast_return_stmt()
 {
@@ -156,20 +142,13 @@ ckx_ast_return_stmt::~ckx_ast_return_stmt()
 
 ckx_ast_decl_stmt::init_decl::~init_decl() { delete init; }
 
-ckx_ast_decl_stmt::ckx_ast_decl_stmt(ckx_token _at_token,
-        ckx_prelexed_type _type,
-        saber::vector<init_decl> &&_decls) :
-    ckx_ast_stmt(_at_token),
-    type(saber::move(_type)),
-    decls(saber::move(_decls))
-{}
+ckx_ast_decl_stmt::ckx_ast_decl_stmt(ckx_prelexed_type&& _type,
+                                     saber::vector<init_decl>&& _decls) :
+    type(saber::move(_type)), decls(saber::move(_decls)) {}
 
 
-ckx_ast_expr_stmt::ckx_ast_expr_stmt(ckx_token _at_token,
-                                     ckx_ast_expr *_expr) :
-    ckx_ast_stmt(_at_token),
-    expr(_expr)
-{}
+ckx_ast_expr_stmt::ckx_ast_expr_stmt(ckx_ast_expr *_expr) :
+    expr(_expr) {}
 
 ckx_ast_expr_stmt::~ckx_ast_expr_stmt()
 {
@@ -178,17 +157,17 @@ ckx_ast_expr_stmt::~ckx_ast_expr_stmt()
 
 
 
-ckx_ast_func_stmt::ckx_ast_func_stmt(ckx_token _at_token,
+ckx_ast_func_stmt::ckx_ast_func_stmt(
+        ckx_src_rng _kwd_rng,
         saber_string_view _name,
         saber::vector<ckx_ast_func_stmt::param_decl> &&_param_decls,
         ckx_prelexed_type _ret_type,
         ckx_ast_compound_stmt *_fnbody) :
-    ckx_ast_stmt(_at_token),
+    kwd_rng(_kwd_rng),
     name(_name),
     param_decls(saber::move(_param_decls)),
     ret_type(saber::move(_ret_type)),
-    fnbody(_fnbody)
-{}
+    fnbody(_fnbody) {}
 
 ckx_ast_func_stmt::~ckx_ast_func_stmt()
 {
@@ -197,81 +176,48 @@ ckx_ast_func_stmt::~ckx_ast_func_stmt()
 
 
 
-ckx_ast_struct_stmt::ckx_ast_struct_stmt(ckx_token _at_token,
+ckx_ast_record_stmt::ckx_ast_record_stmt(ckx_src_rng _kwd_rng,
+                                         ckx_src_rng _id_rng,
+                                         ckx_src_rng _lbrace_rng,
+                                         ckx_src_rng _rbrace_rng,
+                                         record_tag _tag,
                                          saber_string_view _name,
-                                         saber::vector<field> &&_fields) :
-    ckx_ast_stmt(_at_token),
-    name(_name),
-    fields(saber::move(_fields))
-{}
-
-ckx_ast_struct_stmt::~ckx_ast_struct_stmt() {}
-
-const saber::vector<ckx_ast_struct_stmt::field>&
-ckx_ast_struct_stmt::get_fields() const
-{
-    return fields;
-}
+                                         saber::vector<field_row> &&_fields) :
+    kwd_rng(_kwd_rng), id_rng(_id_rng),
+    lbrace_rng(_lbrace_rng), rbrace_rng(_rbrace_rng),
+    tag(_tag), name(_name), fields(saber::move(_fields)) {}
 
 
-ckx_ast_variant_stmt::ckx_ast_variant_stmt(ckx_token _at_token,
-                                           saber_string_view _name,
-                                           saber::vector<field> &&_fields) :
-    ckx_ast_stmt(_at_token),
-    name(_name),
-    fields(saber::move(_fields))
-{}
-
-ckx_ast_variant_stmt::~ckx_ast_variant_stmt() {}
-
-const saber::vector<ckx_ast_variant_stmt::field>&
-ckx_ast_variant_stmt::get_fields() const
-{
-    return fields;
-}
-
-
-ckx_ast_alias_stmt::ckx_ast_alias_stmt(ckx_token _at_token,
-                                       saber_string_view _name,
-                                       ckx_prelexed_type _type) :
-    ckx_ast_stmt(_at_token),
-    name(_name),
-    type(saber::move(_type))
-{}
-
-
-ckx_ast_enum_stmt::ckx_ast_enum_stmt(ckx_token _at_token,
+ckx_ast_enum_stmt::ckx_ast_enum_stmt(ckx_src_rng _kwd_rng,
+                                     ckx_src_rng _id_rng,
+                                     ckx_src_rng _lbrace_rng,
+                                     ckx_src_rng _rbrace_rng,
                                      saber_string_view _name,
                                      saber::vector<enumerator> &&_enumerators) :
-    ckx_ast_stmt(_at_token),
+    kwd_rng(_kwd_rng), id_rng(_id_rng),
+    lbrace_rng(_lbrace_rng), rbrace_rng(_rbrace_rng),
     name(_name),
-    enumerators(_enumerators)
-{}
+    enumerators(_enumerators) {}
 
 ckx_ast_enum_stmt::~ckx_ast_enum_stmt() {}
 
-const saber::vector<ckx_ast_enum_stmt::enumerator>&
-ckx_ast_enum_stmt::get_enumerators() const
-{
-    return enumerators;
-}
+
+ckx_ast_alias_stmt::ckx_ast_alias_stmt(ckx_src_rng _kwd_rng,
+                                       ckx_src_rng _id_rng,
+                                       saber_string_view _name,
+                                       ckx_prelexed_type _type) :
+    kwd_rng(_kwd_rng), id_rng(_id_rng),
+    name(_name), type(saber::move(_type)) {}
 
 
-ckx_ast_expr::ckx_ast_expr(ckx_token _at_token) :
-    ckx_ast_node(_at_token)
-{}
-
-ckx_ast_expr::~ckx_ast_expr() {}
-
-ckx_ast_binary_expr::ckx_ast_binary_expr(ckx_token _at_token,
+ckx_ast_binary_expr::ckx_ast_binary_expr(ckx_src_rng _operator_rng,
                                          ckx_op _opercode,
                                          ckx_ast_expr *_loperand,
                                          ckx_ast_expr *_roperand) :
-    ckx_ast_expr(_at_token),
+    operator_rng(_operator_rng),
     opercode(_opercode),
     loperand(_loperand),
-    roperand(_roperand)
-{}
+    roperand(_roperand) {}
 
 ckx_ast_binary_expr::~ckx_ast_binary_expr()
 {
@@ -279,26 +225,26 @@ ckx_ast_binary_expr::~ckx_ast_binary_expr()
     delete roperand;
 }
 
-ckx_ast_unary_expr::ckx_ast_unary_expr(ckx_token _at_token,
+ckx_ast_unary_expr::ckx_ast_unary_expr(ckx_src_rng _operator_rng,
                                        ckx_op _opercode,
                                        ckx_ast_expr *_operand) :
-    ckx_ast_expr(_at_token),
+    operator_rng(_operator_rng),
     opercode(_opercode),
-    operand(_operand)
-{}
+    operand(_operand) {}
 
 ckx_ast_unary_expr::~ckx_ast_unary_expr()
 {
     delete operand;
 }
 
-ckx_ast_subscript_expr::ckx_ast_subscript_expr(ckx_token _at_token,
+ckx_ast_subscript_expr::ckx_ast_subscript_expr(ckx_src_rng _lbracket_rng,
+                                               ckx_src_rng _rbracket_rng,
                                                ckx_ast_expr *_base,
                                                ckx_ast_expr *_subscript) :
-    ckx_ast_expr(_at_token),
+    lbracket_rng(_lbracket_rng),
+    rbracket_rng(_rbracket_rng),
     base(_base),
-    subscript(_subscript)
-{}
+    subscript(_subscript) {}
 
 ckx_ast_subscript_expr::~ckx_ast_subscript_expr()
 {
@@ -306,14 +252,14 @@ ckx_ast_subscript_expr::~ckx_ast_subscript_expr()
     delete subscript;
 }
 
-ckx_ast_invoke_expr::ckx_ast_invoke_expr(ckx_token _at_token,
+ckx_ast_invoke_expr::ckx_ast_invoke_expr(ckx_src_rng _lparen_rng,
+                                         ckx_src_rng _rparen_rng,
                                          ckx_ast_expr *_invokable,
                                          saber::vector<ckx_ast_expr*> &&_args) :
-    ckx_ast_expr(_at_token),
+    lparen_rng(_lparen_rng),
+    rparen_rng(_rparen_rng),
     invokable(_invokable),
-    args(saber::move(_args))
-{
-}
+    args(saber::move(_args)) {}
 
 ckx_ast_invoke_expr::~ckx_ast_invoke_expr()
 {
@@ -321,13 +267,10 @@ ckx_ast_invoke_expr::~ckx_ast_invoke_expr()
     for (auto& arg : args) delete arg;
 }
 
-ckx_ast_extract_expr::ckx_ast_extract_expr(ckx_token _at_token,
-                                           ckx_ast_expr *_extracted,
+ckx_ast_extract_expr::ckx_ast_extract_expr(ckx_ast_expr *_extracted,
                                            saber_string_view _field_name) :
-    ckx_ast_expr(_at_token),
     extracted(_extracted),
-    field_name(_field_name)
-{}
+    field_name(_field_name) {}
 
 ckx_ast_extract_expr::~ckx_ast_extract_expr()
 {
@@ -335,23 +278,25 @@ ckx_ast_extract_expr::~ckx_ast_extract_expr()
 }
 
 ckx_ast_enumerator_expr::ckx_ast_enumerator_expr(
-        ckx_token _at_token,
+        ckx_src_rng _enum_rng,
+        ckx_src_rng _enumerator_rng,
         saber_string_view _enum_name,
         saber_string_view _enumerator_name) :
-    ckx_ast_expr(_at_token),
+    enum_rng(_enum_rng),
+    enumerator_rng(_enumerator_rng),
     enum_name(_enum_name),
-    enumerator_name(_enumerator_name)
-{}
+    enumerator_name(_enumerator_name) {}
 
-ckx_ast_cond_expr::ckx_ast_cond_expr(ckx_token _at_token,
+ckx_ast_cond_expr::ckx_ast_cond_expr(ckx_src_rng _ques_rng,
+                                     ckx_src_rng _colon_rng,
                                      ckx_ast_expr *_cond_expr,
                                      ckx_ast_expr *_then_expr,
                                      ckx_ast_expr *_else_expr) :
-    ckx_ast_expr(_at_token),
+    ques_rng(_ques_rng),
+    colon_rng(_colon_rng),
     cond_expr(_cond_expr),
     then_expr(_then_expr),
-    else_expr(_else_expr)
-{}
+    else_expr(_else_expr) {}
 
 ckx_ast_cond_expr::~ckx_ast_cond_expr()
 {
@@ -360,53 +305,36 @@ ckx_ast_cond_expr::~ckx_ast_cond_expr()
     delete else_expr;
 }
 
-ckx_ast_id_expr::ckx_ast_id_expr(ckx_token _at_token,
+ckx_ast_id_expr::ckx_ast_id_expr(ckx_src_rng _rng,
                                  saber_string_view _name) :
-    ckx_ast_expr(_at_token),
-    name(_name)
-{}
+    rng(_rng), name(_name) {}
 
-ckx_ast_id_expr::~ckx_ast_id_expr()
-{}
-
-ckx_ast_cast_expr::ckx_ast_cast_expr(ckx_token _at_token,
+ckx_ast_cast_expr::ckx_ast_cast_expr(ckx_src_rng _kwd_rng,
                                      castop _op,
                                      ckx_prelexed_type _desired_type,
                                      ckx_ast_expr *_expr) :
-    ckx_ast_expr(_at_token),
+    kwd_rng(_kwd_rng),
     op(_op),
     desired_type(saber::move(_desired_type)),
-    expr(_expr)
-{}
+    expr(_expr) {}
 
 ckx_ast_cast_expr::~ckx_ast_cast_expr()
 {
     delete expr;
 }
 
-ckx_ast_sizeof_expr::ckx_ast_sizeof_expr(ckx_token _at_token,
+ckx_ast_sizeof_expr::ckx_ast_sizeof_expr(ckx_src_rng _kwd_rng,
                                          ckx_prelexed_type _type) :
-    ckx_ast_expr(_at_token),
-    type(saber::move(_type))
-{}
+    kwd_rng(_kwd_rng), type(saber::move(_type)) {}
 
-ckx_ast_vi_literal_expr::ckx_ast_vi_literal_expr(ckx_token _at_token,
-                                                 qint64 _val) :
-    ckx_ast_expr(_at_token),
-    val(_val)
-{}
+ckx_ast_vi_literal_expr::ckx_ast_vi_literal_expr(ckx_src_rng _rng, qint64 _val):
+    rng(_rng), val(_val) {}
 
-ckx_ast_vr_literal_expr::ckx_ast_vr_literal_expr(ckx_token _at_token,
-                                                 qreal _val) :
-    ckx_ast_expr(_at_token),
-    val(_val)
-{}
+ckx_ast_vr_literal_expr::ckx_ast_vr_literal_expr(ckx_src_rng _rng, qreal _val) :
+    rng(_rng), val(_val) {}
 
-ckx_ast_array_expr::ckx_ast_array_expr(ckx_token _at_token,
-                                       ckx_prelexed_type _array_of_type) :
-    ckx_ast_expr(_at_token),
-    array_of_type(saber::move(_array_of_type))
-{}
+ckx_ast_array_expr::ckx_ast_array_expr(ckx_prelexed_type _array_of_type) :
+    array_of_type(saber::move(_array_of_type)) {}
 
 ckx_ast_array_expr::~ckx_ast_array_expr()
 {

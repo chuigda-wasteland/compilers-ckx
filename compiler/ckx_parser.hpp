@@ -23,6 +23,8 @@
 #include "ckx_ast_node_fwd.hpp"
 #include "list.hpp"
 
+#include "memory.hpp"
+
 namespace ckx
 {
 
@@ -31,22 +33,32 @@ namespace detail
 class ckx_parser_impl;
 } // namespace detail
 
+class ckx_syntax_error
+{
+public:
+    ckx_syntax_error(ckx_src_rng _rng, saber_string_view _desc) :
+        rng(_rng), desc(_desc) {}
+
+    ckx_src_rng rng;
+    saber_string_view desc;
+};
+
 class ckx_parser
 {
 public:
     struct parse_result
     {
         parse_result(ckx_ast_translation_unit *_trans_unit,
-                     saber::list<ckx_error> &&_error_list,
-                     saber::list<ckx_error> &&_warn_list);
-        ~parse_result();
+                     saber::list<ckx_syntax_error> &&_error_list,
+                     saber::list<ckx_syntax_error> &&_warn_list);
+        ~parse_result() = default;
 
         parse_result(const parse_result& _another) = delete;
         parse_result(parse_result&& _another);
 
-        ckx_ast_translation_unit *trans_unit;
-        saber::list<ckx_error> error_list;
-        saber::list<ckx_error> warn_list;
+        saber::caster_ptr<ckx_ast_translation_unit> trans_unit;
+        saber::list<ckx_syntax_error> error_list;
+        saber::list<ckx_syntax_error> warn_list;
     };
 
     ckx_parser();
