@@ -42,12 +42,9 @@ ckx_parser::parse_result::~parse_result()
 
 
 ckx_parser::parse_result::parse_result(parse_result &&_another) :
-    trans_unit(_another.trans_unit),
+    trans_unit(saber::move(_another.trans_unit)),
     error_list(saber::move(_another.error_list)),
-    warn_list(saber::move(_another.warn_list))
-{
-    _another.trans_unit = nullptr;
-}
+    warn_list(saber::move(_another.warn_list)) {}
 
 
 

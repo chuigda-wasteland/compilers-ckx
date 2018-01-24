@@ -37,7 +37,7 @@ void ckx_ast_translation_unit::ast_dump(we::we_file_writer& _writer,
 }
 
 
-void ckx_ast_compound_stmt::ast_dump(we::we_file_writer& _writer, quint16 _level)
+void ckx_ast_compound_stmt::ast_dump(we::we_file_writer& _writer,quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write("Compound-statement\n");

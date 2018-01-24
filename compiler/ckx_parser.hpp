@@ -23,6 +23,8 @@
 #include "ckx_ast_node_fwd.hpp"
 #include "list.hpp"
 
+#include "memory.hpp"
+
 namespace ckx
 {
 
@@ -54,7 +56,7 @@ public:
         parse_result(const parse_result& _another) = delete;
         parse_result(parse_result&& _another);
 
-        ckx_ast_translation_unit *trans_unit;
+        saber::caster_ptr<ckx_ast_translation_unit> trans_unit;
         saber::list<ckx_syntax_error> error_list;
         saber::list<ckx_syntax_error> warn_list;
     };

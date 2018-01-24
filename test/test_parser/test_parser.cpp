@@ -53,7 +53,6 @@ int main(int argc, const char* argv[])
         std::printf("Error -- %s \n", error.desc.get().c_str());
     }
 
-    delete parse_result.trans_unit;
     delete stream;
 
     std::fclose(fp);

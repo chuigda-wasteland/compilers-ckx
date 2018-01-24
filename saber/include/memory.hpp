@@ -32,6 +32,8 @@
 #include "utility.hpp"
 #include <memory>
 
+#include "c8assert.hpp"
+
 namespace saber
 {
 
@@ -251,8 +253,6 @@ public:
     caster_ptr(const caster_ptr&) = delete;
     caster_ptr(caster_ptr&& _another)
     {
-        assert(raw == nullptr);
-        delete raw;
         raw = _another.raw;
         _another.raw = nullptr;
     }
