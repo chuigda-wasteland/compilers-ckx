@@ -44,8 +44,7 @@ bool ckx_type::is_basic() const
 
 bool ckx_type::is_scalar() const
 {
-    /// @details basic types are all scalar types and vice versa, currently.
-    return is_basic();
+    return is_basic() || is_pointer();
 }
 
 bool ckx_type::is_signed() const
@@ -252,6 +251,11 @@ ckx_pointer_type::ckx_pointer_type(ckx_type* _target) :
     target(_target)
 {}
 
+ckx_type*
+ckx_pointer_type::get_pointee()
+{
+    return target;
+}
 
 ckx_array_type::ckx_array_type(ckx_type* _element) :
     ckx_type(ckx_type::category::type_array),
@@ -292,7 +296,6 @@ ckx_type_helper::get_type(ckx_token::type _basic_type_token)
     case ckx_token::type::tk_vr32:  return get_vr32_type();
     case ckx_token::type::tk_vr64:  return get_vr64_type();
     case ckx_token::type::tk_void:   return get_void_type();
-
     default: C8ASSERT(0);
     }
 }

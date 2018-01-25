@@ -23,6 +23,7 @@ SOURCES += \
     ../../compiler/ckx_token_set.cpp \
     ../../compiler/ckx_token_stream.cpp \
     ../../compiler/ckx_translate.cpp \
+    ../../compiler/ckx_func_name_mangler.cpp\
     test_expr.cpp
 
 INCLUDEPATH += \

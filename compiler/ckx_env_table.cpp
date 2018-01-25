@@ -18,6 +18,8 @@
 
 #include "ckx_env_table.hpp"
 
+#include "ckx_func_name_mangler.hpp"
+
 namespace ckx
 {
 
@@ -108,7 +110,7 @@ ckx_env::lookup_func_local(saber_string_view _name)
 }
 
 saber::result<ckx_env_var_entry *, ckx_env::err_add_var>
-ckx_env::add_var(ckx_token _decl_at, saber_string_view _name, ckx_type* _type)
+ckx_env::add_var(ckx_src_rng _decl_at, saber_string_view _name, ckx_type* _type)
 {
     ckx_env_var_entry *entry = lookup_var_local(_name);
     if (entry != nullptr)
@@ -122,7 +124,7 @@ ckx_env::add_var(ckx_token _decl_at, saber_string_view _name, ckx_type* _type)
 }
 
 saber::result<ckx_env_type_entry *, ckx_env::err_add_type>
-ckx_env::add_type(ckx_token _decl_at, saber_string_view _name, ckx_type *_type)
+ckx_env::add_type(ckx_src_rng _decl_at, saber_string_view _name, ckx_type *_type)
 {
     ckx_env_type_entry *entry = lookup_type(_name);
     if (entry != nullptr)
@@ -136,7 +138,7 @@ ckx_env::add_type(ckx_token _decl_at, saber_string_view _name, ckx_type *_type)
 }
 
 ckx_env::result_add_func
-ckx_env::add_func(ckx_token _decl_at, saber_string_view _name, ckx_type* _type)
+ckx_env::add_func(ckx_src_rng _decl_at, saber_string_view _name, ckx_type* _type)
 {
     saber::vector<ckx_env_func_entry>* seen_funcs = lookup_func_local(_name);
     if (seen_funcs != nullptr)
@@ -147,10 +149,11 @@ ckx_env::add_func(ckx_token _decl_at, saber_string_view _name, ckx_type* _type)
         }
     }
 
-    auto it = funcs.emplace( _name, saber::vector<ckx_env_func_entry>{
-                                        ckx_env_func_entry(
-                                            _decl_at, _name, _type,
-                                            "" /** @todo mangler*/)
+    auto it = funcs.emplace(
+        _name, saber::vector<ckx_env_func_entry>{
+                   ckx_env_func_entry(_decl_at, _name, _type,
+                                      ckx_func_name_mangler::std_mangle(
+                                          _name, _type))
                            }).first;
     return result_add_func{.status=result_add_func::declare,
                            .v.added_func=&(it->second[0])};

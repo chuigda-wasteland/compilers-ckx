@@ -54,10 +54,17 @@ inline string to_string_helper(const char* _str)
     return string(_str);
 }
 
+inline string to_string_helper(string _str)
+{
+    return string(saber::move(_str));
+}
+
+/*
 inline string to_string_helper(const string& _str)
 {
     return string(_str);
 }
+*/
 
 inline string to_string_helper(string&& _str)
 {

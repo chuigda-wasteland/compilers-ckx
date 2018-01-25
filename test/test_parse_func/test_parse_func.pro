@@ -17,6 +17,7 @@ SOURCES += \
     ../../compiler/ckx_token.cpp \
     ../../compiler/ckx_token_set.cpp \
     ../../compiler/ckx_translate.cpp \
+    ../../compiler/ckx_func_name_mangler.cpp\
     ../../compiler/ckx_token_stream.cpp
 
 INCLUDEPATH += \

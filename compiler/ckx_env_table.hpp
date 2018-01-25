@@ -38,56 +38,43 @@ using saber::saber_ptr;
 
 open_class ckx_env_var_entry
 {
-    ckx_token decl_at;
+    ckx_src_rng decl_at;
     saber_string_view name;
     ckx_type* type;
 
-    /// @note we are not sure that this is correct.
-    faker::llvm_value *llvm_value_bind;
+    /// @note these variables require external components working on it.
+    quint16 mangle_count;
+    faker::llvm_value *llvm_value_bind = nullptr;
 
-    ckx_env_var_entry(ckx_token _decl_at,
-                      saber_string_view _name,
+    ckx_env_var_entry(ckx_src_rng _decl_at, saber_string_view _name,
                       ckx_type* _type) :
-        decl_at(_decl_at),
-        name(_name),
-        type(_type)
-    {}
+        decl_at(_decl_at), name(_name), type(_type) {}
 };
 
 open_class ckx_env_type_entry
 {
-    ckx_token decl_at;
+    ckx_src_rng decl_at;
     saber_string_view name;
     ckx_type* type;
 
-    /// @note we are not sure that is this correct.
     faker::llvm_type *llvm_type_bind;
 
-    ckx_env_type_entry(ckx_token _decl_at,
-                       saber_string_view _name,
+    ckx_env_type_entry(ckx_src_rng _decl_at, saber_string_view _name,
                        ckx_type* _type) :
-        decl_at(_decl_at),
-        name(_name),
-        type(_type)
-    {}
+        decl_at(_decl_at), name(_name), type(_type) {}
 };
 
 open_class ckx_env_func_entry
 {
-    ckx_token decl_at;
+    ckx_src_rng decl_at;
     saber_string_view name;
     ckx_type* type;
-    saber_string llvm_name;
+    saber_string_view llvm_name;
 
-    ckx_env_func_entry(ckx_token _decl_at,
-                       saber_string_view _name,
-                       ckx_type* _type,
-                       saber_string&& _llvm_name) :
-        decl_at(_decl_at),
-        name(_name),
-        type(_type),
-        llvm_name(saber::move(_llvm_name))
-    {}
+    ckx_env_func_entry(ckx_src_rng _decl_at, saber_string_view _name,
+                       ckx_type* _type, saber_string_view _llvm_name) :
+        decl_at(_decl_at), name(_name),
+        type(_type), llvm_name(_llvm_name) {}
 };
 
 
@@ -137,12 +124,12 @@ public:
     lookup_func_local(saber_string_view _name);
 
     saber::result<ckx_env_var_entry*, err_add_var>
-    add_var(ckx_token _decl_at, saber_string_view _name, ckx_type* _type);
+    add_var(ckx_src_rng _decl_at, saber_string_view _name, ckx_type* _type);
 
     saber::result<ckx_env_type_entry*, err_add_type>
-    add_type(ckx_token _decl_at, saber_string_view _name, ckx_type* _type);
+    add_type(ckx_src_rng _decl_at, saber_string_view _name, ckx_type* _type);
 
-    result_add_func add_func(ckx_token _decl_at,
+    result_add_func add_func(ckx_src_rng _decl_at,
                              saber_string_view _name,
                              ckx_type* _type);
 
@@ -152,7 +139,6 @@ private:
     using svhash = string_view_hash;
 
     saber::unordered_map<sv, ckx_env_var_entry, svhash> vars;
-    saber::unordered_map<sv, quint16, svhash> var_mangle_counts;
     saber::unordered_map<sv, ckx_env_type_entry, svhash> types;
     saber::unordered_map<sv, saber::vector<ckx_env_func_entry>, svhash> funcs;
 

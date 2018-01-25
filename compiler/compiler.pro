@@ -18,7 +18,8 @@ SOURCES += main.cpp \
     ../shared/src/file_reader.cpp \
     ../shared/src/file_writer.cpp \
     ckx_prelexed_type.cpp \
-    ckx_translate.cpp
+    ckx_translate.cpp \
+    ckx_func_name_mangler.cpp
 
 HEADERS += \
     we_file_reader.hpp \
@@ -67,7 +68,8 @@ HEADERS += \
     ckx_sema.hpp \
     ckx_sema_result.hpp \
     ckx_sema_result_fwd.hpp \
-    ckx_sema_fwd.hpp
+    ckx_sema_fwd.hpp \
+    ckx_func_name_mangler.hpp
 
 INCLUDEPATH += ../saber/include/
 INCLUDEPATH += ../shared/include/
