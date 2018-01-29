@@ -43,7 +43,6 @@ open_class ckx_env_var_entry
     ckx_type* type;
 
     /// @note these variables require external components working on it.
-    quint16 mangle_count;
     faker::llvm_value *llvm_value_bind = nullptr;
 
     ckx_env_var_entry(ckx_src_rng _decl_at, saber_string_view _name,
@@ -57,7 +56,7 @@ open_class ckx_env_type_entry
     saber_string_view name;
     ckx_type* type;
 
-    faker::llvm_type *llvm_type_bind;
+    faker::llvm_type llvm_type_bind = saber_string_pool::create_view("");
 
     ckx_env_type_entry(ckx_src_rng _decl_at, saber_string_view _name,
                        ckx_type* _type) :

@@ -3,9 +3,12 @@ CONFIG += console c++14
 CONFIG -= app_bundle
 CONFIG -= qt
 
-SOURCES += main.cpp \
-    ckx_token.cpp \
+SOURCES += \
+    main.cpp \
     ../saber/src/safe_stl_general.cpp \
+    ../shared/src/file_reader.cpp \
+    ../shared/src/file_writer.cpp \
+    ckx_token.cpp \
     ckx_token_stream.cpp \
     ckx_parser.cpp \
     ckx_ast_node.cpp \
@@ -15,11 +18,14 @@ SOURCES += main.cpp \
     ckx_ast_dump.cpp \
     ckx_type_dump.cpp \
     ckx_operator.cpp \
-    ../shared/src/file_reader.cpp \
-    ../shared/src/file_writer.cpp \
     ckx_prelexed_type.cpp \
     ckx_translate.cpp \
-    ckx_func_name_mangler.cpp
+    ckx_func_name_mangler.cpp \
+    ckx_sema.cpp \
+    ../llvm_ir_builder/llvm_value.cpp \
+    ../llvm_ir_builder/llvm_inst.cpp \
+    ../llvm_ir_builder/llvm_ir_builder.cpp \
+    ../llvm_ir_builder/llvm_ir_builder_impl.cpp
 
 HEADERS += \
     we_file_reader.hpp \

@@ -310,7 +310,6 @@ public:
                                             saber::vector<ckx_type*> &&_params);
     static ckx_array_type*   create_array_type(ckx_type *_elem_type);
     static ckx_pointer_type* pointer_to(ckx_type* _base);
-
     static ckx_type*         qual_const(ckx_type* _base);
 
     /// @note made public may benefit testing a lot.

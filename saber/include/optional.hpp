@@ -29,7 +29,8 @@ public:
     optional(Args&& ..._args)
     {
         contains_value = true;
-        construct(reinterpret_cast<T*>(&storage), forward<Args>(_args)...);
+        construct(reinterpret_cast<T*>(&storage),
+                  saber::forward<Args>(_args)...);
     }
 
     ~optional()

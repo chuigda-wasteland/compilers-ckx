@@ -213,6 +213,7 @@ private:
 
 class ckx_ast_decl_stmt final implements ckx_ast_stmt
 {
+    friend class ckx_sema_engine;
 public:
     open_class init_decl
     {

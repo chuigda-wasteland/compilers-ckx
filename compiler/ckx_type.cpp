@@ -295,7 +295,7 @@ ckx_type_helper::get_type(ckx_token::type _basic_type_token)
     case ckx_token::type::tk_vch:   return get_vch_type();
     case ckx_token::type::tk_vr32:  return get_vr32_type();
     case ckx_token::type::tk_vr64:  return get_vr64_type();
-    case ckx_token::type::tk_void:   return get_void_type();
+    case ckx_token::type::tk_void:  return get_void_type();
     default: C8ASSERT(0);
     }
 }
