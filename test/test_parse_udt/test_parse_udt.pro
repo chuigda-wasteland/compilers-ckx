@@ -4,6 +4,10 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+    ../../llvm_ir_builder/llvm_value.cpp \
+    ../../llvm_ir_builder/llvm_inst.cpp \
+    ../../llvm_ir_builder/llvm_ir_builder.cpp \
+    ../../llvm_ir_builder/llvm_ir_builder_impl.cpp \
     ../../saber/src/safe_stl_general.cpp \
     ../../shared/src/file_writer.cpp \
     ../../shared/src/file_reader.cpp \
@@ -18,7 +22,8 @@ SOURCES += \
     ../../compiler/ckx_token_set.cpp \
     ../../compiler/ckx_translate.cpp \
     ../../compiler/ckx_token_stream.cpp \
-    ../../compiler/ckx_func_name_mangler.cpp\
+    ../../compiler/ckx_func_name_mangler.cpp \
+    ../../compiler/ckx_sema.cpp \
     test_udt.cpp
 
 INCLUDEPATH += \

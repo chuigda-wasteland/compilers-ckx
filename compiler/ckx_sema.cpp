@@ -3,7 +3,8 @@
 namespace ckx
 {
 
-void ckx_sema_engine::visit_decl_node(ckx_ast_decl_stmt* _decl_stmt)
+void
+ckx_sema_engine::visit_decl_node(ckx_ast_decl_stmt* _decl_stmt)
 {
     saber::optional<ckx_type_result> result = re_lex_type(_decl_stmt->type);
     if (!result.is_type())
@@ -28,12 +29,17 @@ void ckx_sema_engine::visit_decl_node(ckx_ast_decl_stmt* _decl_stmt)
                     saber::string_paste(decl.name, var_name_mangle_count())) :
                 decl.name;
             faker::llvm_value* llvm_value_bind =
-                builder->create_named_var(mangled_name);
-            builder->create_alloca(llvm_value_bind,
+                builder.create_named_var(mangled_name);
+            builder.create_alloca(llvm_value_bind,
                                    result.get().llvm_type_bind, 1);
             add_result.value()->llvm_value_bind = llvm_value_bind;
         }
     }
+}
+
+void ckx_sema_engine::test_print(we::we_file_writer &writer)
+{
+    builder.pretty_print(writer);
 }
 
 saber::optional<ckx_type_result>

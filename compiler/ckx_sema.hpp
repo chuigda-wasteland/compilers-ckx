@@ -14,7 +14,14 @@ namespace ckx
 
 class ckx_sema_engine
 {
+    friend int main();
 public:
+    ckx_sema_engine() = default;
+    ~ckx_sema_engine() = default;
+
+    ckx_sema_engine(const ckx_sema_engine&) = delete;
+    ckx_sema_engine(ckx_sema_engine&&) = delete;
+
     bool is_in_func() const { return in_func; }
     void error() {}
 
@@ -28,10 +35,13 @@ public:
     saber::optional<ckx_expr_result> try_reinter_cast(ckx_expr_result _expr);
     saber::optional<ckx_expr_result> try_ckx_cast(ckx_expr_result _expr);
 
+    /// @note for test only.
+    void test_print(we::we_file_writer& writer);
+
 private:
     ckx_env root_env;
-    ckx_env *current_env;
-    faker::llvm_ir_builder *builder;
+    ckx_env *current_env = &root_env;
+    faker::llvm_ir_builder builder;
 
     saber::optional<ckx_type_result>
     re_lex_type(const ckx_prelexed_type &_prelexed_type);

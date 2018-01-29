@@ -9,6 +9,10 @@ CONFIG -= qt
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ../../llvm_ir_builder/llvm_value.cpp \
+    ../../llvm_ir_builder/llvm_inst.cpp \
+    ../../llvm_ir_builder/llvm_ir_builder.cpp \
+    ../../llvm_ir_builder/llvm_ir_builder_impl.cpp \
     ../../saber/src/safe_stl_general.cpp \
     ../../shared/src/file_writer.cpp \
     ../../shared/src/file_reader.cpp \
@@ -23,7 +27,8 @@ SOURCES += \
     ../../compiler/ckx_token_set.cpp \
     ../../compiler/ckx_token_stream.cpp \
     ../../compiler/ckx_translate.cpp \
-    ../../compiler/ckx_func_name_mangler.cpp\
+    ../../compiler/ckx_func_name_mangler.cpp \
+    ../../compiler/ckx_sema.cpp \
     test_expr.cpp
 
 INCLUDEPATH += \

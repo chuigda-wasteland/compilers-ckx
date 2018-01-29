@@ -50,6 +50,11 @@ open_class ckx_src_rng
         return ckx_src_rng(r1.begin_line, r1.begin_col,
                                 r2.end_line, r2.end_col);
     }
+
+    static ckx_src_rng empty()
+    {
+        return ckx_src_rng(-1, -1, -1, -1);
+    }
 };
 
 open_class ckx_token
