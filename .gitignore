@@ -36,8 +36,4 @@
 *.pro.user.*
 
 # CMake project configuration
-<<<<<<< Updated upstream
 CMakeLists.txt.user
-=======
-*.user
->>>>>>> Stashed changes
