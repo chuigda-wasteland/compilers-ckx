@@ -16,9 +16,9 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
   */
 
-#include "file_reader.hpp"
-#include "ckx_parser.hpp"
-#include "ckx_ast_node.hpp"
+#include "frontend/parse/ckx_parser_impl.hpp"
+#include "saber/memory.hpp"
+#include "saber/c8assert.hpp"
 
 #include <cstdio>
 
