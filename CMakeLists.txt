@@ -1,0 +1,46 @@
+﻿cmake_minimum_required (VERSION 2.8)
+project (compilers-ckx)
+
+set (CMAKE_CXX_STANDARD 14)
+
+include_directories (include)
+
+aux_source_directory (src/driver DRIVER_SRC)
+aux_source_directory (src/frontend/AST AST_SRCS)
+aux_source_directory (src/frontend/lex LEX_SRCS)
+aux_source_directory (src/frontend/parse PARSE_SRCS)
+aux_source_directory (src/frontend/sema SEMA_SRCS)
+aux_source_directory (src/frontend/util UTIL_SRCS)
+aux_source_directory (src/llvm LLVM_SRCS)
+aux_source_directory (src/saber SABER_SRCS)
+aux_source_directory (src/we WE_SRCS)
+
+add_library (saber ${SABER_SRCS})
+add_library (we ${WE_SRCS})
+add_library (llvm ${LLVM_SRCS})
+add_library (frontend ${AST_SRCS} ${LEX_SRCS} ${PARSE_SRCS} ${SEMA_SRCS} ${UTIL_SRCS})
+add_executable (ckxc ${DRIVER_SRC})
+
+target_link_libraries (we "saber")
+target_link_libraries (llvm "we" "saber") 
+target_link_libraries (frontend "we" "saber")
+target_link_libraries (ckxc "we" "saber" "frontend" "llvm")
+
+aux_source_directory (test/parse/test_parse_decl TEST_PARSE_DECL_SRC)
+aux_source_directory (test/parse/test_parse_expr TEST_PARSE_EXPR_SRC)
+aux_source_directory (test/parse/test_parse_func TEST_PARSE_FUNC_SRC)
+aux_source_directory (test/parse/test_parse_stmt TEST_PARSE_STMT_SRC)
+aux_source_directory (test/parse/test_parse_udt  TEST_PARSE_UDT_SRC)
+
+add_executable (test_parse_decl ${TEST_PARSE_DECL_SRC})
+add_executable (test_parse_expr ${TEST_PARSE_EXPR_SRC})
+add_executable (test_parse_func ${TEST_PARSE_FUNC_SRC})
+add_executable (test_parse_stmt ${TEST_PARSE_STMT_SRC})
+add_executable (test_parse_udt  ${TEST_PARSE_UDT_SRC})
+
+target_link_libraries (test_parse_decl "we" "saber" "frontend" "llvm")
+target_link_libraries (test_parse_expr "we" "saber" "frontend" "llvm")
+target_link_libraries (test_parse_func "we" "saber" "frontend" "llvm")
+target_link_libraries (test_parse_stmt "we" "saber" "frontend" "llvm")
+target_link_libraries (test_parse_udt "we" "saber" "frontend" "llvm")
+
