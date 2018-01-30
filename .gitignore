@@ -34,3 +34,6 @@
 # Qt project configuration
 *.pro.user
 *.pro.user.*
+
+# CMake project configuration
+CMakeLists.txt.user

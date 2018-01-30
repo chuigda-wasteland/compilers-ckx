@@ -26,7 +26,7 @@
 #include "saber/optional.hpp"
 #include "we/defs.hpp"
 
-#include "frontend/lex/ckx_token.hpp"
+#include "frontend/util/ckx_src_rng.hpp"
 #include "frontend/sema/ckx_type.hpp"
 #include "llvm/llvm_value.hpp"
 #include "llvm/llvm_type.hpp"
