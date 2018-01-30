@@ -18,9 +18,9 @@
 /// @note This file contains a MANUAL test. Debuggers should read the log
 /// themselves and manually detect bugs.
 
-#include "ckx_parser_impl.hpp"
-#include "memory.hpp"
-#include "c8assert.hpp"
+#include "frontend/parse/ckx_parser_impl.hpp"
+#include "saber/memory.hpp"
+#include "saber/c8assert.hpp"
 
 using namespace ckx;
 
