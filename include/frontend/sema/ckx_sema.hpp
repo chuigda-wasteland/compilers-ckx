@@ -1,8 +1,9 @@
 ﻿#ifndef CKX_SEMA_HPP
 #define CKX_SEMA_HPP
 
-#include "frontend/parse/ckx_prelexed_type.hpp"
 #include "frontend/AST/ckx_ast_node.hpp"
+#include "frontend/parse/ckx_prelexed_type.hpp"
+#include "frontend/util/ckx_src_rng.hpp"
 #include "frontend/sema/ckx_type.hpp"
 #include "frontend/sema/ckx_env_table.hpp"
 #include "frontend/sema/ckx_sema_result.hpp"

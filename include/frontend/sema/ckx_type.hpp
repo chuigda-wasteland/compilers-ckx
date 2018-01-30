@@ -22,11 +22,10 @@
 #include "saber/memory.hpp"
 #include "saber/utility.hpp"
 #include "saber/string.hpp"
+#include "saber/string_pool.hpp"
 #include "saber/object_pool.hpp"
-
-#include "frontend/lex/ckx_token.hpp"
 #include "we/defs.hpp"
-
+#include "frontend/lex/ckx_token.hpp"
 
 namespace ckx
 {
