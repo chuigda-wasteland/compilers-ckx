@@ -76,6 +76,7 @@ void llvm_ir_builder_impl::create_n_enter_func(
     functions.push_back(new llvm_function_block(fndef));
     stashed_global_insertion_point = cur_insertion_point;
     cur_insertion_point = fndef;
+    create_label(saber_string_pool::create_view("entry"));
 }
 
 void llvm_ir_builder_impl::leave_func()

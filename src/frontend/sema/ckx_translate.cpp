@@ -13,7 +13,10 @@ void ckx_ast_translation_unit::accept(ckx_sema_engine &_sema)
     _sema.visit_translation_unit(this);
 }
 
-void ckx_ast_compound_stmt::accept(ckx_sema_engine&) {}
+void ckx_ast_compound_stmt::accept(ckx_sema_engine& _sema)
+{
+    _sema.visit_compound_stmt(this);
+}
 void ckx_ast_if_stmt::accept(ckx_sema_engine&) {}
 void ckx_ast_while_stmt::accept(ckx_sema_engine&) {}
 void ckx_ast_do_while_stmt::accept(ckx_sema_engine&) {}

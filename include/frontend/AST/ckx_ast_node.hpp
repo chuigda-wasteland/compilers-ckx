@@ -75,6 +75,7 @@ public:
 
 class ckx_ast_compound_stmt final implements ckx_ast_stmt
 {
+    friend class ckx_sema_engine;
 public:
     ckx_ast_compound_stmt(ckx_src_rng _lbrace_rng, ckx_src_rng _rbrace_rng,
                           saber::vector<ckx_ast_stmt*>&& _stmts);

@@ -5,12 +5,17 @@
 
 saber_string str =
 R"cc(
-struct s { vi8 a; vi16 b, c; s* d;}
+
+struct s { vi8 a; vi16 b, c; s* d; }
 
 fn foo(vi8 a, vi8 b): vi8;
 fn bar(vi16 a, vi8* const b): void;
 fn baz(s s1): void;
-fn main(vi8 argc, vi8** argv): void;
+fn main(vi8 argc, vi8** argv): vi32 {
+    vi8 a, b;
+    s s1;
+}
+
 )cc";
 
 int main()
