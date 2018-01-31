@@ -111,14 +111,17 @@ public:
                                                          llvm_type _ty,
                                                          llvm_value* _idx);
 
-    llvm_value *create_string_constant(saber_string_view _str);
-    llvm_value *create_signed_constant(qint64 _i);
-    llvm_value *create_unsigned_constant(quint64 _u);
-    llvm_value *create_floating_constant(qreal _r);
-    llvm_value *create_bool_constant(bool _b);
+    llvm_new_type* create_udt(saber_string_view _type_name,
+                              saber::vector<llvm_type>&& _fields);
 
-    llvm_value *create_temporary_var();
-    llvm_value *create_named_var(saber_string_view _name);
+    llvm_value* create_string_constant(saber_string_view _str);
+    llvm_value* create_signed_constant(qint64 _i);
+    llvm_value* create_unsigned_constant(quint64 _u);
+    llvm_value* create_floating_constant(qreal _r);
+    llvm_value* create_bool_constant(bool _b);
+
+    llvm_value* create_temporary_var();
+    llvm_value* create_named_var(saber_string_view _name);
 
 private:
     open_class llvm_function_block /// `Type rich programming`?

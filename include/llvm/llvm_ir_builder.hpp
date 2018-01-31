@@ -115,6 +115,9 @@ COMMENT(END_BLOCK)
                                            llvm_type _type, llvm_value *_ptr,
                                            llvm_type _ty, llvm_value *_idx);
 
+    llvm_instruction* create_udt(saber_string_view _name,
+                                 saber::vector<llvm_type>&& _fields);
+
     /// @fn functions dealing with values
     llvm_value *create_string_constant(saber_string_view _str);
     llvm_value *create_signed_constant(qint64 _i);

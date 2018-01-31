@@ -83,6 +83,8 @@ void ckx_sema_engine::visit_struct_decl(ckx_ast_record_stmt *_struct_stmt)
         root_env.add_type(
             _struct_stmt->kwd_rng, _struct_stmt->name, struct_type).value();
 
+    saber::vector<faker::llvm_type> llvm_type_fields;
+
     for (ckx_ast_record_stmt::field_row& row : _struct_stmt->fields)
     {
         saber::optional<ckx_type_result> result = re_lex_type(row.type);
@@ -93,8 +95,20 @@ void ckx_sema_engine::visit_struct_decl(ckx_ast_record_stmt *_struct_stmt)
         }
 
         for (ckx_ast_record_stmt::field& field : row.fields)
+        {
             struct_type->add_field(field.name, result.get().type);
+            llvm_type_fields.push_back(result.get().llvm_type_bind);
+        }
     }
+
+    saber_string_view llvm_type_name =
+        saber_string_pool::create_view(
+            saber::string_paste("struct.", _struct_stmt->name));
+    builder.create_udt(llvm_type_name, saber::move(llvm_type_fields));
+
+    entry->llvm_type_bind =
+        saber_string_pool::create_view(
+            saber::string_paste("%", llvm_type_name));
 }
 
 void ckx_sema_engine::visit_variant_decl(ckx_ast_record_stmt *_variant_stmt)

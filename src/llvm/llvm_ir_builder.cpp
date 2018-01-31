@@ -192,6 +192,13 @@ llvm_ir_builder::create_getelementptr(llvm_value *_result,
     return impl->create_getelementptr(_result, _type, _ptr, _ty, _idx);
 }
 
+llvm_instruction*
+llvm_ir_builder::create_udt(saber_string_view _name,
+                            saber::vector<llvm_type> &&_fields)
+{
+    return impl->create_udt(_name, saber::move(_fields));
+}
+
 llvm_value *llvm_ir_builder::create_string_constant(saber_string_view _str)
 {
     return impl->create_string_constant(_str);

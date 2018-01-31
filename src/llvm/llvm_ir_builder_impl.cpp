@@ -206,7 +206,15 @@ llvm_getelementptr_instruction* llvm_ir_builder_impl::create_getelementptr(
 {
     return insert_after_current(
         new llvm_getelementptr_instruction(
-            _result, _yield_type, _ptr, _ty, _idx));
+                    _result, _yield_type, _ptr, _ty, _idx));
+}
+
+llvm_new_type*
+llvm_ir_builder_impl::create_udt(saber_string_view _type_name,
+                                 saber::vector<llvm_type> &&_fields)
+{
+    return insert_after_current(
+         new llvm_new_type(_type_name, saber::move(_fields)));
 }
 
 llvm_value* llvm_ir_builder_impl::create_string_constant(saber_string_view _str)
