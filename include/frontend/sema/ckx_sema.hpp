@@ -21,8 +21,10 @@ public:
     ckx_sema_engine(const ckx_sema_engine&) = delete;
     ckx_sema_engine(ckx_sema_engine&&) = delete;
 
+    void visit_translation_unit(ckx_ast_translation_unit *_unit);
     void visit_decl_node(ckx_ast_decl_stmt* _decl_stmt);
     void visit_record_node(ckx_ast_record_stmt* _record_stmt);
+    void visit_func_node(ckx_ast_func_stmt* _func_stmt);
 
     ckx_expr_result decay_to_rvalue(ckx_expr_result _expr);
     saber::optional<ckx_expr_result> try_implicit_cast(ckx_expr_result _expr);
@@ -43,6 +45,8 @@ private:
     void visit_local_decl(ckx_ast_decl_stmt *_decl_stmt);
     void visit_struct_decl(ckx_ast_record_stmt *_struct_stmt);
     void visit_variant_decl(ckx_ast_record_stmt *_variant_stmt);
+    void visit_func_decl(ckx_ast_func_stmt *_func_stmt);
+    void visit_func_def(ckx_ast_func_stmt *_func_stmt);
 
     saber::optional<ckx_type_result>
     re_lex_type(const ckx_prelexed_type &_prelexed_type);

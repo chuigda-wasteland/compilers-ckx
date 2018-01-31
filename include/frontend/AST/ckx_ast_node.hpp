@@ -48,12 +48,15 @@ public:
 
 class ckx_ast_translation_unit final implements ckx_ast_node
 {
+    friend class ckx_sema_engine;
 public:
     explicit ckx_ast_translation_unit();
     ~ckx_ast_translation_unit();
 
     void add_new_stmt(ckx_ast_stmt *_stmt);
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
+
+    void accept(ckx_sema_engine& _sema);
 
 private:
     saber::vector<ckx_ast_stmt*> stmts;
@@ -253,6 +256,7 @@ private:
 
 class ckx_ast_func_stmt implements ckx_ast_stmt
 {
+    friend class ckx_sema_engine;
 public:
     open_class param_decl
     {
@@ -273,7 +277,7 @@ public:
     ~ckx_ast_func_stmt();
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
-    void accept(ckx_sema_engine &sema) override final;
+    void accept(ckx_sema_engine &_sema) override final;
 
 private:
     ckx_src_rng kwd_rng;

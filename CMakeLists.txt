@@ -45,5 +45,6 @@ target_link_libraries (test_parse_stmt "we" "saber" "frontend" "llvm")
 target_link_libraries (test_parse_udt "we" "saber" "frontend" "llvm")
 
 add_executable (test_sema_1 test/sema/test1.cpp)
-
+add_executable (test_sema_2 test/sema/test2.cpp)
 target_link_libraries (test_sema_1 "we" "saber" "frontend" "llvm")
+target_link_libraries (test_sema_2 "we" "saber" "frontend" "llvm")

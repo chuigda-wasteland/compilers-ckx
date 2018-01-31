@@ -76,6 +76,23 @@ private:
     detail::we_istream_reader_impl *impl;
 };
 
+class we_test_filereader final implements we_file_reader
+{
+public:
+    we_test_filereader(saber::string&& _str) : str(saber::move(_str)) {}
+    ~we_test_filereader() = default;
+    qchar get_next_char(void) override final
+    {
+        pos++;
+        if (pos-1 < str.size()) return str[pos-1];
+        else return static_cast<qchar>(saber::char_traits<qchar>::eof());
+    }
+
+private:
+    qsizet pos = 0;
+    saber::string str;
+};
+
 } // namespace ckx
 
 #endif // CKX_FILE_READER_HPP

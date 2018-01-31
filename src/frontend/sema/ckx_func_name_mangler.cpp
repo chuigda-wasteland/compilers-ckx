@@ -2,6 +2,7 @@
 #include "we/defs.hpp"
 #include <atomic>
 
+static saber_string_view main_func = saber_string_pool::create_view("main");
 
 namespace ckx
 {
@@ -76,6 +77,8 @@ ckx_func_name_mangler::std_mangle(saber_string_view _func_name,
                                   ckx_type *_func_type)
 {
     C8ASSERT(_func_type->get_category() == ckx_type::category::type_function);
+    if (_func_name == main_func)
+        return _func_name;
     ckx_func_type *func_type = reinterpret_cast<ckx_func_type*>(_func_type);
     saber_string func_appendix = "_";
     for (ckx_type* type : func_type->get_param_type_list())
@@ -89,6 +92,8 @@ saber_string_view
 ckx_func_name_mangler::simple_mangle(saber_string_view _func_name)
 {
     static std::atomic<quint64> mangle_count {0};
+    if (_func_name == main_func)
+        return _func_name;
     return saber_string_pool::create_view(
         saber::string_paste(_func_name, mangle_count++));
 }

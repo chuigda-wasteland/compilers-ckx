@@ -3,6 +3,11 @@
 namespace ckx
 {
 
+void ckx_sema_engine::visit_translation_unit(ckx_ast_translation_unit *_unit)
+{
+    for (ckx_ast_stmt *stmt : _unit->stmts) stmt->accept(*this);
+}
+
 void
 ckx_sema_engine::visit_decl_node(ckx_ast_decl_stmt* _decl_stmt)
 {
@@ -25,6 +30,14 @@ void ckx_sema_engine::visit_record_node(ckx_ast_record_stmt *_record_stmt)
         visit_struct_decl(_record_stmt);
     else
         visit_variant_decl(_record_stmt);
+}
+
+void ckx_sema_engine::visit_func_node(ckx_ast_func_stmt *_func_stmt)
+{
+    if (_func_stmt->fnbody == nullptr)
+        visit_func_decl(_func_stmt);
+    else
+        visit_func_def(_func_stmt);
 }
 
 void ckx_sema_engine::test_print(we::we_file_writer &writer)
@@ -60,8 +73,7 @@ ckx_sema_engine::visit_global_decl(ckx_ast_decl_stmt *_decl_stmt)
     error(); /// @todo currently I don't know how to implement it.
 }
 
-void
-ckx_sema_engine::visit_local_decl(ckx_ast_decl_stmt *_decl_stmt)
+void ckx_sema_engine::visit_local_decl(ckx_ast_decl_stmt *_decl_stmt)
 {
     C8ASSERT(is_in_func());
     saber::optional<ckx_type_result> result = re_lex_type(_decl_stmt->type);
@@ -102,6 +114,12 @@ void ckx_sema_engine::visit_struct_decl(ckx_ast_record_stmt *_struct_stmt)
     ckx_env_type_entry *entry =
         root_env.add_type(
             _struct_stmt->kwd_rng, _struct_stmt->name, struct_type).value();
+    saber_string_view llvm_type_name =
+        saber_string_pool::create_view(
+            saber::string_paste("struct.", _struct_stmt->name));
+    entry->llvm_type_bind =
+        saber_string_pool::create_view(
+            saber::string_paste("%", llvm_type_name));
 
     saber::vector<faker::llvm_type> llvm_type_fields;
 
@@ -121,20 +139,17 @@ void ckx_sema_engine::visit_struct_decl(ckx_ast_record_stmt *_struct_stmt)
         }
     }
 
-    saber_string_view llvm_type_name =
-        saber_string_pool::create_view(
-            saber::string_paste("struct.", _struct_stmt->name));
     builder.create_udt(llvm_type_name, saber::move(llvm_type_fields));
-
-    entry->llvm_type_bind =
-        saber_string_pool::create_view(
-            saber::string_paste("%", llvm_type_name));
 }
 
 void ckx_sema_engine::visit_variant_decl(ckx_ast_record_stmt *_variant_stmt)
 {
     C8ASSERT(_variant_stmt->tag == ckx_ast_record_stmt::record_tag::rt_variant);
-
+    /// @todo this feature will be discarded in the future.
+    /// And now I don't know how to implement
+    /// @todo How can we calculate size of types correctly?
+    error();
+    /*
     ckx_variant_type *variant_type =
         ckx_type_helper::create_variant_type(_variant_stmt->name);
     ckx_env_type_entry *entry =
@@ -153,6 +168,62 @@ void ckx_sema_engine::visit_variant_decl(ckx_ast_record_stmt *_variant_stmt)
         for (ckx_ast_record_stmt::field& field : row.fields)
             variant_type->add_field(field.name, result.get().type);
     }
+    */
+}
+
+void ckx_sema_engine::visit_func_decl(ckx_ast_func_stmt *_func_stmt)
+{
+    saber::optional<ckx_type_result> ret_type_result =
+        re_lex_type(_func_stmt->ret_type);
+    if (!ret_type_result.is_type())
+    {
+        error();
+        return;
+    }
+
+    saber::vector<ckx_type*> param_types;
+    saber::vector<faker::llvm_type> param_llvm_types;
+    saber::vector<saber_string_view> param_names;
+
+    for (ckx_ast_func_stmt::param_decl &param_decl : _func_stmt->param_decls)
+    {
+        saber::optional<ckx_type_result> param_type_result =
+            re_lex_type(param_decl.type);
+        if (!param_type_result.is_type())
+        {
+            error();
+            break;
+        }
+
+        param_types.push_back(param_type_result.get().type);
+        param_llvm_types.push_back(param_type_result.get().llvm_type_bind);
+        param_names.push_back(param_decl.name);
+    }
+
+    ckx_func_type *func_type =
+        ckx_type_helper::create_func_type(
+            ret_type_result.get().type, saber::move(param_types));
+
+    ckx_env::result_add_func entry =
+        current_env->add_func(_func_stmt->kwd_rng, _func_stmt->name, func_type);
+
+    if (entry.status == ckx_env::result_add_func::add_status::conflict
+        || entry.status == ckx_env::result_add_func::add_status::conflict)
+    {
+        error();
+        return;
+    }
+
+    builder.create_func_decl(ret_type_result.get().llvm_type_bind,
+                             entry.added_or_conflict_func->llvm_name,
+                             saber::move(param_llvm_types),
+                             saber::move(param_names),
+                             faker::llvm_func_attrs(
+                                 true, faker::llvm_func_attrs::it_default));
+}
+
+void ckx_sema_engine::visit_func_def(ckx_ast_func_stmt *_func_stmt)
+{
 }
 
 saber::optional<ckx_type_result>

@@ -8,6 +8,11 @@ namespace ckx
 /// @todo this is just for suppressing warnings.
 using bwsb = saber::optional<ckx_expr_result>;
 
+void ckx_ast_translation_unit::accept(ckx_sema_engine &_sema)
+{
+    _sema.visit_translation_unit(this);
+}
+
 void ckx_ast_compound_stmt::accept(ckx_sema_engine&) {}
 void ckx_ast_if_stmt::accept(ckx_sema_engine&) {}
 void ckx_ast_while_stmt::accept(ckx_sema_engine&) {}
@@ -16,16 +21,23 @@ void ckx_ast_for_stmt::accept(ckx_sema_engine&) {}
 void ckx_ast_break_stmt::accept(ckx_sema_engine&) {}
 void ckx_ast_continue_stmt::accept(ckx_sema_engine&) {}
 void ckx_ast_return_stmt::accept(ckx_sema_engine&) {}
+
 void ckx_ast_decl_stmt::accept(ckx_sema_engine& _sema)
 {
     _sema.visit_decl_node(this);
 }
+
 void ckx_ast_expr_stmt::accept(ckx_sema_engine&) {}
-void ckx_ast_func_stmt::accept(ckx_sema_engine&) {}
+void ckx_ast_func_stmt::accept(ckx_sema_engine& _sema)
+{
+    _sema.visit_func_node(this);
+}
+
 void ckx_ast_record_stmt::accept(ckx_sema_engine& _sema)
 {
     _sema.visit_record_node(this);
 }
+
 void ckx_ast_alias_stmt::accept(ckx_sema_engine&) {}
 void ckx_ast_enum_stmt::accept(ckx_sema_engine&) {}
 saber::optional<ckx_expr_result>

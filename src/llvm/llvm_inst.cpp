@@ -66,7 +66,7 @@ void llvm_func_decl::pretty_print(we::we_file_writer &_writer)
     }
     _writer.write(") ");
     attrs.pretty_print(_writer);
-    _writer.write(";");
+    _writer.write(";\n");
 }
 
 llvm_func_def::llvm_func_def(
