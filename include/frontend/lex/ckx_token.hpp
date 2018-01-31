@@ -160,6 +160,13 @@ open_class ckx_token
         const qint64 i64;
         const quint64 u64;
         const qreal r;
+
+        token_value() {}
+        token_value(qchar _ch) : ch(_ch) {}
+        token_value(qint64 _i64) : i64(_i64) {}
+        token_value(quint64 _u64) : u64(_u64) {}
+        token_value(qreal _r) : r(_r) {}
+        ~token_value() = default;
     } v;
     const saber_string_view str = saber_string_pool::create_view("");
 };

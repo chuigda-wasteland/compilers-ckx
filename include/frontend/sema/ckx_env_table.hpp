@@ -100,12 +100,14 @@ public:
 
     open_class result_add_func
     {
-        enum { declare, redeclare, define, overload, conflict, fail } status;
-        variant value
+        enum class add_status
         {
-            ckx_env_func_entry* added_func;
-            ckx_env_func_entry* conflict_func;
-        } v;
+            declare, redeclare, overload, conflict, fail
+        }
+        status;
+        ckx_env_func_entry* added_or_conflict_func;
+        result_add_func(add_status _status, ckx_env_func_entry *_entry) :
+            status(_status), added_or_conflict_func(_entry) {}
     };
 
     ckx_env(ckx_env* _parent = nullptr) : parent(_parent) {}
