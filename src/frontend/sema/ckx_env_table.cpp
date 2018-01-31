@@ -154,8 +154,8 @@ ckx_env::add_func(ckx_src_rng _decl_at, saber_string_view _name, ckx_type* _type
                                       ckx_func_name_mangler::std_mangle(
                                           _name, _type))
                            }).first;
-    return result_add_func{.status=result_add_func::declare,
-                           .v.added_func=&(it->second[0])};
+    return result_add_func(result_add_func::add_status::declare,
+                           &(it->second[0]));
 }
 
 } // namespace ckx
