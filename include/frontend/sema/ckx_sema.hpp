@@ -33,6 +33,10 @@ public:
 
     /// @note for test only.
     void test_print(we::we_file_writer& writer);
+    void test_enter_func();
+    void test_leave_func();
+    void test_enter_scope();
+    void test_leave_scope();
 
 private:
     void visit_global_decl(ckx_ast_decl_stmt *_decl_stmt);

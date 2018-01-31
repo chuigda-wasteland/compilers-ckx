@@ -22,7 +22,10 @@ void ckx_ast_decl_stmt::accept(ckx_sema_engine& _sema)
 }
 void ckx_ast_expr_stmt::accept(ckx_sema_engine&) {}
 void ckx_ast_func_stmt::accept(ckx_sema_engine&) {}
-void ckx_ast_record_stmt::accept(ckx_sema_engine&) {}
+void ckx_ast_record_stmt::accept(ckx_sema_engine& _sema)
+{
+    _sema.visit_record_node(this);
+}
 void ckx_ast_alias_stmt::accept(ckx_sema_engine&) {}
 void ckx_ast_enum_stmt::accept(ckx_sema_engine&) {}
 saber::optional<ckx_expr_result>
