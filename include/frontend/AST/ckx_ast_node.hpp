@@ -285,6 +285,7 @@ private:
 
 class ckx_ast_record_stmt final implements ckx_ast_stmt
 {
+    friend class ckx_sema_engine;
 public:
     open_class field
     {

@@ -112,6 +112,8 @@ public:
 
     ckx_env(ckx_env* _parent = nullptr) : parent(_parent) {}
 
+    ckx_env* get_parent() { return parent; }
+
     bool lookup(saber_string_view _name);
     bool lookup_local(saber_string_view _name);
 
@@ -143,7 +145,7 @@ private:
     saber::unordered_map<sv, ckx_env_type_entry, svhash> types;
     saber::unordered_map<sv, saber::vector<ckx_env_func_entry>, svhash> funcs;
 
-    ckx_env *parent;
+    ckx_env *const parent;
 };
 
 
