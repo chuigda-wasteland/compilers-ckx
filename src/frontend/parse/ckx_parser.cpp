@@ -259,7 +259,7 @@ ckx_parser_impl::parse_func_stmt()
     expect_n_eat(ckx_token::type::tk_lparen);
     saber::vector<ckx_ast_func_stmt::param_decl> param_decl_list;
 
-    while (1)
+    while (current_token().token_type != ckx_token::type::tk_rparen)
     {
         ckx_src_rng param_rng = current_token().rng;
         ckx_prelexed_type param_type = parse_type();
@@ -271,11 +271,7 @@ ckx_parser_impl::parse_func_stmt()
         if (current_token().token_type == ckx_token::type::tk_comma)
         {
             next_token();
-            continue;
         }
-
-        if (current_token().token_type == ckx_token::type::tk_rparen)
-            break;
     }
     expect_n_eat(ckx_token::type::tk_rparen);
     expect_n_eat(ckx_token::type::tk_colon);

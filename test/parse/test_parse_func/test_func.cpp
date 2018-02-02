@@ -124,6 +124,23 @@ ckx_parser_impl_test::test_parse_func_decl()
         cleanup_test();
         base::token_stream = nullptr;
     }
+
+    {
+        ckx_test_filereader reader { "fn main(): vi32;" };
+        base::token_stream = new ckx_token_stream(reader);
+        initialize_test();
+        base::typename_table.add_typename(
+            saber_string_pool::create_view("Student"));
+
+        ckx_ast_func_stmt *func = base::parse_func_stmt();
+        func->ast_dump(writer, 0);
+        delete func;
+
+        C8ASSERT(base::error_list.empty());
+        C8ASSERT(base::warn_list.empty());
+        cleanup_test();
+        base::token_stream = nullptr;
+    }
 }
 
 
