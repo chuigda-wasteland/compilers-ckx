@@ -8,6 +8,7 @@
 #include "frontend/sema/ckx_env_table.hpp"
 #include "frontend/sema/ckx_sema_result.hpp"
 #include "llvm/llvm_ir_builder.hpp"
+#include "saber/optional.hpp"
 
 namespace ckx
 {
@@ -48,6 +49,31 @@ private:
     void visit_variant_decl(ckx_ast_record_stmt *_variant_stmt);
     void visit_func_decl(ckx_ast_func_stmt *_func_stmt);
     void visit_func_def(ckx_ast_func_stmt *_func_stmt);
+
+    struct function_header_info
+    {
+        ckx_type_result ret_type_result;
+        saber::vector<ckx_type_result> param_types_results;
+        saber::vector<saber_string_view> param_names;
+
+        function_header_info(
+            ckx_type_result _ret_type_result,
+            saber::vector<ckx_type_result> &&_param_type_results,
+            saber::vector<saber_string_view> &&_param_names) :
+                ret_type_result(_ret_type_result),
+                param_types_results(saber::move(_param_type_results)),
+                param_names(saber::move(_param_names)) {}
+
+        function_header_info(function_header_info&& _another) :
+            function_header_info(_another.ret_type_result,
+                                 saber::move(_another.param_types_results),
+                                 saber::move(_another.param_names)) {}
+
+        function_header_info(const function_header_info&) = delete;
+    };
+
+    saber::optional<function_header_info>
+    visit_function_header(ckx_ast_func_stmt *_func_stmt);
 
     saber::optional<ckx_type_result>
     re_lex_type(const ckx_prelexed_type &_prelexed_type);

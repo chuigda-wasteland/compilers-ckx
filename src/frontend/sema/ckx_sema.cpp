@@ -180,36 +180,25 @@ void ckx_sema_engine::visit_variant_decl(ckx_ast_record_stmt *_variant_stmt)
 
 void ckx_sema_engine::visit_func_decl(ckx_ast_func_stmt *_func_stmt)
 {
-    saber::optional<ckx_type_result> ret_type_result =
-        re_lex_type(_func_stmt->ret_type);
-    if (!ret_type_result.is_type())
-    {
-        error();
+    saber::optional<function_header_info> func_header_info =
+        visit_function_header(_func_stmt);
+
+    if (!func_header_info.is_type())
         return;
-    }
 
     saber::vector<ckx_type*> param_types;
     saber::vector<faker::llvm_type> param_llvm_types;
-    saber::vector<saber_string_view> param_names;
 
-    for (ckx_ast_func_stmt::param_decl &param_decl : _func_stmt->param_decls)
+    for (ckx_type_result& result : func_header_info.get().param_types_results)
     {
-        saber::optional<ckx_type_result> param_type_result =
-            re_lex_type(param_decl.type);
-        if (!param_type_result.is_type())
-        {
-            error();
-            break;
-        }
-
-        param_types.push_back(param_type_result.get().type);
-        param_llvm_types.push_back(param_type_result.get().llvm_type_bind);
-        param_names.push_back(param_decl.name);
+        param_types.push_back(result.type);
+        param_llvm_types.push_back(result.llvm_type_bind);
     }
 
     ckx_func_type *func_type =
         ckx_type_helper::create_func_type(
-            ret_type_result.get().type, saber::move(param_types));
+            func_header_info.get().ret_type_result.type,
+            saber::move(param_types));
 
     ckx_env::result_add_func entry =
         current_env->add_func(_func_stmt->kwd_rng, _func_stmt->name, func_type);
@@ -221,51 +210,39 @@ void ckx_sema_engine::visit_func_decl(ckx_ast_func_stmt *_func_stmt)
         return;
     }
 
-    builder.create_func_decl(ret_type_result.get().llvm_type_bind,
-                             entry.added_or_conflict_func->llvm_name,
-                             saber::move(param_llvm_types),
-                             saber::move(param_names),
-                             faker::llvm_func_attrs(
-                                 true, faker::llvm_func_attrs::it_default));
+    builder.create_func_decl(
+        func_header_info.get().ret_type_result.llvm_type_bind,
+        entry.added_or_conflict_func->llvm_name,
+        saber::move(param_llvm_types),
+        saber::move(func_header_info.get().param_names),
+        faker::llvm_func_attrs(true, faker::llvm_func_attrs::it_default));
 }
 
 void ckx_sema_engine::visit_func_def(ckx_ast_func_stmt *_func_stmt)
 {
-    /// @todo copy-paste is just a temporary solution
+    saber::optional<function_header_info> func_header_info =
+        visit_function_header(_func_stmt);
 
-    saber::optional<ckx_type_result> ret_type_result =
-        re_lex_type(_func_stmt->ret_type);
-    if (!ret_type_result.is_type())
-    {
-        error();
+    if (!func_header_info.is_type())
         return;
-    }
 
     saber::vector<ckx_type*> param_types;
     saber::vector<faker::llvm_type> param_llvm_types;
-    saber::vector<saber_string_view> param_names;
 
-    for (ckx_ast_func_stmt::param_decl &param_decl : _func_stmt->param_decls)
+    for (ckx_type_result& result : func_header_info.get().param_types_results)
     {
-        saber::optional<ckx_type_result> param_type_result =
-            re_lex_type(param_decl.type);
-        if (!param_type_result.is_type())
-        {
-            error();
-            break;
-        }
-
-        param_types.push_back(param_type_result.get().type);
-        param_llvm_types.push_back(param_type_result.get().llvm_type_bind);
-        param_names.push_back(param_decl.name);
+        param_types.push_back(result.type);
+        param_llvm_types.push_back(result.llvm_type_bind);
     }
 
     saber::vector<ckx_type*> param_types_1 = param_types;
-    saber::vector<saber_string_view> param_names_1 = param_names;
+    saber::vector<saber_string_view> param_names_1 =
+        func_header_info.get().param_names;
 
     ckx_func_type *func_type =
         ckx_type_helper::create_func_type(
-            ret_type_result.get().type, saber::move(param_types));
+            func_header_info.get().ret_type_result.type,
+            saber::move(param_types_1));
 
     ckx_env::result_add_func entry =
         current_env->add_func(_func_stmt->kwd_rng, _func_stmt->name, func_type);
@@ -277,12 +254,11 @@ void ckx_sema_engine::visit_func_def(ckx_ast_func_stmt *_func_stmt)
         return;
     }
 
-    builder.create_n_enter_func(ret_type_result.get().llvm_type_bind,
-                                entry.added_or_conflict_func->llvm_name,
-                                saber::move(param_llvm_types),
-                                saber::move(param_names),
-                                faker::llvm_func_attrs(
-                                    true, faker::llvm_func_attrs::it_default));
+    builder.create_n_enter_func(
+        func_header_info.get().ret_type_result.llvm_type_bind,
+        entry.added_or_conflict_func->llvm_name,
+        saber::move(param_llvm_types), saber::move(param_names_1),
+        faker::llvm_func_attrs(true, faker::llvm_func_attrs::it_default));
 
     enter_func();
     for (size_t i = 0; i < _func_stmt->param_decls.size(); ++i)
@@ -290,12 +266,46 @@ void ckx_sema_engine::visit_func_def(ckx_ast_func_stmt *_func_stmt)
         saber::result<ckx_env_var_entry*, ckx_env::err_add_var> result =
         current_env->add_var(_func_stmt->param_decls[i].rng,
                              _func_stmt->param_decls[i].name,
-                             param_types_1[i]);
+                             param_types[i]);
         result.value()->llvm_value_bind =
-            builder.create_named_var(param_names_1[i]);
+            builder.create_named_var(func_header_info.get().param_names[i]);
     }
     _func_stmt->fnbody->accept(*this);
     leave_func();
+}
+
+saber::optional<ckx_sema_engine::function_header_info>
+ckx_sema_engine::visit_function_header(ckx_ast_func_stmt *_func_stmt)
+{
+    saber::optional<ckx_type_result> ret_type_result =
+        re_lex_type(_func_stmt->ret_type);
+    if (!ret_type_result.is_type())
+    {
+        error();
+        return saber::optional<function_header_info>();
+    }
+
+    saber::vector<ckx_type_result> param_type_results;
+    saber::vector<saber_string_view> param_names;
+
+    for (ckx_ast_func_stmt::param_decl &param_decl : _func_stmt->param_decls)
+    {
+        saber::optional<ckx_type_result> param_type_result =
+            re_lex_type(param_decl.type);
+        if (!param_type_result.is_type())
+        {
+            error();
+            break;
+        }
+
+        param_type_results.push_back(param_type_result.get());
+        param_names.push_back(param_decl.name);
+    }
+
+    return saber::optional<function_header_info>(
+        ret_type_result.get(),
+        saber::move(param_type_results),
+        saber::move(param_names));
 }
 
 saber::optional<ckx_type_result>
