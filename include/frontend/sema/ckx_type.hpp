@@ -79,6 +79,8 @@ public:
     virtual ~ckx_type() = 0;
     virtual saber_string to_string() const = 0;
 
+    virtual bool equal_to(ckx_type *_another) const = 0;
+
     category get_category() const;
 
     bool is_basic() const;
@@ -121,6 +123,7 @@ class ckx_basic_type final implements ckx_type
 public:
     ~ckx_basic_type() override final = default;
     saber_string to_string() const override final;
+    bool equal_to(ckx_type *_another) const override final;
 
 private:
     friend class ckx_type_helper;
@@ -150,6 +153,7 @@ public:
     ~ckx_struct_type() override final = default;
 
     saber_string to_string() const override final;
+    bool equal_to(ckx_type *_another) const override final;
 
     saber_string_view get_name() const;
     add_status add_field(saber_string_view _name, ckx_type* _type);
@@ -185,6 +189,7 @@ public:
     ~ckx_variant_type() override final = default;
 
     saber_string to_string() const override final;
+    bool equal_to(ckx_type *_another) const override final;
 
     saber_string_view get_name() const;
     add_status add_field(saber_string_view _name, ckx_type* _type);
@@ -218,6 +223,7 @@ public:
     ~ckx_enum_type() override final = default;
 
     saber_string to_string() const override final;
+    bool equal_to(ckx_type *_another) const override final;
 
     saber_string_view get_name() const;
     add_status add_enumerator(saber_string_view _name, qint64 _value);
@@ -236,6 +242,7 @@ public:
     ~ckx_func_type() override final = default;
 
     saber_string to_string() const override final;
+    bool equal_to(ckx_type *_another) const override final;
 
     ckx_type* get_return_type();
     const saber::vector<ckx_type*>& get_param_type_list();
@@ -255,6 +262,7 @@ public:
     ~ckx_pointer_type() override final = default;
 
     saber_string to_string() const override final;
+    bool equal_to(ckx_type *_another) const override final;
     ckx_type* get_pointee();
 
 private:
@@ -270,6 +278,7 @@ public:
     ~ckx_array_type() override final = default;
 
     saber_string to_string() const override final;
+    bool equal_to(ckx_type *_another) const override final;
     ckx_type* get_element_type();
 
 private:
@@ -285,6 +294,7 @@ public:
     ~ckx_type_alias() override final = default;
 
     saber_string to_string() const override final;
+    bool equal_to(ckx_type *_another) const override final;
     ckx_type* get_aliasee();
 
 private:
