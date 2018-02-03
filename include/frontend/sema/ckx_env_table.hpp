@@ -67,11 +67,11 @@ open_class ckx_env_func_entry
 {
     ckx_src_rng decl_at;
     saber_string_view name;
-    ckx_type* type;
+    ckx_func_type* type;
     saber_string_view llvm_name;
 
     ckx_env_func_entry(ckx_src_rng _decl_at, saber_string_view _name,
-                       ckx_type* _type, saber_string_view _llvm_name) :
+                       ckx_func_type* _type, saber_string_view _llvm_name) :
         decl_at(_decl_at), name(_name),
         type(_type), llvm_name(_llvm_name) {}
 };
@@ -134,7 +134,7 @@ public:
 
     result_add_func add_func(ckx_src_rng _decl_at,
                              saber_string_view _name,
-                             ckx_type* _type);
+                             ckx_func_type *_type);
 
 private:
     /// just for shortening identifiers

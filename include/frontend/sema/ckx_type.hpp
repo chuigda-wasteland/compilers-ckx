@@ -309,8 +309,6 @@ private:
 class ckx_type_helper
 {
 public:
-    static ckx_type* get_type(ckx_token::type _basic_type_token);
-
     static ckx_struct_type*  create_struct_type(saber_string_view _name);
     static ckx_variant_type* create_variant_type(saber_string_view _name);
     static ckx_enum_type*    create_enum_type(saber_string_view _name);
@@ -321,7 +319,7 @@ public:
     static ckx_pointer_type* pointer_to(ckx_type* _base);
     static ckx_type*         qual_const(ckx_type* _base);
 
-    /// @note made public may benefit testing a lot.
+    static ckx_type* get_type(ckx_token::type _basic_type_token);
 
     static ckx_type* get_vi8_type();
     static ckx_type* get_vi16_type();
@@ -338,6 +336,10 @@ public:
     static ckx_type* get_vr64_type();
 
     static ckx_type* get_void_type();
+
+    enum class function_relation { fr_duplicate, fr_overload };
+    function_relation predicate_function_relation(ckx_func_type *_f1,
+                                                  ckx_func_type *_f2);
 
 private:
     thread_local static saber::object_pool<ckx_struct_type>  struct_type_pool;

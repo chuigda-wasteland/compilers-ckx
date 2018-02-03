@@ -531,4 +531,19 @@ ckx_type_helper::get_void_type()
     return &ret;
 }
 
+ckx_type_helper::function_relation
+ckx_type_helper::predicate_function_relation(ckx_func_type *_f1,
+                                             ckx_func_type *_f2)
+{
+    if (_f1->param_type_list.size() != _f2->param_type_list.size())
+        return function_relation::fr_overload;
+    for (qsizet i = 0; i < _f1->param_type_list.size(); i++)
+    {
+        if (!_f1->param_type_list[i]->equal_to(_f2->param_type_list[i]))
+            return function_relation::fr_overload;
+    }
+
+    return function_relation::fr_duplicate;
+}
+
 } // namespace ckx
