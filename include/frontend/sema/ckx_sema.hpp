@@ -37,6 +37,11 @@ public:
     saber::optional<ckx_expr_result> try_reinter_cast(ckx_expr_result _expr);
     saber::optional<ckx_expr_result> try_ckx_cast(ckx_expr_result _expr);
 
+    ckx_expr_result
+    visit_vi_literal_node(ckx_ast_vi_literal_expr* _literal_expr);
+    ckx_expr_result
+    visit_vr_literal_node(ckx_ast_vr_literal_expr* _literal_expr);
+
     /// @note for test only.
     void test_print(we::we_file_writer& writer);
     void test_enter_func();

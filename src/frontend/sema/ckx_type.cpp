@@ -28,6 +28,12 @@ ckx_type::ckx_type(category _category) :
     qual(0)
 {}
 
+bool ckx_type::equal_to(ckx_type *_another) const
+{
+    return get_qual_bits() == _another->get_qual_bits()
+           && this->equal_to_no_cvr(_another);
+}
+
 ckx_type::~ckx_type() {}
 
 ckx_type::category
@@ -39,7 +45,7 @@ ckx_type::get_category() const
 bool ckx_type::is_basic() const
 {
     return get_category() >= category::type_vi8
-            && get_category() <= category::type_void;
+           && get_category() <= category::type_void;
 }
 
 bool ckx_type::is_scalar() const
@@ -156,10 +162,9 @@ ckx_basic_type::ckx_basic_type(category _basic_category) :
     ckx_type(_basic_category)
 {}
 
-bool ckx_basic_type::equal_to(ckx_type *_another) const
+bool ckx_basic_type::equal_to_no_cvr(ckx_type *_another) const
 {
-    return get_category() == _another->get_category()
-           && get_qual_bits() == _another->get_qual_bits();
+    return get_category() == _another->get_category();
 }
 
 
@@ -168,14 +173,13 @@ ckx_struct_type::ckx_struct_type(saber_string_view _struct_name) :
     struct_name(_struct_name)
 {}
 
-bool ckx_struct_type::equal_to(ckx_type *_another) const
+bool ckx_struct_type::equal_to_no_cvr(ckx_type *_another) const
 {
     if (_another->get_category() != category::type_struct)
         return false;
 
     ckx_struct_type *struct_type = static_cast<ckx_struct_type*>(_another);
-    return this->get_category() == struct_type->get_category()
-           && this->struct_name == struct_type->struct_name;
+    return this->struct_name == struct_type->struct_name;
 }
 
 saber_string_view ckx_struct_type::get_name() const
@@ -200,14 +204,13 @@ ckx_variant_type::ckx_variant_type(saber_string_view _variant_name) :
     variant_name(_variant_name)
 {}
 
-bool ckx_variant_type::equal_to(ckx_type *_another) const
+bool ckx_variant_type::equal_to_no_cvr(ckx_type *_another) const
 {
     if (_another->get_category() != category::type_variant)
         return false;
 
     ckx_variant_type *variant_type = static_cast<ckx_variant_type*>(_another);
-    return this->get_category() == variant_type->get_category()
-           && this->variant_name == variant_type->variant_name;
+    return this->variant_name == variant_type->variant_name;
 }
 
 saber_string_view
@@ -233,14 +236,13 @@ ckx_enum_type::ckx_enum_type(saber_string_view _enum_name) :
     enum_name(_enum_name)
 {}
 
-bool ckx_enum_type::equal_to(ckx_type *_another) const
+bool ckx_enum_type::equal_to_no_cvr(ckx_type *_another) const
 {
     if (_another->get_category() != category::type_enum)
         return false;
 
     ckx_enum_type *enum_type = static_cast<ckx_enum_type*>(_another);
-    return this->get_category() == enum_type->get_category()
-           && this->enum_name == enum_type->enum_name;
+    return this->enum_name == enum_type->enum_name;
 }
 
 saber_string_view
@@ -269,13 +271,13 @@ ckx_func_type::ckx_func_type(
     param_type_list(saber::move(_param_type_list))
 {}
 
-bool ckx_func_type::equal_to(ckx_type *_another) const
+bool ckx_func_type::equal_to_no_cvr(ckx_type *_another) const
 {
     if (_another->get_category() != category::type_function)
         return false;
 
     ckx_func_type *func_type = static_cast<ckx_func_type*>(_another);
-    return get_category() == func_type->get_category()
+    return true
         && return_type->equal_to(func_type->get_return_type())
         && [&]()->bool {
             if (param_type_list.size() != func_type->param_type_list.size())
@@ -306,14 +308,13 @@ ckx_pointer_type::ckx_pointer_type(ckx_type* _target) :
     target(_target)
 {}
 
-bool ckx_pointer_type::equal_to(ckx_type *_another) const
+bool ckx_pointer_type::equal_to_no_cvr(ckx_type *_another) const
 {
     if (_another->get_category() != category::type_pointer)
         return false;
 
     ckx_pointer_type *pointer_type = static_cast<ckx_pointer_type*>(_another);
-    return this->get_qual_bits() == pointer_type->get_qual_bits()
-           && this->target->equal_to(pointer_type->get_pointee());
+    return this->target->equal_to(pointer_type->get_pointee());
 }
 
 ckx_type*
@@ -329,7 +330,7 @@ ckx_array_type::ckx_array_type(ckx_type* _element) :
 {}
 
 /// @note array is deprecated. it will be removed soon.
-bool ckx_array_type::equal_to(ckx_type *_another) const
+bool ckx_array_type::equal_to_no_cvr(ckx_type *_another) const
 {
     return false;
 }
@@ -345,9 +346,8 @@ ckx_type_alias::ckx_type_alias(ckx_type *_origin) :
     origin(_origin)
 {}
 
-bool ckx_type_alias::equal_to(ckx_type *_another) const
+bool ckx_type_alias::equal_to_no_cvr(ckx_type *_another) const
 {
-    /// @note This implementation is buggy.
     ckx_type *cannonical_type =
         _another->is_alias() ?
             static_cast<ckx_type_alias*>(_another)->get_aliasee() : _another;

@@ -582,6 +582,7 @@ private:
 
 class ckx_ast_vi_literal_expr final implements ckx_ast_expr
 {
+    friend class ckx_sema_engine;
 public:
     ckx_ast_vi_literal_expr(ckx_src_rng _rng, qint64 _val);
     ~ckx_ast_vi_literal_expr() override final = default;
@@ -597,6 +598,7 @@ private:
 
 class ckx_ast_vr_literal_expr final implements ckx_ast_expr
 {
+    friend class ckx_sema_engine;
 public:
     ckx_ast_vr_literal_expr(ckx_src_rng _rng, qreal _val);
     ~ckx_ast_vr_literal_expr() override final = default;

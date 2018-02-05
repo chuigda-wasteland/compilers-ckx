@@ -15,8 +15,7 @@ void ckx_sema_engine::visit_compound_stmt(ckx_ast_compound_stmt *_stmt)
     leave_scope();
 }
 
-void
-ckx_sema_engine::visit_decl_node(ckx_ast_decl_stmt* _decl_stmt)
+void ckx_sema_engine::visit_decl_node(ckx_ast_decl_stmt* _decl_stmt)
 {
     if (is_in_func())
         visit_local_decl(_decl_stmt);
@@ -49,6 +48,42 @@ void ckx_sema_engine::visit_func_node(ckx_ast_func_stmt *_func_stmt)
 
 void ckx_sema_engine::visit_return_node(ckx_ast_return_stmt *_return_stmt)
 {
+}
+
+ckx_expr_result
+ckx_sema_engine::visit_vi_literal_node(ckx_ast_vi_literal_expr *_literal_expr)
+{
+    qint64 expr_value = _literal_expr->val;
+    ckx_type *expr_type = nullptr;
+
+    if (expr_value >= std::numeric_limits<qint8>::min()
+        && expr_value <= std::numeric_limits<qint8>::max())
+        expr_type = ckx_type_helper::get_vi8_type();
+    else if (expr_value >= std::numeric_limits<qint16>::min()
+             && expr_value <= std::numeric_limits<qint16>::max())
+        expr_type = ckx_type_helper::get_vi16_type();
+    else if (expr_value >= std::numeric_limits<qint32>::min()
+             && expr_value <= std::numeric_limits<qint32>::max())
+        expr_type = ckx_type_helper::get_vi32_type();
+    else /* if (expr_value >= std::numeric_limits<qint64>::min()
+             && expr_value <= std::numeric_limits<qint64>::max()) */
+        expr_type = ckx_type_helper::get_vi64_type();
+
+    return ckx_expr_result(
+        expr_type, ckx_expr_result::value_category::prvalue,
+        builder.create_signed_constant(expr_value));
+}
+
+ckx_expr_result
+ckx_sema_engine::visit_vr_literal_node(ckx_ast_vr_literal_expr *_literal_expr)
+{
+    qreal expr_value = _literal_expr->val;
+    /// @todo this is temporary
+    ckx_type *const expr_type = ckx_type_helper::get_vr64_type();
+
+    return ckx_expr_result(
+        expr_type, ckx_expr_result::value_category::prvalue,
+        builder.create_floating_constant(expr_value));
 }
 
 void ckx_sema_engine::test_print(we::we_file_writer &writer)
