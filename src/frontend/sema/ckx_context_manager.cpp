@@ -8,6 +8,19 @@ ckx_context_manager::ckx_context_manager()
     context_chain.push_back(new ckx_global_context());
 }
 
+ckx_func_context* ckx_context_manager::lookup_func_context()
+{
+    for (auto it = context_chain.rbegin(); it != context_chain.rend(); ++it)
+    {
+        if ((*it)->type == ckx_context::context_type::cxt_func)
+        {
+            return static_cast<ckx_func_context*>(*it);
+        }
+    }
+
+    return nullptr;
+}
+
 ckx_context::context_type
 ckx_context_manager::current_context_type_intern() const
 {

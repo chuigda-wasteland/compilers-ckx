@@ -2,7 +2,7 @@
 #define CKX_CONTEXT_MANAGER_HPP
 
 #include "frontend/sema/ckx_context.hpp"
-#include "saber/list.hpp"
+#include "saber/optional.hpp"
 
 namespace ckx
 {
@@ -31,6 +31,8 @@ public:
     private:
         ckx_context_manager& context_manager;
     };
+
+    ckx_func_context* lookup_func_context();
 
 private:
     ckx_context::context_type current_context_type_intern() const;

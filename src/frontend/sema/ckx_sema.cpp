@@ -47,6 +47,10 @@ void ckx_sema_engine::visit_func_node(ckx_ast_func_stmt *_func_stmt)
         visit_func_def(_func_stmt);
 }
 
+void ckx_sema_engine::visit_return_node(ckx_ast_return_stmt *_return_stmt)
+{
+}
+
 void ckx_sema_engine::test_print(we::we_file_writer &writer)
 {
     builder.pretty_print(writer);
