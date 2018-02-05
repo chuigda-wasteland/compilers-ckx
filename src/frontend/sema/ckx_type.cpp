@@ -62,7 +62,7 @@ bool ckx_type::is_signed() const
 bool ckx_type::is_unsigned() const
 {
     return get_category() >= category::type_vu8
-            && get_category() <= category::type_vu64;
+           && get_category() <= category::type_vu64;
 }
 
 bool ckx_type::is_integral() const
@@ -73,7 +73,7 @@ bool ckx_type::is_integral() const
 bool ckx_type::is_floating() const
 {
     return get_category() == category::type_vr32
-            || get_category() == category::type_vr64;
+           || get_category() == category::type_vr64;
 }
 
 bool ckx_type::is_numeric() const
