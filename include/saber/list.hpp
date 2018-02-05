@@ -108,7 +108,9 @@ public:
     iterator emplace_front(Args&& ..._args);
 
     void push_back(const value_type& _value);
+    void push_back(value_type&& _value);
     void push_front(const value_type& _value);
+    void push_front(value_type&& _value);
 
     iterator erase(const_iterator _position);
     iterator erase(const_iterator _first, const_iterator _last);
@@ -370,7 +372,7 @@ template <typename T, typename Allocator>
 typename list<T, Allocator>::iterator
 list<T, Allocator>::insert(const_iterator _position, value_type &&_value)
 {
-    return emplace(_position, std::move(_value));
+    return emplace(_position, saber::move(_value));
 }
 
 template <typename T, typename Allocator>
@@ -453,11 +455,25 @@ list<T, Allocator>::push_back(const value_type &_value)
     insert(cend(), _value);
 }
 
+template<typename T, typename Allocator>
+void
+list<T, Allocator>::push_back(list::value_type &&_value)
+{
+    insert(cend(), saber::move(_value));
+}
+
 template <typename T, typename Allocator>
 void
 list<T, Allocator>::push_front(const value_type &_value)
 {
     insert(cbegin(), _value);
+}
+
+template <typename T, typename Allocator>
+void
+list<T, Allocator>::push_front(value_type&& _value)
+{
+    insert(cbegin(), saber::move(_value));
 }
 
 template <typename T, typename Allocator>

@@ -260,6 +260,7 @@ void ckx_sema_engine::visit_func_def(ckx_ast_func_stmt *_func_stmt)
         saber::move(param_llvm_types), saber::move(param_names_1),
         faker::llvm_func_attrs(true, faker::llvm_func_attrs::it_default));
 
+    ckx_context_manager::func_context_raii raii(context_manager, func_type);
     enter_func();
     for (size_t i = 0; i < _func_stmt->param_decls.size(); ++i)
     {

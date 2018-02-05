@@ -6,6 +6,7 @@
 #include "frontend/util/ckx_src_rng.hpp"
 #include "frontend/sema/ckx_type.hpp"
 #include "frontend/sema/ckx_env_table.hpp"
+#include "frontend/sema/ckx_context_manager.hpp"
 #include "frontend/sema/ckx_sema_result.hpp"
 #include "llvm/llvm_ir_builder.hpp"
 #include "saber/optional.hpp"
@@ -89,6 +90,8 @@ private:
 
     ckx_env root_env;
     ckx_env *current_env = &root_env;
+
+    ckx_context_manager context_manager;
 
     bool in_func = false;
     quint64 vname_mangle_count = 0;

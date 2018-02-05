@@ -37,7 +37,7 @@ private:
     void enter_func_context_intern(ckx_func_type *_func_type);
     void exit_func_context_intern();
 
-    saber::list<ckx_context> context_chain;
+    saber::vector<ckx_context*> context_chain;
 };
 
 } // namespace ckx
