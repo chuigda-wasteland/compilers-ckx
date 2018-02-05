@@ -110,6 +110,7 @@ public:
 
     unsigned char get_qual_bits() const;
     void from_qual_bits(unsigned char _qual_bits);
+    bool more_qual_than(unsigned char _another_qual_bits) const;
 
 protected:
     category type_category;
@@ -337,6 +338,8 @@ public:
     static ckx_type* get_vr64_type();
 
     static ckx_type* get_void_type();
+
+    static qint8 rank_of(ckx_type::category _type_category);
 
     enum class function_relation { fr_duplicate, fr_overload };
     function_relation predicate_function_relation(ckx_func_type *_f1,

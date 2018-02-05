@@ -157,6 +157,11 @@ void ckx_type::from_qual_bits(unsigned char _qual_bits)
     qual = _qual_bits;
 }
 
+bool ckx_type::more_qual_than(unsigned char _another_qual_bits) const
+{
+    return (qual & _another_qual_bits) == _another_qual_bits;
+}
+
 
 ckx_basic_type::ckx_basic_type(category _basic_category) :
     ckx_type(_basic_category)
@@ -529,6 +534,12 @@ ckx_type_helper::get_void_type()
 {
     static ckx_basic_type ret(ckx_type::category::type_void);
     return &ret;
+}
+
+qint8
+ckx_type_helper::rank_of(ckx_type::category _type_category)
+{
+    return static_cast<qint8>(_type_category);
 }
 
 ckx_type_helper::function_relation

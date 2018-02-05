@@ -57,6 +57,8 @@ private:
     void visit_func_decl(ckx_ast_func_stmt *_func_stmt);
     void visit_func_def(ckx_ast_func_stmt *_func_stmt);
 
+    bool can_implicit_cast(ckx_type *_ty1, ckx_type* _ty2) const;
+
     struct function_header_info
     {
         ckx_type_result ret_type_result;
