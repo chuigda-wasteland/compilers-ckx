@@ -70,6 +70,8 @@ open_class ckx_env_func_entry
     ckx_func_type* type;
     saber_string_view llvm_name;
 
+    bool defined = false;
+
     ckx_env_func_entry(ckx_src_rng _decl_at, saber_string_view _name,
                        ckx_func_type* _type, saber_string_view _llvm_name) :
         decl_at(_decl_at), name(_name),
