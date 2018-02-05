@@ -314,30 +314,6 @@ void ckx_sema_engine::visit_func_def(ckx_ast_func_stmt *_func_stmt)
     leave_func();
 }
 
-bool ckx_sema_engine::can_implicit_cast(ckx_type *_ty1, ckx_type *_ty2) const
-{
-    if (_ty1->equal_to_no_cvr(_ty2)
-        && _ty1->more_qual_than(_ty2->get_qual_bits()))\
-        return true;
-
-    if (_ty1->is_signed() && _ty2->is_signed())
-        if (ckx_type_helper::rank_of(_ty1->get_category())
-            > ckx_type_helper::rank_of(_ty2->get_category()))
-            return true;
-
-    if (_ty1->is_unsigned() && _ty2->is_unsigned())
-        if (ckx_type_helper::rank_of(_ty1->get_category())
-            > ckx_type_helper::rank_of(_ty2->get_category()))
-            return true;
-
-    if (_ty1->is_floating() && _ty2->is_floating())
-        if (ckx_type_helper::rank_of(_ty1->get_category())
-            > ckx_type_helper::rank_of(_ty2->get_category()))
-            return true;
-
-    return false;
-}
-
 saber::optional<ckx_sema_engine::function_header_info>
 ckx_sema_engine::visit_function_header(ckx_ast_func_stmt *_func_stmt)
 {

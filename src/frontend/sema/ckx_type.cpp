@@ -76,6 +76,11 @@ bool ckx_type::is_floating() const
             || get_category() == category::type_vr64;
 }
 
+bool ckx_type::is_numeric() const
+{
+    return is_integral() || is_floating();
+}
+
 bool ckx_type::is_pointer() const
 {
     return get_category() == ckx_type::category::type_pointer;
@@ -435,8 +440,7 @@ ckx_type_helper::create_func_type(ckx_type *_ret_type,
     return func_type_pool.store(ckx_func_type(_ret_type, saber::move(_params)));
 }
 
-ckx_array_type*
-ckx_type_helper::create_array_type(ckx_type *_elem_type)
+ckx_array_type* ckx_type_helper::create_array_type(ckx_type *_elem_type)
 {
     return array_type_pool.store(ckx_array_type(_elem_type));
 }
@@ -446,100 +450,134 @@ ckx_pointer_type *ckx_type_helper::pointer_to(ckx_type* _base)
     return pointer_type_pool.store(ckx_pointer_type(_base));
 }
 
-ckx_type*
-ckx_type_helper::qual_const(ckx_type* _base)
+ckx_type* ckx_type_helper::qual_const(ckx_type* _base)
 {
     _base->add_const(); return _base;
 }
 
-ckx_type*
-ckx_type_helper::get_vi8_type()
+ckx_type* ckx_type_helper::get_vi8_type()
 {
     static ckx_basic_type ret(ckx_type::category::type_vi8);
     return &ret;
 }
 
-ckx_type*
-ckx_type_helper::get_vi16_type()
+ckx_type* ckx_type_helper::get_vi16_type()
 {
     static ckx_basic_type ret(ckx_type::category::type_vi16);
     return &ret;
 }
 
-ckx_type*
-ckx_type_helper::get_vi32_type()
+ckx_type* ckx_type_helper::get_vi32_type()
 {
     static ckx_basic_type ret(ckx_type::category::type_vi32);
     return &ret;
 }
 
-ckx_type*
-ckx_type_helper::get_vi64_type()
+ckx_type* ckx_type_helper::get_vi64_type()
 {
     static ckx_basic_type ret(ckx_type::category::type_vi64);
     return &ret;
 }
 
-ckx_type*
-ckx_type_helper::get_vu8_type()
+ckx_type* ckx_type_helper::get_vu8_type()
 {
     static ckx_basic_type ret(ckx_type::category::type_vu8);
     return &ret;
 }
 
-ckx_type*
-ckx_type_helper::get_vu16_type()
+ckx_type* ckx_type_helper::get_vu16_type()
 {
     static ckx_basic_type ret(ckx_type::category::type_vu16);
     return &ret;
 }
 
-ckx_type*
-ckx_type_helper::get_vu32_type()
+ckx_type* ckx_type_helper::get_vu32_type()
 {
     static ckx_basic_type ret(ckx_type::category::type_vu32);
     return &ret;
 }
 
-ckx_type*
-ckx_type_helper::get_vu64_type()
+ckx_type* ckx_type_helper::get_vu64_type()
 {
     static ckx_basic_type ret(ckx_type::category::type_vu64);
     return &ret;
 }
 
-ckx_type*
-ckx_type_helper::get_vch_type()
+ckx_type* ckx_type_helper::get_vch_type()
 {
     static ckx_basic_type ret(ckx_type::category::type_vch);
     return &ret;
 }
 
-ckx_type*
-ckx_type_helper::get_vr32_type()
+ckx_type* ckx_type_helper::get_vr32_type()
 {
     static ckx_basic_type ret(ckx_type::category::type_vr32);
     return &ret;
 }
 
-ckx_type*
-ckx_type_helper::get_vr64_type()
+ckx_type* ckx_type_helper::get_vr64_type()
 {
     static ckx_basic_type ret(ckx_type::category::type_vr64);
     return &ret;
 }
 
-ckx_type*
-ckx_type_helper::get_void_type()
+ckx_type* ckx_type_helper::get_void_type()
 {
     static ckx_basic_type ret(ckx_type::category::type_void);
     return &ret;
 }
 
-qint8
-ckx_type_helper::rank_of(ckx_type::category _type_category)
+qint8 ckx_type_helper::rank_of(ckx_type::category _type_category)
 {
     return static_cast<qint8>(_type_category);
+}
+
+bool ckx_type_helper::can_implicit_cast(ckx_type *_from, ckx_type *_dest) const
+{
+    if (_from->equal_to_no_cvr(_dest)
+        && _dest->more_qual_than(_from->get_qual_bits()))
+        return true;
+
+    if (_from->is_signed() && _dest->is_signed())
+        if (rank_of(_from->get_category()) > rank_of(_dest->get_category()))
+            return true;
+
+    if (_from->is_unsigned() && _dest->is_unsigned())
+        if (rank_of(_from->get_category()) > rank_of(_dest->get_category()))
+            return true;
+
+    if (_from->is_floating() && _dest->is_floating())
+        if (rank_of(_from->get_category()) > rank_of(_dest->get_category()))
+            return true;
+
+    return false;
+}
+
+bool ckx_type_helper::can_static_cast(ckx_type *_from, ckx_type *_dest) const
+{
+    if (_dest->more_qual_than(_from->get_qual_bits()))
+    {
+        if (_from->is_numeric() && _dest->is_numeric())
+            return true;
+
+        if ((_from->is_integral() && _dest->is_enum())
+            || (_from->is_enum() && _dest->is_integral()))
+            return true;
+    }
+    return false;
+}
+
+bool ckx_type_helper::can_reinterpret_cast(ckx_type *_from,
+                                           ckx_type *_dest) const
+{
+    return _from->more_qual_than(_dest->get_qual_bits())
+           && _from->is_pointer()
+           && _dest->is_pointer();
+}
+
+bool ckx_type_helper::can_const_cast(ckx_type *_from, ckx_type *_dest) const
+{
+    return _from->equal_to_no_cvr(_dest);
 }
 
 ckx_type_helper::function_relation

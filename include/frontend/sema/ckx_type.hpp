@@ -90,6 +90,7 @@ public:
     bool is_unsigned() const;
     bool is_integral() const;
     bool is_floating() const;
+    bool is_numeric() const;
     bool is_pointer() const;
     bool is_function() const;
     bool is_record() const;
@@ -340,6 +341,12 @@ public:
     static ckx_type* get_void_type();
 
     static qint8 rank_of(ckx_type::category _type_category);
+
+    bool can_implicit_cast(ckx_type* _from, ckx_type* _dest) const;
+    bool can_static_cast(ckx_type* _from, ckx_type* _dest) const;
+    bool can_reinterpret_cast(ckx_type* _from, ckx_type* _dest) const;
+    bool can_const_cast(ckx_type* _from, ckx_type* _dest) const;
+    bool can_ckx_cast(ckx_type* _from, ckx_type* _dest) const;
 
     enum class function_relation { fr_duplicate, fr_overload };
     function_relation predicate_function_relation(ckx_func_type *_f1,
