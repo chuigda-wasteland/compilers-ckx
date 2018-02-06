@@ -422,6 +422,7 @@ void ckx_sema_engine::visit_func_def(ckx_ast_func_stmt *_func_stmt)
             builder.create_named_var(func_header_info.get().param_names[i]);
     }
     _func_stmt->fnbody->accept(*this);
+    builder.leave_func();
     leave_func();
 }
 
