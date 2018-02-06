@@ -31,11 +31,17 @@ public:
     void visit_return_node(ckx_ast_return_stmt* _return_stmt);
 
     ckx_expr_result decay_to_rvalue(ckx_expr_result _expr);
-    saber::optional<ckx_expr_result> try_implicit_cast(ckx_expr_result _expr);
-    saber::optional<ckx_expr_result> try_static_cast(ckx_expr_result _expr);
-    saber::optional<ckx_expr_result> try_const_cast(ckx_expr_result _expr);
-    saber::optional<ckx_expr_result> try_reinter_cast(ckx_expr_result _expr);
-    saber::optional<ckx_expr_result> try_ckx_cast(ckx_expr_result _expr);
+
+    saber::optional<ckx_expr_result>
+    try_implicit_cast(ckx_expr_result &_expr, ckx_type *_desired);
+    saber::optional<ckx_expr_result>
+    try_static_cast(ckx_expr_result _expr, ckx_type *_desired);
+    saber::optional<ckx_expr_result>
+    try_const_cast(ckx_expr_result _expr, ckx_type *_desired);
+    saber::optional<ckx_expr_result>
+    try_reinter_cast(ckx_expr_result _expr, ckx_type* _desired);
+    saber::optional<ckx_expr_result>
+    try_ckx_cast(ckx_expr_result _expr, ckx_type* _desired);
 
     ckx_expr_result
     visit_vi_literal_node(ckx_ast_vi_literal_expr* _literal_expr);
@@ -84,7 +90,9 @@ private:
 
     saber::optional<ckx_type_result>
     re_lex_type(const ckx_prelexed_type &_prelexed_type);
+
     static saber_string map_basic_type(ckx_type::category _basic_type);
+
     quint64 var_name_mangle_count() { return ++vname_mangle_count; }
 
     bool is_in_func() const { return in_func; }

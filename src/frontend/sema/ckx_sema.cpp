@@ -1,4 +1,5 @@
 ﻿#include "frontend/sema/ckx_sema.hpp"
+#include "frontend/sema/ckx_llvm_type_builder.hpp"
 
 namespace ckx
 {
@@ -48,6 +49,89 @@ void ckx_sema_engine::visit_func_node(ckx_ast_func_stmt *_func_stmt)
 
 void ckx_sema_engine::visit_return_node(ckx_ast_return_stmt *_return_stmt)
 {
+    if (_return_stmt->return_expr != nullptr)
+    {
+        saber::optional<ckx_expr_result> return_expr_result =
+            _return_stmt->return_expr->accept(*this);
+        if (!return_expr_result.is_type()) return;
+
+        ckx_type *correct_ret_type =
+            context_manager.lookup_func_context()->func_type->get_return_type();
+
+        faker::llvm_value *returned_value =
+            return_expr_result.get().llvm_value_bind;
+
+        if (!correct_ret_type->equal_to(return_expr_result.get().type))
+        {
+            saber::optional<ckx_expr_result> cast_result =
+                try_implicit_cast(return_expr_result.get(), correct_ret_type);
+            if (!cast_result.is_type())
+            {
+                error(); return;
+            }
+
+            returned_value = cast_result.get().llvm_value_bind;
+        }
+
+        builder.create_return(ckx_llvm_type_builder::build(correct_ret_type),
+                              returned_value);
+    }
+    else
+    {
+        builder.create_return_void();
+    }
+
+}
+
+saber::optional<ckx_expr_result>
+ckx_sema_engine::try_implicit_cast(ckx_expr_result& _expr, ckx_type *_desired)
+{
+    if (!ckx_type_helper::can_implicit_cast(_expr.type, _desired))
+        return saber::optional<ckx_expr_result>();
+
+    if (_expr.type->equal_to_no_cvr(_desired))
+    {
+        /// @note Do nothing, qualifiers never matter.
+        return _expr;
+    }
+    else if (_expr.type->is_signed())
+    {
+        C8ASSERT(_desired->is_signed());
+        faker::llvm_value *destloc = builder.create_temporary_var();
+        builder.create_sext(destloc,
+                            ckx_llvm_type_builder::build(_expr.type),
+                            _expr.llvm_value_bind,
+                            ckx_llvm_type_builder::build(_desired));
+        return saber::optional<ckx_expr_result>(
+            _desired, ckx_expr_result::value_category::prvalue, destloc);
+    }
+    else if (_expr.type->is_unsigned())
+    {
+        C8ASSERT(_desired->is_unsigned());
+        faker::llvm_value *destloc = builder.create_temporary_var();
+        builder.create_zext(destloc,
+                            ckx_llvm_type_builder::build(_expr.type),
+                            _expr.llvm_value_bind,
+                            ckx_llvm_type_builder::build(_desired));
+        return saber::optional<ckx_expr_result>(
+            _desired, ckx_expr_result::value_category::prvalue, destloc);
+    }
+    else if (_expr.type->is_floating())
+    {
+        C8ASSERT(_desired->is_floating());
+        faker::llvm_value *destloc = builder.create_temporary_var();
+        builder.create_fpext(destloc,
+                             ckx_llvm_type_builder::build(_expr.type),
+                             _expr.llvm_value_bind,
+                             ckx_llvm_type_builder::build(_desired));
+        return saber::optional<ckx_expr_result>(
+            _desired, ckx_expr_result::value_category::prvalue, destloc);
+    }
+    else
+    {
+        C8ASSERT(false);
+        return saber::optional<ckx_expr_result>();
+    }
 }
 
 ckx_expr_result
@@ -136,6 +220,7 @@ void ckx_sema_engine::visit_local_decl(ckx_ast_decl_stmt *_decl_stmt)
         if (add_result.is_err())
         {
             error();
+            break;
         }
         else
         {
@@ -147,6 +232,34 @@ void ckx_sema_engine::visit_local_decl(ckx_ast_decl_stmt *_decl_stmt)
             builder.create_alloca(llvm_value_bind,
                                    result.get().llvm_type_bind, 1);
             add_result.value()->llvm_value_bind = llvm_value_bind;
+        }
+
+        if (decl.init != nullptr)
+        {
+            saber::optional<ckx_expr_result> init_expr_result =
+                decl.init->accept(*this);
+            if (!init_expr_result.is_type())
+            {
+                error();
+                break;
+            }
+
+            faker::llvm_value* stored_value =
+                init_expr_result.get().llvm_value_bind;
+            if (!init_expr_result.get().type->equal_to(result.get().type))
+            {
+                saber::optional<ckx_expr_result> casted_expr_result =
+                   try_implicit_cast(init_expr_result.get(), result.get().type);
+                if (!casted_expr_result.is_type())
+                {
+                    error();
+                    break;
+                }
+                stored_value = casted_expr_result.get().llvm_value_bind;
+            }
+
+            builder.create_store(result.get().llvm_type_bind, stored_value,
+                                 add_result.value()->llvm_value_bind);
         }
     }
 }
@@ -161,11 +274,9 @@ void ckx_sema_engine::visit_struct_decl(ckx_ast_record_stmt *_struct_stmt)
         root_env.add_type(
             _struct_stmt->kwd_rng, _struct_stmt->name, struct_type).value();
     saber_string_view llvm_type_name =
-        saber_string_pool::create_view(
-            saber::string_paste("struct.", _struct_stmt->name));
+        ckx_llvm_type_builder::full_name_for_struct(_struct_stmt->name);
     entry->llvm_type_bind =
-        saber_string_pool::create_view(
-            saber::string_paste("%", llvm_type_name));
+        ckx_llvm_type_builder::build(struct_type);
 
     saber::vector<faker::llvm_type> llvm_type_fields;
 
@@ -357,23 +468,17 @@ ckx_sema_engine::re_lex_type(const ckx_prelexed_type& _prelexed_type)
     C8ASSERT(!prelexed_tokens.empty()); // What the fuck!
 
     ckx_type *type = nullptr;
-    saber_string llvm_type_string = "";
 
     if (prelexed_tokens.front().token_type >= ckx_token::type::tk_vi8
         && prelexed_tokens.front().token_type <= ckx_token::type::tk_void)
     {
         type = ckx_type_helper::get_type(prelexed_tokens.front().token_type);
-        llvm_type_string = map_basic_type(type->get_category());
     }
     else if (prelexed_tokens.front().token_type == ckx_token::type::tk_id)
     {
         ckx_env_type_entry *entry =
             current_env->lookup_type(prelexed_tokens.front().str);
-        if (entry)
-        {
-            type = entry->type;
-            llvm_type_string = entry->llvm_type_bind.get();
-        }
+        if (entry) type = entry->type;
         else return saber::optional<ckx_type_result>();
     }
     else
@@ -391,7 +496,6 @@ ckx_sema_engine::re_lex_type(const ckx_prelexed_type& _prelexed_type)
             break;
         case ckx_token::type::tk_mul:
             type = ckx_type_helper::pointer_to(type);
-            llvm_type_string += '*';
             break;
         default:
             C8ASSERT(false);
@@ -399,32 +503,9 @@ ckx_sema_engine::re_lex_type(const ckx_prelexed_type& _prelexed_type)
     }
 
     return saber::optional<ckx_type_result>(
-        type, saber_string_pool::create_view(llvm_type_string));
+        type, ckx_llvm_type_builder::build(type));
 }
 
-saber_string
-ckx_sema_engine::map_basic_type(ckx_type::category _basic_type)
-{
-    switch (_basic_type)
-    {
-    case ckx_type::category::type_vi8:  return "i8";
-    case ckx_type::category::type_vi16: return "i16";
-    case ckx_type::category::type_vi32: return "i32";
-    case ckx_type::category::type_vi64: return "i64";
-    case ckx_type::category::type_vu8:  return "i8";
-    case ckx_type::category::type_vu16: return "i16";
-    case ckx_type::category::type_vu32: return "i32";
-    case ckx_type::category::type_vu64: return "i64";
-    case ckx_type::category::type_vr32: return "float";
-    case ckx_type::category::type_vr64: return "double";
-    case ckx_type::category::type_void: return "void";
-
-    case ckx_type::category::type_vch:
-    /// @todo I don't know how to implement this char type
-    default:
-        C8ASSERT(false);
-    }
-}
 
 void ckx_sema_engine::enter_func()
 {

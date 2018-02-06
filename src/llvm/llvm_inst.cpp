@@ -239,6 +239,7 @@ void llvm_cast_instruction::pretty_print(we::we_file_writer &_writer)
     case operator_type::ot_trunc:    _writer.write("trunc ");    break;
     case operator_type::ot_zext:     _writer.write("zext ");     break;
     case operator_type::ot_sext:     _writer.write("sext ");     break;
+    case operator_type::ot_fpext:    _writer.write("fpext ");    break;
     case operator_type::ot_fptoui:   _writer.write("fptoui ");   break;
     case operator_type::ot_uitofp:   _writer.write("uitofp ");   break;
     case operator_type::ot_fptosi:   _writer.write("fptosi ");   break;

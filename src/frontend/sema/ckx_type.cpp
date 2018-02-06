@@ -532,28 +532,28 @@ qint8 ckx_type_helper::rank_of(ckx_type::category _type_category)
     return static_cast<qint8>(_type_category);
 }
 
-bool ckx_type_helper::can_implicit_cast(ckx_type *_from, ckx_type *_dest) const
+bool ckx_type_helper::can_implicit_cast(ckx_type *_from, ckx_type *_dest)
 {
     if (_from->equal_to_no_cvr(_dest)
         && _dest->more_qual_than(_from->get_qual_bits()))
         return true;
 
     if (_from->is_signed() && _dest->is_signed())
-        if (rank_of(_from->get_category()) > rank_of(_dest->get_category()))
+        if (rank_of(_from->get_category()) < rank_of(_dest->get_category()))
             return true;
 
     if (_from->is_unsigned() && _dest->is_unsigned())
-        if (rank_of(_from->get_category()) > rank_of(_dest->get_category()))
+        if (rank_of(_from->get_category()) < rank_of(_dest->get_category()))
             return true;
 
     if (_from->is_floating() && _dest->is_floating())
-        if (rank_of(_from->get_category()) > rank_of(_dest->get_category()))
+        if (rank_of(_from->get_category()) < rank_of(_dest->get_category()))
             return true;
 
     return false;
 }
 
-bool ckx_type_helper::can_static_cast(ckx_type *_from, ckx_type *_dest) const
+bool ckx_type_helper::can_static_cast(ckx_type *_from, ckx_type *_dest)
 {
     if (_dest->more_qual_than(_from->get_qual_bits()))
     {
@@ -568,14 +568,14 @@ bool ckx_type_helper::can_static_cast(ckx_type *_from, ckx_type *_dest) const
 }
 
 bool ckx_type_helper::can_reinterpret_cast(ckx_type *_from,
-                                           ckx_type *_dest) const
+                                           ckx_type *_dest)
 {
     return _from->more_qual_than(_dest->get_qual_bits())
            && _from->is_pointer()
-           && _dest->is_pointer();
+            && _dest->is_pointer();
 }
 
-bool ckx_type_helper::can_const_cast(ckx_type *_from, ckx_type *_dest) const
+bool ckx_type_helper::can_const_cast(ckx_type *_from, ckx_type *_dest)
 {
     return _from->equal_to_no_cvr(_dest);
 }

@@ -198,6 +198,7 @@ private:
 
 class ckx_ast_return_stmt final implements ckx_ast_stmt
 {
+    friend class ckx_sema_engine;
 public:
     ckx_ast_return_stmt(ckx_src_rng _return_rng, ckx_ast_expr* _return_expr);
     ~ckx_ast_return_stmt() override final;
