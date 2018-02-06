@@ -34,7 +34,11 @@ void ckx_ast_decl_stmt::accept(ckx_sema_engine& _sema)
     _sema.visit_decl_node(this);
 }
 
-void ckx_ast_expr_stmt::accept(ckx_sema_engine&) {}
+void ckx_ast_expr_stmt::accept(ckx_sema_engine& _sema)
+{
+    expr->accept(_sema);
+}
+
 void ckx_ast_func_stmt::accept(ckx_sema_engine& _sema)
 {
     _sema.visit_func_node(this);
@@ -47,22 +51,33 @@ void ckx_ast_record_stmt::accept(ckx_sema_engine& _sema)
 
 void ckx_ast_alias_stmt::accept(ckx_sema_engine&) {}
 void ckx_ast_enum_stmt::accept(ckx_sema_engine&) {}
+
 saber::optional<ckx_expr_result>
 ckx_ast_binary_expr::accept(ckx_sema_engine&) { return bwsb(); }
 saber::optional<ckx_expr_result>
 ckx_ast_unary_expr::accept(ckx_sema_engine&) { return bwsb(); }
 saber::optional<ckx_expr_result>
 ckx_ast_subscript_expr::accept(ckx_sema_engine&) { return bwsb(); }
+
 saber::optional<ckx_expr_result>
-ckx_ast_invoke_expr::accept(ckx_sema_engine&) { return bwsb(); }
+ckx_ast_invoke_expr::accept(ckx_sema_engine& _sema)
+{
+    return _sema.visit_invoke_expr(this);
+}
+
 saber::optional<ckx_expr_result>
 ckx_ast_extract_expr::accept(ckx_sema_engine&) { return bwsb(); }
 saber::optional<ckx_expr_result>
 ckx_ast_enumerator_expr::accept(ckx_sema_engine&) { return bwsb(); }
 saber::optional<ckx_expr_result>
 ckx_ast_cond_expr::accept(ckx_sema_engine&) { return bwsb(); }
+
 saber::optional<ckx_expr_result>
-ckx_ast_id_expr::accept(ckx_sema_engine&) { return bwsb(); }
+ckx_ast_id_expr::accept(ckx_sema_engine& _sema)
+{
+    return _sema.visit_id_expr(this);
+}
+
 saber::optional<ckx_expr_result>
 ckx_ast_cast_expr::accept(ckx_sema_engine&) { return bwsb(); }
 saber::optional<ckx_expr_result>

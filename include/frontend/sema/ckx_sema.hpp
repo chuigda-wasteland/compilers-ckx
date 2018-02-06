@@ -43,6 +43,10 @@ public:
     saber::optional<ckx_expr_result>
     try_ckx_cast(ckx_expr_result _expr, ckx_type* _desired);
 
+    saber::optional<ckx_expr_result>
+    visit_invoke_expr(ckx_ast_invoke_expr *_invoke_expr);
+    saber::optional<ckx_expr_result>
+    visit_id_expr(ckx_ast_id_expr *_id_expr);
     ckx_expr_result
     visit_vi_literal_node(ckx_ast_vi_literal_expr* _literal_expr);
     ckx_expr_result
@@ -85,13 +89,14 @@ private:
         function_header_info(const function_header_info&) = delete;
     };
 
+    quint64 calculate_disagreements(const saber::vector<ckx_expr_result>& _args,
+                                    const saber::vector<ckx_type*>& _params);
+
     saber::optional<function_header_info>
     visit_function_header(ckx_ast_func_stmt *_func_stmt);
 
     saber::optional<ckx_type_result>
     re_lex_type(const ckx_prelexed_type &_prelexed_type);
-
-    static saber_string map_basic_type(ckx_type::category _basic_type);
 
     quint64 var_name_mangle_count() { return ++vname_mangle_count; }
 

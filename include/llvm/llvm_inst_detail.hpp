@@ -250,6 +250,7 @@ public:
     llvm_call_instruction(llvm_value *_result,
                           llvm_type _yield_type,
                           saber_string_view _func_name,
+                          saber::vector<llvm_type>&& _types,
                           saber::vector<llvm_value*>&& _args);
     ~llvm_call_instruction() override final = default;
 
@@ -259,6 +260,7 @@ private:
     llvm_value *result;
     llvm_type yield_type;
     saber_string_view func_name;
+    saber::vector<llvm_type> types;
     saber::vector<llvm_value*> args;
 };
 

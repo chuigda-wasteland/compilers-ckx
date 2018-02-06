@@ -108,9 +108,11 @@ llvm_ir_builder::create_phi(llvm_value *_result, llvm_type _type,
 llvm_instruction*
 llvm_ir_builder::create_call(llvm_value *_result, llvm_type _type,
                              saber_string_view _func_name,
+                             saber::vector<llvm_type> && _types,
                              saber::vector<llvm_value *> &&_args)
 {
-    return impl->create_call(_result, _type, _func_name, saber::move(_args));
+    return impl->create_call(_result, _type, _func_name,
+                             saber::move(_types), saber::move(_args));
 }
 
 llvm_label*

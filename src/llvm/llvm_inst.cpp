@@ -306,13 +306,16 @@ void llvm_cmp_instruction::pretty_print(we::we_file_writer &_writer)
     _writer.write("\n");
 }
 
-llvm_call_instruction::llvm_call_instruction(llvm_value *_result,
+llvm_call_instruction::llvm_call_instruction(
+        llvm_value *_result,
         llvm_type _yield_type,
         saber_string_view _func_name,
+        saber::vector<llvm_type> &&_types,
         saber::vector<llvm_value *> &&_args) :
     result(_result),
     yield_type(_yield_type),
     func_name(_func_name),
+    types(saber::move(_types)),
     args(saber::move(_args))
 {}
 
@@ -333,6 +336,8 @@ void llvm_call_instruction::pretty_print(we::we_file_writer &_writer)
     _writer.write(" (");
     for (size_t i = 0; i < args.size(); i++)
     {
+        _writer.write(types[i]);
+        _writer.write(" ");
         _writer.write(args[i]->to_string());
         if (i != args.size()-1)
             _writer.write(", ");

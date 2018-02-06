@@ -73,7 +73,7 @@ public:
                                      llvm_label *_label2, llvm_value *_val2);
 
     llvm_call_instruction* create_call(llvm_value* _result, llvm_type _type,
-                                       saber_string_view _func_name,
+                                       saber_string_view _func_name, saber::vector<llvm_type> &&_types,
                                        saber::vector<llvm_value*> &&_args);
 
     llvm_label* create_label(saber_string_view _name);

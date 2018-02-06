@@ -455,6 +455,7 @@ private:
 
 class ckx_ast_invoke_expr final implements ckx_ast_expr
 {
+    friend class ckx_sema_engine;
 public:
     ckx_ast_invoke_expr(ckx_src_rng _lparen_rng, ckx_src_rng _rparen_rng,
                         ckx_ast_expr *_invokable,
@@ -530,6 +531,7 @@ private:
 
 class ckx_ast_id_expr final implements ckx_ast_expr
 {
+    friend class ckx_sema_engine;
 public:
     ckx_ast_id_expr(ckx_src_rng _rng, saber_string_view _name);
     ~ckx_ast_id_expr() override final = default;

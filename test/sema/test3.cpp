@@ -6,22 +6,15 @@
 saber_string str =
 R"cc(
 
-struct s { vi8 a; vi16 b, c; s* d; }
+fn add(vi8 a, vi8 b): vi8;
+fn print(vi8 number): vi8;
+fn simple_input(): vi8;
 
-fn one(): vi32 {
-    return 1;
-}
-
-fn foo(vi8 a, vi8 b): vi8;
-fn bar(vi16 a, vi8* const b): void;
-fn baz(s s1): void;
-
-fn main(vi8 argc, vi8** argv): vi32 {
-    vi8 c;
-    vi32 a = 5, b = 65536;
-    vi8 d = 0;
-    s s1;
-    return d;
+fn main(): vi32 {
+    vi8 a = simple_input(),
+        b = simple_input();
+    print(add(a, b));
+    return 0;
 }
 
 )cc";

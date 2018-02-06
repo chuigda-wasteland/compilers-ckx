@@ -1,6 +1,8 @@
 ﻿#include "frontend/sema/ckx_sema.hpp"
 #include "frontend/sema/ckx_llvm_type_builder.hpp"
 
+#include <algorithm>
+
 namespace ckx
 {
 
@@ -55,16 +57,19 @@ void ckx_sema_engine::visit_return_node(ckx_ast_return_stmt *_return_stmt)
             _return_stmt->return_expr->accept(*this);
         if (!return_expr_result.is_type()) return;
 
+        ckx_expr_result return_expr_result1 =
+            decay_to_rvalue(return_expr_result.get());
+
         ckx_type *correct_ret_type =
             context_manager.lookup_func_context()->func_type->get_return_type();
 
         faker::llvm_value *returned_value =
-            return_expr_result.get().llvm_value_bind;
+            return_expr_result1.llvm_value_bind;
 
-        if (!correct_ret_type->equal_to(return_expr_result.get().type))
+        if (!correct_ret_type->equal_to(return_expr_result1.type))
         {
             saber::optional<ckx_expr_result> cast_result =
-                try_implicit_cast(return_expr_result.get(), correct_ret_type);
+                try_implicit_cast(return_expr_result1, correct_ret_type);
             if (!cast_result.is_type())
             {
                 error(); return;
@@ -80,7 +85,24 @@ void ckx_sema_engine::visit_return_node(ckx_ast_return_stmt *_return_stmt)
     {
         builder.create_return_void();
     }
+}
 
+ckx_expr_result ckx_sema_engine::decay_to_rvalue(ckx_expr_result _expr)
+{
+    if (_expr.categ == ckx_expr_result::value_category::lvalue)
+    {
+        faker::llvm_value *decayed_value = builder.create_temporary_var();
+        builder.create_load(decayed_value,
+                            ckx_llvm_type_builder::build(_expr.type),
+                            _expr.llvm_value_bind);
+        return ckx_expr_result(_expr.type,
+                               ckx_expr_result::value_category::prvalue,
+                               decayed_value);
+    }
+    else
+    {
+        return _expr;
+    }
 }
 
 saber::optional<ckx_expr_result>
@@ -132,6 +154,75 @@ ckx_sema_engine::try_implicit_cast(ckx_expr_result& _expr, ckx_type *_desired)
         C8ASSERT(false);
         return saber::optional<ckx_expr_result>();
     }
+}
+
+saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_invoke_expr(ckx_ast_invoke_expr *_invoke_expr)
+{
+    saber::vector<ckx_expr_result> arg_results;
+
+    for (ckx_ast_expr *expr : _invoke_expr->args)
+    {
+        saber::optional<ckx_expr_result> arg_result = expr->accept(*this);
+        if (!arg_result.is_type())
+            return saber::optional<ckx_expr_result>();
+        arg_results.push_back(arg_result.get());
+    }
+
+    if (ckx_ast_id_expr *id_expr =
+        dynamic_cast<ckx_ast_id_expr*>(_invoke_expr->invokable))
+    {
+        saber::vector<ckx_env_func_entry> *funcs =
+            current_env->lookup_func(id_expr->name);
+
+        saber::vector<quint64> disagreements;
+
+        for (ckx_env_func_entry& entry : *funcs)
+        {
+            ckx_func_type* func_type = entry.type;
+            disagreements.push_back(
+                calculate_disagreements(
+                    arg_results, func_type->get_param_type_list()));
+        }
+
+        auto it = std::min_element(disagreements.begin(), disagreements.end());
+        if (*it == std::numeric_limits<quint64>::max())
+            return saber::optional<ckx_expr_result>();
+
+        ckx_env_func_entry &selected = (*funcs)[it - disagreements.begin()];
+
+        saber::vector<faker::llvm_type> types;
+        saber::vector<faker::llvm_value*> args;
+        for (ckx_expr_result& result : arg_results)
+        {
+            types.push_back(ckx_llvm_type_builder::build(result.type));
+            args.push_back(decay_to_rvalue(result).llvm_value_bind);
+        }
+
+        faker::llvm_value* value = builder.create_temporary_var();
+        builder.create_call(
+            value,
+            ckx_llvm_type_builder::build(selected.type->get_return_type()),
+            selected.llvm_name, saber::move(types), saber::move(args));
+
+        return saber::optional<ckx_expr_result>(
+            selected.type->get_return_type(),
+            ckx_expr_result::value_category::prvalue, value);
+    }
+
+    C8ASSERT(false);
+}
+
+saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_id_expr(ckx_ast_id_expr *_id_expr)
+{
+    ckx_env_var_entry* entry = current_env->lookup_var(_id_expr->name);
+    if (entry != nullptr)
+        return saber::optional<ckx_expr_result>(
+            entry->type, ckx_expr_result::value_category::lvalue,
+            entry->llvm_value_bind);
+    else
+        return saber::optional<ckx_expr_result>();
 }
 
 ckx_expr_result
@@ -424,6 +515,26 @@ void ckx_sema_engine::visit_func_def(ckx_ast_func_stmt *_func_stmt)
     _func_stmt->fnbody->accept(*this);
     builder.leave_func();
     leave_func();
+}
+
+quint64 ckx_sema_engine::calculate_disagreements(
+            const saber::vector<ckx_expr_result> &_args,
+            const saber::vector<ckx_type *> &_params)
+{
+    if (_args.size() != _params.size())
+        return std::numeric_limits<quint64>::max();
+
+    quint64 disagreements = 0;
+    for (quint64 i = 0; i < _args.size(); ++i)
+    {
+        if (_args[i].type->equal_to(_params[i]))
+            continue;
+        else if (ckx_type_helper::can_implicit_cast(_args[i].type, _params[i]))
+            disagreements++;
+        else
+            return std::numeric_limits<quint64>::max();
+    }
+    return disagreements;
 }
 
 saber::optional<ckx_sema_engine::function_header_info>

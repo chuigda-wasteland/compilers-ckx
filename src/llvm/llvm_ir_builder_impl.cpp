@@ -136,11 +136,14 @@ llvm_phi_instruction* llvm_ir_builder_impl::create_phi(
 
 llvm_call_instruction* llvm_ir_builder_impl::create_call(
         llvm_value *_result, llvm_type _type,
-        saber_string_view _func_name, saber::vector<llvm_value*> &&_args)
+        saber_string_view _func_name,
+        saber::vector<llvm_type> &&_types,
+        saber::vector<llvm_value*> &&_args)
 {
     return insert_after_current(
         new llvm_call_instruction(
-            _result, _type, _func_name, saber::move(_args)));
+            _result, _type, _func_name,
+            saber::move(_types), saber::move(_args)));
 }
 
 llvm_label* llvm_ir_builder_impl::create_label(saber_string_view _name)
