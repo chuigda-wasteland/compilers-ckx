@@ -35,8 +35,7 @@ llvm_func_decl::llvm_func_decl(
     name(_name),
     param_type_list(saber::move(_param_type_list)),
     param_name_list(saber::move(_param_name_list)),
-    attrs(_attrs)
-{}
+    attrs(_attrs) {}
 
 void llvm_func_attrs::pretty_print(we::we_file_writer &_writer)
 {
@@ -78,8 +77,7 @@ llvm_func_def::llvm_func_def(
     name(_name),
     param_type_list(saber::move(_param_type_list)),
     param_name_list(saber::move(_param_name_list)),
-    attrs(_attrs)
-{}
+    attrs(_attrs) {}
 
 llvm_func_def::~llvm_func_def()
 {
@@ -113,6 +111,7 @@ void llvm_func_def::pretty_print(we::we_file_writer &_writer)
     llvm_instruction* iter = get_next();
     while (iter != nullptr)
     {
+        _writer.write_whitespace(2);
         iter->pretty_print(_writer);
         iter = iter->get_next();
     }
@@ -120,8 +119,7 @@ void llvm_func_def::pretty_print(we::we_file_writer &_writer)
 }
 
 llvm_global_constant::llvm_global_constant(llvm_value *_value) :
-    value(_value)
-{}
+    value(_value) {}
 
 void llvm_global_constant::pretty_print(we::we_file_writer&)
 {
@@ -131,8 +129,7 @@ void llvm_global_constant::pretty_print(we::we_file_writer&)
 llvm_global_variable::llvm_global_variable(llvm_type _type,
                                            saber_string_view _name) :
     type(_type),
-    name(_name)
-{}
+    name(_name) {}
 
 void llvm_global_variable::pretty_print(we::we_file_writer&)
 {
@@ -142,8 +139,7 @@ void llvm_global_variable::pretty_print(we::we_file_writer&)
 llvm_new_type::llvm_new_type(saber_string_view _name,
                              saber::vector<llvm_type> &&_fields) :
     name(_name),
-    fields(saber::move(_fields))
-{}
+    fields(saber::move(_fields)) {}
 
 void llvm_new_type::pretty_print(we::we_file_writer &_writer)
 {
@@ -227,8 +223,7 @@ llvm_cast_instruction::llvm_cast_instruction(llvm_value *_result,
     op(_op),
     origin_type(_origin_type),
     value(_value),
-    dest_type(_dest_type)
-{}
+    dest_type(_dest_type) {}
 
 void llvm_cast_instruction::pretty_print(we::we_file_writer &_writer)
 {
@@ -265,8 +260,7 @@ llvm_cmp_instruction::llvm_cmp_instruction(llvm_value *_result,
     result(_result),
     op(_op),
     compared_type(_compared_type),
-    val1(_val1), val2(_val2)
-{}
+    val1(_val1), val2(_val2) {}
 
 void llvm_cmp_instruction::pretty_print(we::we_file_writer &_writer)
 {
@@ -316,8 +310,7 @@ llvm_call_instruction::llvm_call_instruction(
     yield_type(_yield_type),
     func_name(_func_name),
     types(saber::move(_types)),
-    args(saber::move(_args))
-{}
+    args(saber::move(_args)) {}
 
 void llvm_call_instruction::pretty_print(we::we_file_writer &_writer)
 {
@@ -348,8 +341,7 @@ void llvm_call_instruction::pretty_print(we::we_file_writer &_writer)
 llvm_ret_instruction::llvm_ret_instruction(llvm_type _type,
                                            llvm_value *_result) :
     type(_type),
-    result(_result)
-{}
+    result(_result) {}
 
 void llvm_ret_instruction::pretty_print(we::we_file_writer &_writer)
 {
@@ -364,8 +356,7 @@ void llvm_ret_instruction::pretty_print(we::we_file_writer &_writer)
 }
 
 llvm_br_instruction::llvm_br_instruction(llvm_label *_dest) :
-    dest(_dest)
-{}
+    dest(_dest) {}
 
 void llvm_br_instruction::pretty_print(we::we_file_writer &_writer)
 {
@@ -402,8 +393,7 @@ llvm_phi_instruction::llvm_phi_instruction(llvm_value *_result,
     result(_result),
     yield_type(_yield_type),
     label1(_label1), label2(_label2),
-    val1(_val1), val2(_val2)
-{}
+    val1(_val1), val2(_val2) {}
 
 void llvm_phi_instruction::pretty_print(we::we_file_writer &_writer)
 {
@@ -426,8 +416,7 @@ llvm_alloca_instruction::llvm_alloca_instruction(llvm_value *_result,
                                                  quint32 _num_elems) :
     result(_result),
     yield_type(_yield_type),
-    num_elems(_num_elems)
-{}
+    num_elems(_num_elems) {}
 
 void llvm_alloca_instruction::pretty_print(we::we_file_writer &_writer)
 {
@@ -447,8 +436,7 @@ llvm_load_instruction::llvm_load_instruction(llvm_value *_result,
                                              llvm_value *_ptr) :
     result(_result),
     yield_type(_yield_type),
-    ptr(_ptr)
-{}
+    ptr(_ptr) {}
 
 void llvm_load_instruction::pretty_print(we::we_file_writer &_writer)
 {
@@ -467,8 +455,7 @@ llvm_store_instruction::llvm_store_instruction(llvm_type _src_type,
                                                llvm_value *_result) :
     src_type(_src_type),
     src(_src),
-    result(_result)
-{}
+    result(_result) {}
 
 void llvm_store_instruction::pretty_print(we::we_file_writer &_writer)
 {
@@ -493,8 +480,7 @@ llvm_getelementptr_instruction::llvm_getelementptr_instruction(
     yield_type(_yield_type),
     ptr(_ptr),
     ty(_ty),
-    idx(_idx)
-{}
+    idx(_idx) {}
 
 void llvm_getelementptr_instruction::pretty_print(we::we_file_writer &_writer)
 {

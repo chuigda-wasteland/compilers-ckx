@@ -6,13 +6,13 @@
 saber_string str =
 R"cc(
 
-fn add(vi8 a, vi8 b): vi8;
-fn print(vi8 number): vi8;
-fn simple_input(): vi8;
+fn add(vr64 a, vr64 b): vr64;
+fn print(vr64 number): vr64;
+fn simple_input(): vr64;
 
 fn main(): vi32 {
-    vi8 a = simple_input(),
-        b = simple_input();
+    vr64 a = simple_input(),
+         b = simple_input();
     print(add(a, b));
     return 0;
 }
