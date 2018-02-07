@@ -104,7 +104,7 @@ public:
     {
         enum class add_status
         {
-            declare, redeclare, overload, conflict, fail
+            declare, redeclare, conflict, fail
         }
         status;
         ckx_env_func_entry* added_or_conflict_func;

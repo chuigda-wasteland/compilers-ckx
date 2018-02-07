@@ -160,7 +160,7 @@ ckx_sema_engine::visit_invoke_expr(ckx_ast_invoke_expr *_invoke_expr)
         saber::optional<ckx_expr_result> arg_result = expr->accept(*this);
         if (!arg_result.is_type())
             return saber::optional<ckx_expr_result>();
-        arg_results.push_back(arg_result.get());
+        arg_results.push_back(decay_to_rvalue(arg_result.get()));
     }
 
     if (ckx_ast_id_expr *id_expr =
@@ -170,7 +170,7 @@ ckx_sema_engine::visit_invoke_expr(ckx_ast_invoke_expr *_invoke_expr)
         saber::vector<ckx_env_func_entry> *funcs =
             current_env->lookup_func(id_expr->name);
 
-        if (funcs->empty())
+        if (!funcs)
         {
             error();
             return saber::optional<ckx_expr_result>();
@@ -197,10 +197,14 @@ ckx_sema_engine::visit_invoke_expr(ckx_ast_invoke_expr *_invoke_expr)
         /// Emit instructions and build result
         saber::vector<faker::llvm_type> types;
         saber::vector<faker::llvm_value*> args;
-        for (ckx_expr_result& result : arg_results)
+        for (qsizet i = 0; i < arg_results.size(); i++)
         {
-            types.push_back(ckx_llvm_type_builder::build(result.type));
-            args.push_back(decay_to_rvalue(result).llvm_value_bind);
+            types.push_back(ckx_llvm_type_builder::build(
+                                selected.type->get_param_type_list()[i]));
+            saber::optional<ckx_expr_result> casted_result =
+                try_implicit_cast(arg_results[i],
+                                  selected.type->get_param_type_list()[i]);
+            args.push_back(casted_result.get().llvm_value_bind);
         }
 
         faker::llvm_value* value = builder.create_temporary_var();
@@ -408,7 +412,7 @@ void ckx_sema_engine::visit_func_decl(ckx_ast_func_stmt *_func_stmt)
         current_env->add_func(_func_stmt->kwd_rng, _func_stmt->name, func_type);
 
     if (entry.status == ckx_env::result_add_func::add_status::conflict
-        || entry.status == ckx_env::result_add_func::add_status::conflict)
+        || entry.status == ckx_env::result_add_func::add_status::fail)
     {
         error();
         return;
@@ -451,11 +455,22 @@ void ckx_sema_engine::visit_func_def(ckx_ast_func_stmt *_func_stmt)
         current_env->add_func(_func_stmt->kwd_rng, _func_stmt->name, func_type);
 
     if (entry.status == ckx_env::result_add_func::add_status::conflict
-        || entry.status == ckx_env::result_add_func::add_status::conflict)
+        || entry.status == ckx_env::result_add_func::add_status::fail)
     {
         error();
         return;
     }
+
+    if (entry.status == ckx_env::result_add_func::add_status::redeclare)
+    {
+        if (entry.added_or_conflict_func->defined)
+        {
+            error();
+            return;
+        }
+    }
+
+    entry.added_or_conflict_func->defined = true;
 
     builder.create_n_enter_func(
         ckx_llvm_type_builder::build(func_header_info.get().ret_type),

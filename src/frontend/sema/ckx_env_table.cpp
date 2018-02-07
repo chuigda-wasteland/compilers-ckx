@@ -146,7 +146,38 @@ ckx_env::add_func(ckx_src_rng _decl_at, saber_string_view _name,
     {
         for (ckx_env_func_entry &func : *seen_funcs)
         {
-            /// @todo overload resolver
+            if (func.type->get_param_type_list().size()
+                != _type->get_param_type_list().size())
+                continue;
+
+            bool all_params_same = [&](){
+                for (int i=0; i < func.type->get_param_type_list().size(); i++)
+                    if (!func.type->get_param_type_list()[i]->equal_to(
+                           _type->get_param_type_list()[i]))
+                        return false;
+                return true;
+            }();
+
+            if (!all_params_same)
+            {
+                seen_funcs->emplace_back(
+                    _decl_at, _name, _type,
+                    ckx_func_name_mangler::std_mangle(_name, _type));
+                return result_add_func(result_add_func::add_status::declare,
+                                       &(seen_funcs->back()));
+            }
+
+            if (!func.type->get_return_type()->equal_to(
+                    _type->get_return_type()))
+            {
+                return result_add_func(
+                    result_add_func::add_status::conflict, &func);
+            }
+            else
+            {
+                return result_add_func(
+                    result_add_func::add_status::redeclare, &func);
+            }
         }
     }
 
