@@ -261,31 +261,6 @@ ckx_sema_engine::visit_vr_literal_node(ckx_ast_vr_literal_expr *_literal_expr)
         builder.create_floating_constant(expr_value));
 }
 
-void ckx_sema_engine::test_print(we::we_file_writer &writer)
-{
-    builder.pretty_print(writer);
-}
-
-void ckx_sema_engine::test_enter_func()
-{
-    enter_func();
-}
-
-void ckx_sema_engine::test_leave_func()
-{
-    leave_func();
-}
-
-void ckx_sema_engine::test_enter_scope()
-{
-    enter_scope();
-}
-
-void ckx_sema_engine::test_leave_scope()
-{
-    leave_scope();
-}
-
 
 void
 ckx_sema_engine::visit_global_decl(ckx_ast_decl_stmt *_decl_stmt)
