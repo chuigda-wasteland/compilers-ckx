@@ -69,21 +69,21 @@ private:
 
     struct function_header_info
     {
-        ckx_type_result ret_type_result;
-        saber::vector<ckx_type_result> param_types_results;
+        ckx_type* ret_type;
+        saber::vector<ckx_type*> param_types;
         saber::vector<saber_string_view> param_names;
 
         function_header_info(
-            ckx_type_result _ret_type_result,
-            saber::vector<ckx_type_result> &&_param_type_results,
+            ckx_type* _ret_type,
+            saber::vector<ckx_type*> &&_param_types,
             saber::vector<saber_string_view> &&_param_names) :
-                ret_type_result(_ret_type_result),
-                param_types_results(saber::move(_param_type_results)),
+                ret_type(_ret_type),
+                param_types(saber::move(_param_types)),
                 param_names(saber::move(_param_names)) {}
 
         function_header_info(function_header_info&& _another) :
-            function_header_info(_another.ret_type_result,
-                                 saber::move(_another.param_types_results),
+            function_header_info(_another.ret_type,
+                                 saber::move(_another.param_types),
                                  saber::move(_another.param_names)) {}
 
         function_header_info(const function_header_info&) = delete;
@@ -95,7 +95,7 @@ private:
     saber::optional<function_header_info>
     visit_function_header(ckx_ast_func_stmt *_func_stmt);
 
-    saber::optional<ckx_type_result>
+    ckx_type*
     re_lex_type(const ckx_prelexed_type &_prelexed_type);
 
     quint64 var_name_mangle_count() { return ++vname_mangle_count; }
@@ -105,7 +105,7 @@ private:
     void leave_func();
     void enter_scope();
     void leave_scope();
-    void error() {}
+    void error() { std::printf("fuck!\n"); abort(); }
 
     ckx_env root_env;
     ckx_env *current_env = &root_env;

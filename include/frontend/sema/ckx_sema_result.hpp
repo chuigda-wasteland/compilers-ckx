@@ -7,15 +7,6 @@
 namespace ckx
 {
 
-open_class ckx_type_result
-{
-    ckx_type *const type;
-    faker::llvm_type llvm_type_bind;
-
-    ckx_type_result(ckx_type *_type, faker::llvm_type _llvm_type_bind) :
-        type(_type), llvm_type_bind(_llvm_type_bind) {}
-};
-
 open_class ckx_expr_result
 {
     enum class value_category : qchar
