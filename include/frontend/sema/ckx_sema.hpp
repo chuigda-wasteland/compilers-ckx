@@ -87,11 +87,11 @@ private:
         function_header_info(const function_header_info&) = delete;
     };
 
-    quint64 calculate_disagreements(const saber::vector<ckx_expr_result>& _args,
-                                    const saber::vector<ckx_type*>& _params);
-
     saber::optional<function_header_info>
     visit_function_header(ckx_ast_func_stmt *_func_stmt);
+
+    quint64 calculate_disagreements(const saber::vector<ckx_expr_result>& _args,
+                                    const saber::vector<ckx_type*>& _params);
 
     ckx_type*
     re_lex_type(const ckx_prelexed_type &_prelexed_type);
