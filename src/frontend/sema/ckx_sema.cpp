@@ -474,14 +474,14 @@ void ckx_sema_engine::visit_func_def(ckx_ast_func_stmt *_func_stmt)
 
     entry.added_or_conflict_func->defined = true;
 
+    /// @todo FIXME this part cannot be managed by RAII
     builder.create_n_enter_func(
         ckx_llvm_type_builder::build(func_header_info.get().ret_type),
         entry.added_or_conflict_func->llvm_name,
         saber::move(param_llvm_types), saber::move(param_names_1),
         faker::llvm_func_attrs(true, faker::llvm_func_attrs::it_default));
 
-    ckx_context_manager::func_context_raii raii(context_manager, func_type);
-    enter_func();
+    enter_func_protection_raii raii(*this, func_type);
     for (size_t i = 0; i < _func_stmt->param_decls.size(); ++i)
     {
         saber::result<ckx_env_var_entry*, ckx_env::err_add_var> result =
@@ -493,7 +493,6 @@ void ckx_sema_engine::visit_func_def(ckx_ast_func_stmt *_func_stmt)
     }
     _func_stmt->fnbody->accept(*this);
     builder.leave_func();
-    leave_func();
 }
 
 quint64 ckx_sema_engine::calculate_disagreements(
@@ -591,19 +590,11 @@ ckx_type* ckx_sema_engine::re_lex_type(const ckx_prelexed_type& _prelexed_type)
     return type;
 }
 
-
-void ckx_sema_engine::enter_func()
+bool ckx_sema_engine::is_in_func()
 {
-    in_func = true;
-    enter_scope();
+    return context_manager.lookup_func_context() != nullptr;
 }
 
-void ckx_sema_engine::leave_func()
-{
-    C8ASSERT(in_func);
-    in_func = false;
-    leave_scope();
-}
 
 void ckx_sema_engine::enter_scope()
 {
@@ -616,6 +607,23 @@ void ckx_sema_engine::leave_scope()
     ckx_env *parent_env = current_env->get_parent();
     delete current_env;
     current_env = parent_env;
+}
+
+ckx_sema_engine::
+enter_func_protection_raii::enter_func_protection_raii(ckx_sema_engine &_sema,
+                                                    ckx_func_type *_func_type) :
+    sema(_sema)
+{
+    sema.context_manager.enter_func_context(_func_type);
+    sema.enter_scope();
+}
+
+ckx_sema_engine::
+enter_func_protection_raii::~enter_func_protection_raii()
+{
+    C8ASSERT(sema.is_in_func());
+    sema.context_manager.exit_func_context();
+    sema.leave_scope();
 }
 
 } // namespace ckx

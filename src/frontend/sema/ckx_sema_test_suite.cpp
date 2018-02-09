@@ -8,16 +8,6 @@ void ckx_sema_engine::test_print(we::we_file_writer &writer)
     builder.pretty_print(writer);
 }
 
-void ckx_sema_engine::test_enter_func()
-{
-    enter_func();
-}
-
-void ckx_sema_engine::test_leave_func()
-{
-    leave_func();
-}
-
 void ckx_sema_engine::test_enter_scope()
 {
     enter_scope();

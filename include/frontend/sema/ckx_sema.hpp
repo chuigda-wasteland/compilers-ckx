@@ -54,8 +54,6 @@ public:
 
     /// @note for test only.
     void test_print(we::we_file_writer& writer);
-    void test_enter_func();
-    void test_leave_func();
     void test_enter_scope();
     void test_leave_scope();
 
@@ -100,9 +98,19 @@ private:
 
     quint64 var_name_mangle_count() { return ++vname_mangle_count; }
 
-    bool is_in_func() const { return in_func; }
-    void enter_func();
-    void leave_func();
+    class enter_func_protection_raii
+    {
+    public:
+        enter_func_protection_raii(ckx_sema_engine& _sema,
+                                   ckx_func_type* _func_type);
+
+        ~enter_func_protection_raii();
+
+    private:
+        ckx_sema_engine& sema;
+    };
+
+    bool is_in_func();
     void enter_scope();
     void leave_scope();
     void error() { std::printf("fuck!\n"); abort(); }
