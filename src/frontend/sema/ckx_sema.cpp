@@ -150,6 +150,18 @@ ckx_sema_engine::try_implicit_cast(ckx_expr_result& _expr, ckx_type *_desired)
 }
 
 saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_binary_expr(ckx_ast_binary_expr *_binary_expr)
+{
+    switch (_binary_expr->opercode)
+    {
+    case ckx_op::op_assign:
+        return visit_assign_expr(_binary_expr);
+    default:
+        C8ASSERT(false);
+    }
+}
+
+saber::optional<ckx_expr_result>
 ckx_sema_engine::visit_invoke_expr(ckx_ast_invoke_expr *_invoke_expr)
 {
     saber::vector<ckx_expr_result> arg_results;
@@ -542,22 +554,61 @@ ckx_sema_engine::visit_function_header(ckx_ast_func_stmt *_func_stmt)
     }
 
     return saber::optional<function_header_info>(
-        ret_type, saber::move(param_type_results), saber::move(param_names));
+                ret_type, saber::move(param_type_results), saber::move(param_names));
+}
+
+saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_assign_expr(ckx_ast_binary_expr* _assign_expr)
+{
+    C8ASSERT(_assign_expr->opercode == ckx_op::op_assign);
+
+    saber::optional<ckx_expr_result> loperand_result =
+        _assign_expr->loperand->accept(*this);
+    saber::optional<ckx_expr_result> roperand_result =
+        _assign_expr->roperand->accept(*this);
+
+    if (!loperand_result.is_type() || !roperand_result.is_type())
+    {
+        error();
+        return saber::optional<ckx_expr_result>();
+    }
+
+    if (loperand_result.get().categ != ckx_expr_result::value_category::lvalue)
+    {
+        error();
+        return saber::optional<ckx_expr_result>();
+    }
+
+    ckx_expr_result decayed_result = decay_to_rvalue(roperand_result.get());
+    saber::optional<ckx_expr_result> casted_result =
+        try_implicit_cast(decayed_result, loperand_result.get().type);
+    if (!casted_result.is_type())
+    {
+        error();
+        return saber::optional<ckx_expr_result>();
+    }
+    else
+    {
+        builder.create_store(
+            ckx_llvm_type_builder::build(casted_result.get().type),
+            casted_result.get().llvm_value_bind,
+            loperand_result.get().llvm_value_bind);
+        return loperand_result;
+    }
 }
 
 ckx_type* ckx_sema_engine::re_lex_type(const ckx_prelexed_type& _prelexed_type)
 {
     const saber::vector<ckx_token> &prelexed_tokens =
         _prelexed_type.get_prelexed_tokens();
-
     C8ASSERT(!prelexed_tokens.empty()); // What the fuck!
 
     ckx_type *type = nullptr;
-
     if (prelexed_tokens.front().token_type >= ckx_token::type::tk_vi8
         && prelexed_tokens.front().token_type <= ckx_token::type::tk_void)
     {
-        type = ckx_type_helper::get_type(prelexed_tokens.front().token_type);
+        type = ckx_type_helper::get_type_by_token(
+                   prelexed_tokens.front().token_type);
     }
     else if (prelexed_tokens.front().token_type == ckx_token::type::tk_id)
     {

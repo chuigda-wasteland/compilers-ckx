@@ -322,7 +322,8 @@ public:
     static ckx_pointer_type* pointer_to(ckx_type* _base);
     static ckx_type*         qual_const(ckx_type* _base);
 
-    static ckx_type* get_type(ckx_token::type _basic_type_token);
+    static ckx_type* get_type_by_token(ckx_token::type _basic_type_token);
+    static ckx_type* get_basic_type(ckx_type::category _basic_type_categ);
 
     static ckx_type* get_vi8_type();
     static ckx_type* get_vi16_type();

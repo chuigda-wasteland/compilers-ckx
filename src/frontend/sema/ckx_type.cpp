@@ -372,7 +372,7 @@ ckx_type* ckx_type_alias::get_aliasee()
 
 
 ckx_type*
-ckx_type_helper::get_type(ckx_token::type _basic_type_token)
+ckx_type_helper::get_type_by_token(ckx_token::type _basic_type_token)
 {
     switch ( _basic_type_token )
     {
@@ -388,7 +388,27 @@ ckx_type_helper::get_type(ckx_token::type _basic_type_token)
     case ckx_token::type::tk_vr32:  return get_vr32_type();
     case ckx_token::type::tk_vr64:  return get_vr64_type();
     case ckx_token::type::tk_void:  return get_void_type();
-    default: C8ASSERT(0);
+    default: C8ASSERT(false);
+    }
+}
+
+ckx_type *ckx_type_helper::get_basic_type(ckx_type::category _basic_type_categ)
+{
+    switch (_basic_type_categ)
+    {
+    case ckx_type::category::type_vi8:   return get_vi8_type();
+    case ckx_type::category::type_vi16:  return get_vi16_type();
+    case ckx_type::category::type_vi32:  return get_vi32_type();
+    case ckx_type::category::type_vi64:  return get_vi64_type();
+    case ckx_type::category::type_vu8:   return get_vu8_type();
+    case ckx_type::category::type_vu16:  return get_vu16_type();
+    case ckx_type::category::type_vu32:  return get_vu32_type();
+    case ckx_type::category::type_vu64:  return get_vu64_type();
+    case ckx_type::category::type_vch:   return get_vch_type();
+    case ckx_type::category::type_vr32:  return get_vr32_type();
+    case ckx_type::category::type_vr64:  return get_vr64_type();
+    case ckx_type::category::type_void:  return get_void_type();
+    default: C8ASSERT(false);
     }
 }
 
@@ -572,7 +592,7 @@ bool ckx_type_helper::can_reinterpret_cast(ckx_type *_from,
 {
     return _from->more_qual_than(_dest->get_qual_bits())
            && _from->is_pointer()
-            && _dest->is_pointer();
+           && _dest->is_pointer();
 }
 
 bool ckx_type_helper::can_const_cast(ckx_type *_from, ckx_type *_dest)
