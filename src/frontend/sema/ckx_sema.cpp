@@ -18,7 +18,7 @@ void ckx_sema_engine::visit_compound_stmt(ckx_ast_compound_stmt *_stmt)
     leave_scope();
 }
 
-void ckx_sema_engine::visit_decl_node(ckx_ast_decl_stmt* _decl_stmt)
+void ckx_sema_engine::visit_decl_stmt(ckx_ast_decl_stmt* _decl_stmt)
 {
     if (is_in_func())
         visit_local_decl(_decl_stmt);
@@ -26,7 +26,7 @@ void ckx_sema_engine::visit_decl_node(ckx_ast_decl_stmt* _decl_stmt)
         visit_global_decl(_decl_stmt);
 }
 
-void ckx_sema_engine::visit_record_node(ckx_ast_record_stmt *_record_stmt)
+void ckx_sema_engine::visit_record_stmt(ckx_ast_record_stmt *_record_stmt)
 {
     C8ASSERT(!is_in_func());
     if (root_env.lookup(_record_stmt->name))
@@ -41,7 +41,7 @@ void ckx_sema_engine::visit_record_node(ckx_ast_record_stmt *_record_stmt)
         visit_variant_decl(_record_stmt);
 }
 
-void ckx_sema_engine::visit_func_node(ckx_ast_func_stmt *_func_stmt)
+void ckx_sema_engine::visit_func_stmt(ckx_ast_func_stmt *_func_stmt)
 {
     if (_func_stmt->fnbody == nullptr)
         visit_func_decl(_func_stmt);
@@ -49,7 +49,7 @@ void ckx_sema_engine::visit_func_node(ckx_ast_func_stmt *_func_stmt)
         visit_func_def(_func_stmt);
 }
 
-void ckx_sema_engine::visit_return_node(ckx_ast_return_stmt *_return_stmt)
+void ckx_sema_engine::visit_return_stmt(ckx_ast_return_stmt *_return_stmt)
 {
     if (_return_stmt->return_expr != nullptr)
     {
@@ -201,6 +201,8 @@ ckx_sema_engine::visit_invoke_expr(ckx_ast_invoke_expr *_invoke_expr)
         {
             types.push_back(ckx_llvm_type_builder::build(
                                 selected.type->get_param_type_list()[i]));
+
+            /// Once we selected one function, it never fails
             saber::optional<ckx_expr_result> casted_result =
                 try_implicit_cast(arg_results[i],
                                   selected.type->get_param_type_list()[i]);

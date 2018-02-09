@@ -25,10 +25,10 @@ public:
 
     void visit_translation_unit(ckx_ast_translation_unit *_unit);
     void visit_compound_stmt(ckx_ast_compound_stmt *_stmt);
-    void visit_decl_node(ckx_ast_decl_stmt* _decl_stmt);
-    void visit_record_node(ckx_ast_record_stmt* _record_stmt);
-    void visit_func_node(ckx_ast_func_stmt* _func_stmt);
-    void visit_return_node(ckx_ast_return_stmt* _return_stmt);
+    void visit_decl_stmt(ckx_ast_decl_stmt* _decl_stmt);
+    void visit_record_stmt(ckx_ast_record_stmt* _record_stmt);
+    void visit_func_stmt(ckx_ast_func_stmt* _func_stmt);
+    void visit_return_stmt(ckx_ast_return_stmt* _return_stmt);
 
     ckx_expr_result decay_to_rvalue(ckx_expr_result _expr);
 

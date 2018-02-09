@@ -26,12 +26,12 @@ void ckx_ast_continue_stmt::accept(ckx_sema_engine&) {}
 
 void ckx_ast_return_stmt::accept(ckx_sema_engine& _sema)
 {
-    _sema.visit_return_node(this);
+    _sema.visit_return_stmt(this);
 }
 
 void ckx_ast_decl_stmt::accept(ckx_sema_engine& _sema)
 {
-    _sema.visit_decl_node(this);
+    _sema.visit_decl_stmt(this);
 }
 
 void ckx_ast_expr_stmt::accept(ckx_sema_engine& _sema)
@@ -41,12 +41,12 @@ void ckx_ast_expr_stmt::accept(ckx_sema_engine& _sema)
 
 void ckx_ast_func_stmt::accept(ckx_sema_engine& _sema)
 {
-    _sema.visit_func_node(this);
+    _sema.visit_func_stmt(this);
 }
 
 void ckx_ast_record_stmt::accept(ckx_sema_engine& _sema)
 {
-    _sema.visit_record_node(this);
+    _sema.visit_record_stmt(this);
 }
 
 void ckx_ast_alias_stmt::accept(ckx_sema_engine&) {}
