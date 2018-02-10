@@ -105,8 +105,13 @@ public:
                                          llvm_value *_src,
                                          llvm_value *_result);
 
+    llvm_extractvalue_instruction* create_extractvalue(llvm_value *_result,
+                                                       llvm_type _type,
+                                                       llvm_value *_value,
+                                                       llvm_value *_idx);
+
     llvm_getelementptr_instruction* create_getelementptr(llvm_value *_result,
-                                                         llvm_type _yield_type,
+                                                         llvm_type _base_type,
                                                          llvm_value* _ptr,
                                                          llvm_type _ty,
                                                          llvm_value* _idx);

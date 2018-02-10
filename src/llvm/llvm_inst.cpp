@@ -470,14 +470,36 @@ void llvm_store_instruction::pretty_print(we::we_file_writer &_writer)
     _writer.write("\n");
 }
 
+llvm_extractvalue_instruction::llvm_extractvalue_instruction(
+        llvm_value *_result,
+        llvm_type _aggregate,
+        llvm_value *_val,
+        llvm_value *_idx) :
+    result(_result),
+    aggregate(_aggregate),
+    val(_val),
+    idx(_idx) {}
+
+void llvm_extractvalue_instruction::pretty_print(we::we_file_writer &_writer)
+{
+    _writer.write(result->to_string());
+    _writer.write(" = extractvalue ");
+    _writer.write(aggregate);
+    _writer.write(" ");
+    _writer.write(val->to_string());
+    _writer.write(", ");
+    _writer.write(idx->to_string());
+    _writer.write("\n");
+}
+
 llvm_getelementptr_instruction::llvm_getelementptr_instruction(
         llvm_value *_result,
-        llvm_type _yield_type,
+        llvm_type _base_type,
         llvm_value *_ptr,
         llvm_type _ty,
         llvm_value *_idx) :
     result(_result),
-    yield_type(_yield_type),
+    base_type(_base_type),
     ptr(_ptr),
     ty(_ty),
     idx(_idx) {}
@@ -486,14 +508,14 @@ void llvm_getelementptr_instruction::pretty_print(we::we_file_writer &_writer)
 {
     _writer.write(result->to_string());
     _writer.write(" = getelementptr ");
-    _writer.write(yield_type);
+    _writer.write(base_type);
     _writer.write(" ");
-    _writer.write(yield_type);
+    _writer.write(base_type);
     _writer.write("* ");
     _writer.write(ptr->to_string());
-    _writer.write(" ");
+    _writer.write(", ");
     _writer.write(ty);
-    _writer.write(" ");
+    _writer.write(", ");
     _writer.write(idx->to_string());
     _writer.write("\n");
 }

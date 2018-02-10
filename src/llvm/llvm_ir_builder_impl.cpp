@@ -48,7 +48,10 @@ llvm_ir_builder_impl::~llvm_ir_builder_impl()
 void llvm_ir_builder_impl::pretty_print(we::we_file_writer &_writer)
 {
     for (llvm_function_block* function : functions)
+    {
         function->fndef->pretty_print(_writer);
+        _writer.write("\n");
+    }
 
     llvm_instruction* iter =
         static_cast<llvm_instruction*>(global_head_node.get_next());
@@ -204,13 +207,21 @@ llvm_store_instruction* llvm_ir_builder_impl::create_store(
         new llvm_store_instruction(_src_type, _src, _result));
 }
 
+llvm_extractvalue_instruction*
+llvm_ir_builder_impl::create_extractvalue(llvm_value *_result, llvm_type _type,
+                                          llvm_value *_value, llvm_value *_idx)
+{
+    return insert_after_current(
+        new llvm_extractvalue_instruction(_result, _type, _value, _idx));
+}
+
 llvm_getelementptr_instruction* llvm_ir_builder_impl::create_getelementptr(
-        llvm_value *_result, llvm_type _yield_type, llvm_value *_ptr,
+        llvm_value *_result, llvm_type _base_type, llvm_value *_ptr,
         llvm_type _ty, llvm_value *_idx)
 {
     return insert_after_current(
         new llvm_getelementptr_instruction(
-                    _result, _yield_type, _ptr, _ty, _idx));
+                    _result, _base_type, _ptr, _ty, _idx));
 }
 
 llvm_new_type*

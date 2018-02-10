@@ -386,13 +386,34 @@ private:
 
 
 /// @brief
-/// <result> = getelementptr <yield_type> <yield_type>* <ptr> <ty> <idx>
+/// <result> = extractvalue <aggregate> <val>, <idx>
+class llvm_extractvalue_instruction final implements llvm_instruction
+{
+public:
+    llvm_extractvalue_instruction(llvm_value *_result,
+                                  llvm_type _aggregate,
+                                  llvm_value* _val,
+                                  llvm_value* _idx);
+    ~llvm_extractvalue_instruction() override final = default;
+
+    void pretty_print(we::we_file_writer& _writer) override final;
+
+private:
+    llvm_value *result;
+    llvm_type aggregate;
+    llvm_value *val;
+    llvm_value *idx;
+};
+
+
+/// @brief
+/// <result> = getelementptr <base_type> <yield_type>* <ptr> <ty> <idx>
 /// @note we are not about to support multiple "<ty> <idx>".
 class llvm_getelementptr_instruction final implements llvm_instruction
 {
 public:
     llvm_getelementptr_instruction(llvm_value *_result,
-                                   llvm_type _yield_type,
+                                   llvm_type _base_type,
                                    llvm_value* _ptr,
                                    llvm_type _ty,
                                    llvm_value* _idx);
@@ -402,7 +423,7 @@ public:
 
 private:
     llvm_value *result;
-    llvm_type yield_type;
+    llvm_type base_type;
     llvm_value *ptr;
     llvm_type ty;
     llvm_value *idx;

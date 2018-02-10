@@ -74,7 +74,8 @@ public:
                                  llvm_label *_label1, llvm_value *_val1,
                                  llvm_label *_label2, llvm_value *_val2);
     llvm_instruction* create_call(llvm_value* _result, llvm_type _type,
-                                  saber_string_view _func_name, saber::vector<llvm_type> &&_types,
+                                  saber_string_view _func_name,
+                                  saber::vector<llvm_type> &&_types,
                                   saber::vector<llvm_value*> &&_args);
     llvm_label*       create_label(saber_string_view _name);
     llvm_label*       create_temporary_label();
@@ -111,10 +112,13 @@ COMMENT(END_BLOCK)
                                   llvm_value *_ptr);
     llvm_instruction* create_store(llvm_type _type,
                                    llvm_value *_src, llvm_value *_result);
+    llvm_instruction* create_extractvalue(llvm_value *_result,
+                                          llvm_type _type,
+                                          llvm_value *_value,
+                                          llvm_value *_idx);
     llvm_instruction* create_getelementptr(llvm_value *_result,
                                            llvm_type _type, llvm_value *_ptr,
                                            llvm_type _ty, llvm_value *_idx);
-
     llvm_instruction* create_udt(saber_string_view _name,
                                  saber::vector<llvm_type>&& _fields);
 
