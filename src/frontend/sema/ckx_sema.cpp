@@ -236,6 +236,64 @@ ckx_sema_engine::visit_invoke_expr(ckx_ast_invoke_expr *_invoke_expr)
 }
 
 saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_extract_expr(ckx_ast_extract_expr *_extract_expr)
+{
+    saber::optional<ckx_expr_result> base_result =
+        _extract_expr->extracted->accept(*this);
+
+    if (!base_result.is_type()) return saber::optional<ckx_expr_result>();
+
+    if (!base_result.get().type->is_record())
+    {
+        error();
+        return saber::optional<ckx_expr_result>();
+    }
+
+    /// @todo remember to add solution for variant type
+    /// once it gets supported.
+    ckx_struct_type *struct_type =
+        static_cast<ckx_struct_type*>(base_result.get().type);
+    auto it = std::find_if(struct_type->get_fields().begin(),
+                           struct_type->get_fields().end(),
+                           [&](ckx_struct_type::field &field) {
+                               return field.name == _extract_expr->field_name;
+                           });
+    if (it == struct_type->get_fields().end())
+    {
+        error();
+        return saber::optional<ckx_expr_result>();
+    }
+
+    qsizet index = it - struct_type->get_fields().begin();
+
+    faker::llvm_value *llvm_value = builder.create_temporary_var();
+    if (base_result.get().categ == ckx_expr_result::value_category::lvalue)
+    {
+        builder.create_getelementptr2(
+            llvm_value,
+            ckx_llvm_type_builder::build(struct_type),
+            base_result.get().llvm_value_bind,
+            ckx_llvm_type_builder::build(ckx_type_helper::get_vi32_type()),
+            builder.create_unsigned_constant(0),
+            ckx_llvm_type_builder::build(ckx_type_helper::get_vi32_type()),
+            builder.create_unsigned_constant(index));
+        return saber::optional<ckx_expr_result>(
+            it->type, ckx_expr_result::value_category::lvalue, llvm_value);
+    }
+    /// @todo add xvalue resolution if it gets introduced
+    else /*
+    if (base_result.get().categ == ckx_expr_result::value_category::prvalue) */
+    {
+        builder.create_extractvalue(llvm_value,
+                                    ckx_llvm_type_builder::build(struct_type),
+                                    base_result.get().llvm_value_bind,
+                                    builder.create_unsigned_constant(index));
+        return saber::optional<ckx_expr_result>(
+            it->type, ckx_expr_result::value_category::prvalue, llvm_value);
+    }
+}
+
+saber::optional<ckx_expr_result>
 ckx_sema_engine::visit_id_expr(ckx_ast_id_expr *_id_expr)
 {
     ckx_env_var_entry* entry = current_env->lookup_var(_id_expr->name);

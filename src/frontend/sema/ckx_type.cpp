@@ -208,6 +208,11 @@ ckx_struct_type::add_field(saber_string_view _name, ckx_type* _type)
     return add_status::add_success;
 }
 
+saber::vector<ckx_struct_type::field>& ckx_struct_type::get_fields()
+{
+    return fields;
+}
+
 
 ckx_variant_type::ckx_variant_type(saber_string_view _variant_name) :
     ckx_type(ckx_type::category::type_variant),

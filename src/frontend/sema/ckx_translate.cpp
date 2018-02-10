@@ -70,7 +70,11 @@ ckx_ast_invoke_expr::accept(ckx_sema_engine& _sema)
 }
 
 saber::optional<ckx_expr_result>
-ckx_ast_extract_expr::accept(ckx_sema_engine&) { return bwsb(); }
+ckx_ast_extract_expr::accept(ckx_sema_engine& _sema)
+{
+    return _sema.visit_extract_expr(this);
+}
+
 saber::optional<ckx_expr_result>
 ckx_ast_enumerator_expr::accept(ckx_sema_engine&) { return bwsb(); }
 saber::optional<ckx_expr_result>

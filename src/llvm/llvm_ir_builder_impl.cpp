@@ -47,18 +47,19 @@ llvm_ir_builder_impl::~llvm_ir_builder_impl()
 
 void llvm_ir_builder_impl::pretty_print(we::we_file_writer &_writer)
 {
-    for (llvm_function_block* function : functions)
-    {
-        function->fndef->pretty_print(_writer);
-        _writer.write("\n");
-    }
-
     llvm_instruction* iter =
         static_cast<llvm_instruction*>(global_head_node.get_next());
     while (iter != nullptr)
     {
         iter->pretty_print(_writer);
         iter = iter->get_next();
+    }
+    _writer.write("\n");
+
+    for (llvm_function_block* function : functions)
+    {
+        function->fndef->pretty_print(_writer);
+        _writer.write("\n");
     }
 }
 
@@ -222,6 +223,15 @@ llvm_getelementptr_instruction* llvm_ir_builder_impl::create_getelementptr(
     return insert_after_current(
         new llvm_getelementptr_instruction(
                     _result, _base_type, _ptr, _ty, _idx));
+}
+
+llvm_getelementptr2_instruction *llvm_ir_builder_impl::create_getelementptr2(
+        llvm_value *_result, llvm_type _base_type, llvm_value *_ptr,
+        llvm_type _ty1, llvm_value *_idx1, llvm_type _ty2, llvm_value *_idx2)
+{
+    return insert_after_current(
+         new llvm_getelementptr2_instruction(
+             _result, _base_type, _ptr, _ty1, _idx1, _ty2, _idx2));
 }
 
 llvm_new_type*

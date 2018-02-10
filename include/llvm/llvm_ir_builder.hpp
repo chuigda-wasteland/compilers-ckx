@@ -119,6 +119,10 @@ COMMENT(END_BLOCK)
     llvm_instruction* create_getelementptr(llvm_value *_result,
                                            llvm_type _type, llvm_value *_ptr,
                                            llvm_type _ty, llvm_value *_idx);
+    llvm_instruction* create_getelementptr2(llvm_value *_result,
+                                            llvm_type _type, llvm_value *_ptr,
+                                            llvm_type _ty1, llvm_value *_idx1,
+                                            llvm_type _ty2, llvm_value *_idx2);
     llvm_instruction* create_udt(saber_string_view _name,
                                  saber::vector<llvm_type>&& _fields);
 

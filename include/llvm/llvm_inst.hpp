@@ -70,6 +70,7 @@ class llvm_load_instruction;
 class llvm_store_instruction;
 class llvm_extractvalue_instruction;
 class llvm_getelementptr_instruction;
+class llvm_getelementptr2_instruction;
 
 class llvm_func_attrs
 {

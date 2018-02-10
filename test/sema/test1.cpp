@@ -14,6 +14,8 @@ fn one(): vi32 {
 
 fn fuck(): s {
     s s1;
+    s1.a = 0;
+    s1.b = s1.c = 0;
     return s1;
 }
 

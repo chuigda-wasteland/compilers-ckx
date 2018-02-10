@@ -509,14 +509,42 @@ void llvm_getelementptr_instruction::pretty_print(we::we_file_writer &_writer)
     _writer.write(result->to_string());
     _writer.write(" = getelementptr ");
     _writer.write(base_type);
-    _writer.write(" ");
+    _writer.write(", ");
     _writer.write(base_type);
     _writer.write("* ");
     _writer.write(ptr->to_string());
     _writer.write(", ");
     _writer.write(ty);
-    _writer.write(", ");
+    _writer.write(" ");
     _writer.write(idx->to_string());
+    _writer.write("\n");
+}
+
+llvm_getelementptr2_instruction::llvm_getelementptr2_instruction(
+        llvm_value *_result, llvm_type _base_type, llvm_value *_ptr,
+        llvm_type _ty1, llvm_value *_idx1,
+        llvm_type _ty2, llvm_value *_idx2) :
+    result(_result), base_type(_base_type), ptr(_ptr),
+    ty1(_ty1), idx1(_idx1),
+    ty2(_ty2), idx2(_idx2) {}
+
+void llvm_getelementptr2_instruction::pretty_print(we::we_file_writer &_writer)
+{
+    _writer.write(result->to_string());
+    _writer.write(" = getelementptr ");
+    _writer.write(base_type);
+    _writer.write(", ");
+    _writer.write(base_type);
+    _writer.write("* ");
+    _writer.write(ptr->to_string());
+    _writer.write(", ");
+    _writer.write(ty1);
+    _writer.write(" ");
+    _writer.write(idx1->to_string());
+    _writer.write(", ");
+    _writer.write(ty2);
+    _writer.write(" ");
+    _writer.write(idx2->to_string());
     _writer.write("\n");
 }
 

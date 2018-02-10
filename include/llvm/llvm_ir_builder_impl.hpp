@@ -115,6 +115,13 @@ public:
                                                          llvm_value* _ptr,
                                                          llvm_type _ty,
                                                          llvm_value* _idx);
+    llvm_getelementptr2_instruction *create_getelementptr2(llvm_value *_result,
+                                                          llvm_type _base_type,
+                                                          llvm_value* _ptr,
+                                                          llvm_type _ty1,
+                                                          llvm_value* _idx1,
+                                                          llvm_type _ty2,
+                                                          llvm_value* _idx2);
 
     llvm_new_type* create_udt(saber_string_view _type_name,
                               saber::vector<llvm_type>&& _fields);

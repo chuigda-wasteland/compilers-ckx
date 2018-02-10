@@ -161,6 +161,8 @@ public:
     saber_string_view get_name() const;
     add_status add_field(saber_string_view _name, ckx_type* _type);
 
+    saber::vector<field>& get_fields();
+
 private:
     friend class ckx_type_helper;
     explicit ckx_struct_type(saber_string_view _struct_name);

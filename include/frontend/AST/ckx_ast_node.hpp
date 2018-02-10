@@ -476,6 +476,7 @@ private:
 
 class ckx_ast_extract_expr final implements ckx_ast_expr
 {
+    friend class ckx_sema_engine;
 public:
     ckx_ast_extract_expr(ckx_ast_expr *_extracted,
                          saber_string_view _field_name);

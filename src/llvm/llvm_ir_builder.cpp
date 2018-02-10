@@ -202,6 +202,16 @@ llvm_ir_builder::create_getelementptr(llvm_value *_result,
 }
 
 llvm_instruction*
+llvm_ir_builder::create_getelementptr2(llvm_value *_result,
+                                       llvm_type _type, llvm_value *_ptr,
+                                       llvm_type _ty1, llvm_value *_idx1,
+                                       llvm_type _ty2, llvm_value *_idx2)
+{
+    return impl->create_getelementptr2(_result, _type, _ptr,
+                                       _ty1, _idx1, _ty2, _idx2);
+}
+
+llvm_instruction*
 llvm_ir_builder::create_udt(saber_string_view _name,
                             saber::vector<llvm_type> &&_fields)
 {

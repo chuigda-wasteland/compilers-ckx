@@ -407,8 +407,7 @@ private:
 
 
 /// @brief
-/// <result> = getelementptr <base_type> <yield_type>* <ptr> <ty> <idx>
-/// @note we are not about to support multiple "<ty> <idx>".
+/// <result> = getelementptr <base_type>, <yield_type>* <ptr>, <ty> <idx>
 class llvm_getelementptr_instruction final implements llvm_instruction
 {
 public:
@@ -427,6 +426,32 @@ private:
     llvm_value *ptr;
     llvm_type ty;
     llvm_value *idx;
+};
+
+/// @brief
+/// <result> = getelementptr <type>, <type>* <ptr>, <ty> <idx>, <ty1> <idx1>
+class llvm_getelementptr2_instruction final implements llvm_instruction
+{
+public:
+    llvm_getelementptr2_instruction(llvm_value *_result,
+                                   llvm_type _base_type,
+                                   llvm_value* _ptr,
+                                   llvm_type _ty1,
+                                   llvm_value* _idx1,
+                                   llvm_type _ty2,
+                                   llvm_value* _idx2);
+    ~llvm_getelementptr2_instruction() override final = default;
+
+    void pretty_print(we::we_file_writer& _writer) override final;
+
+private:
+    llvm_value *result;
+    llvm_type base_type;
+    llvm_value *ptr;
+    llvm_type ty1;
+    llvm_value *idx1;
+    llvm_type ty2;
+    llvm_value *idx2;
 };
 
 } // namespace faker
