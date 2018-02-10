@@ -351,6 +351,8 @@ public:
     static bool can_const_cast(ckx_type* _from, ckx_type* _dest);
     static bool can_ckx_cast(ckx_type* _from, ckx_type* _dest);
 
+    static ckx_type* common_numeric_type(ckx_type* _ty1, ckx_type *_ty2);
+
     enum class function_relation { fr_duplicate, fr_overload };
     function_relation predicate_function_relation(ckx_func_type *_f1,
                                                   ckx_func_type *_f2);

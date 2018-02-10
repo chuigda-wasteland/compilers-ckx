@@ -605,6 +605,20 @@ bool ckx_type_helper::can_const_cast(ckx_type *_from, ckx_type *_dest)
     return _from->equal_to_no_cvr(_dest);
 }
 
+ckx_type*
+ckx_type_helper::common_numeric_type(ckx_type *_ty1, ckx_type *_ty2)
+{
+    C8ASSERT(_ty1->is_numeric());
+    C8ASSERT(_ty2->is_numeric());
+
+    if (_ty1->is_signed() && _ty2->is_signed()
+        || _ty1->is_unsigned() && _ty2->is_unsigned()
+        || _ty1->is_floating() && _ty2->is_floating())
+        return rank_of(_ty1->get_category()) > rank_of(_ty2->get_category()) ?
+               _ty1 : _ty2;
+    return nullptr;
+}
+
 ckx_type_helper::function_relation
 ckx_type_helper::predicate_function_relation(ckx_func_type *_f1,
                                              ckx_func_type *_f2)
