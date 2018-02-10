@@ -220,7 +220,10 @@ ckx_sema_engine::visit_invoke_expr(ckx_ast_invoke_expr *_invoke_expr)
 
         auto it = std::min_element(disagreements.begin(), disagreements.end());
         if (*it == std::numeric_limits<quint64>::max())
+        {
+            error();
             return saber::optional<ckx_expr_result>();
+        }
 
         ckx_env_func_entry &selected = (*funcs)[it - disagreements.begin()];
 
@@ -412,7 +415,8 @@ void ckx_sema_engine::visit_local_decl(ckx_ast_decl_stmt *_decl_stmt)
             }
 
             saber::optional<ckx_expr_result> casted_result =
-                try_implicit_cast(init_expr_result.get(), decl_type);
+                try_implicit_cast(
+                    decay_to_rvalue(init_expr_result.get()), decl_type);
 
             if (!casted_result.is_type())
             {
@@ -575,12 +579,29 @@ void ckx_sema_engine::visit_func_def(ckx_ast_func_stmt *_func_stmt)
     enter_func_protection_raii raii(*this, func_type);
     for (size_t i = 0; i < _func_stmt->param_decls.size(); ++i)
     {
+        faker::llvm_value *llvm_value =
+            builder.create_named_var(
+                saber_string_pool::create_view(
+                    saber::string_paste(
+                        func_header_info.get().param_names[i],
+                        vname_mangle_count)));
+        faker::llvm_value *param_llvm_value =
+            builder.create_named_var(func_header_info.get().param_names[i]);
+
+        builder.create_alloca(
+            llvm_value,
+            ckx_llvm_type_builder::build(func_header_info.get().param_types[i]),
+            1);
+
+        builder.create_store(
+            ckx_llvm_type_builder::build(func_header_info.get().param_types[i]),
+            param_llvm_value, llvm_value);
+
         saber::result<ckx_env_var_entry*, ckx_env::err_add_var> result =
         current_env->add_var(_func_stmt->param_decls[i].rng,
                              _func_stmt->param_decls[i].name,
                              param_types[i]);
-        result.value()->llvm_value_bind =
-            builder.create_named_var(func_header_info.get().param_names[i]);
+        result.value()->llvm_value_bind = llvm_value;
     }
     _func_stmt->fnbody->accept(*this);
     builder.leave_func();
@@ -892,6 +913,7 @@ enter_func_protection_raii::~enter_func_protection_raii()
     C8ASSERT(sema.is_in_func());
     sema.context_manager.exit_func_context();
     sema.leave_scope();
+    sema.vname_mangle_count = 0;
 }
 
 } // namespace ckx
