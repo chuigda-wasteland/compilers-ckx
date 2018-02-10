@@ -46,6 +46,8 @@ public:
     saber::optional<ckx_expr_result>
     visit_binary_expr(ckx_ast_binary_expr *_binary_expr);
     saber::optional<ckx_expr_result>
+    visit_unary_expr(ckx_ast_unary_expr *_unary_expr);
+    saber::optional<ckx_expr_result>
     visit_invoke_expr(ckx_ast_invoke_expr *_invoke_expr);
     saber::optional<ckx_expr_result>
     visit_extract_expr(ckx_ast_extract_expr *_extract_expr);
@@ -96,6 +98,12 @@ private:
 
     saber::optional<ckx_expr_result>
     visit_assign_expr(ckx_ast_binary_expr *_assign_expr);
+
+    saber::optional<ckx_expr_result>
+    visit_addressof_expr(ckx_ast_unary_expr *_unary_expr);
+
+    saber::optional<ckx_expr_result>
+    visit_deref_expr(ckx_ast_unary_expr *_unary_expr);
 
     quint64 calculate_disagreements(const saber::vector<ckx_expr_result>& _args,
                                     const saber::vector<ckx_type*>& _params);

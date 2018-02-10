@@ -10,16 +10,25 @@ fn add(vr64 a, vr64 b): vr64;
 fn add(vi64 a, vi64 b): vi64;
 fn print(vr64 number): vr64;
 fn print(vi64 number): vi64;
-fn simple_input_vr64(): vr64;
-fn simple_input_vi32(): vi32;
+fn print(vi8 number): vi8;
+fn input(vi32 *p): vi32;
+fn input(vr64 *p): vr64;
+
+fn heap_alloc(): vi8*;
 
 fn main(): vi32 {
-    vr64 a = simple_input_vr64(),
-         b = simple_input_vr64();
+    vr64 a, b;
+    input(&a);
+    input(&b);
     print(add(a, b));
-    vi32 c = simple_input_vi32(),
-         d = simple_input_vi32();
+    vi32 c, d;
+    input(&c);
+    input(&d);
     print(add(c, d));
+    vi8* e = heap_alloc();
+    (*e) = 5;
+    print(*e);
+    print(*heap_alloc());
     return 0;
 }
 

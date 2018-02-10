@@ -59,7 +59,11 @@ ckx_ast_binary_expr::accept(ckx_sema_engine& _sema)
 }
 
 saber::optional<ckx_expr_result>
-ckx_ast_unary_expr::accept(ckx_sema_engine&) { return bwsb(); }
+ckx_ast_unary_expr::accept(ckx_sema_engine& _sema)
+{
+    return _sema.visit_unary_expr(this);
+}
+
 saber::optional<ckx_expr_result>
 ckx_ast_subscript_expr::accept(ckx_sema_engine&) { return bwsb(); }
 

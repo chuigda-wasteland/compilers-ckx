@@ -419,6 +419,7 @@ private:
 
 class ckx_ast_unary_expr final implements ckx_ast_expr
 {
+    friend class ckx_sema_engine;
 public:
     ckx_ast_unary_expr(ckx_src_rng _operator_rng,
                        ckx_op _opercode,

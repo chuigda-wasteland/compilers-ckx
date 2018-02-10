@@ -19,11 +19,14 @@ fn fuck(): s {
     return s1;
 }
 
+fn print(vi16 number): vi16;
+
 fn main(vi8 argc, vi8** argv): vi32 {
     vi64 number;
     number = one();
     s shit;
     shit = fuck();
+    print(fuck().c);
     return 0;
 }
 

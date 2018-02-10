@@ -162,6 +162,20 @@ ckx_sema_engine::visit_binary_expr(ckx_ast_binary_expr *_binary_expr)
 }
 
 saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_unary_expr(ckx_ast_unary_expr *_unary_expr)
+{
+    switch (_unary_expr->opercode)
+    {
+    case ckx_op::op_addr:
+        return visit_addressof_expr(_unary_expr);
+    case ckx_op::op_deref:
+        return visit_deref_expr(_unary_expr);
+    default:
+        C8ASSERT(false);
+    }
+}
+
+saber::optional<ckx_expr_result>
 ckx_sema_engine::visit_invoke_expr(ckx_ast_invoke_expr *_invoke_expr)
 {
     saber::vector<ckx_expr_result> arg_results;
@@ -653,6 +667,53 @@ ckx_sema_engine::visit_assign_expr(ckx_ast_binary_expr* _assign_expr)
             loperand_result.get().llvm_value_bind);
         return loperand_result;
     }
+}
+
+saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_addressof_expr(ckx_ast_unary_expr *_unary_expr)
+{
+    saber::optional<ckx_expr_result> operand_result =
+        _unary_expr->operand->accept(*this);
+    if (!operand_result.is_type()) return saber::optional<ckx_expr_result>();
+
+    if (operand_result.get().categ != ckx_expr_result::value_category::lvalue)
+    {
+        error();
+        return saber::optional<ckx_expr_result>();
+    }
+
+    /// FIXME This is a bogus hack, ask me if you don't comprehend.
+    /// And give me some advice if you have better solutions.
+    return saber::optional<ckx_expr_result>(
+        ckx_type_helper::pointer_to(operand_result.get().type),
+        ckx_expr_result::value_category::prvalue,
+        operand_result.get().llvm_value_bind);
+}
+
+saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_deref_expr(ckx_ast_unary_expr *_unary_expr)
+{
+    saber::optional<ckx_expr_result> operand_result =
+        _unary_expr->operand->accept(*this);
+    if (!operand_result.is_type()) return saber::optional<ckx_expr_result>();
+
+    if (!operand_result.get().type->is_pointer())
+    {
+        error();
+        return saber::optional<ckx_expr_result>();
+    }
+
+    ckx_pointer_type *pointer =
+        static_cast<ckx_pointer_type*>(operand_result.get().type);
+
+    ckx_expr_result decayed_result = decay_to_rvalue(operand_result.get());
+
+    /// FIXME This is a bogus hack, ask me if you don't comprehend.
+    /// And give me some advice if you have better solutions.
+    return saber::optional<ckx_expr_result>(
+        pointer->get_pointee(),
+        ckx_expr_result::value_category::lvalue,
+        decayed_result.llvm_value_bind);
 }
 
 ckx_type* ckx_sema_engine::re_lex_type(const ckx_prelexed_type& _prelexed_type)
