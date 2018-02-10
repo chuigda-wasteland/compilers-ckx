@@ -235,7 +235,10 @@ ckx_sema_engine::visit_invoke_expr(ckx_ast_invoke_expr *_invoke_expr)
             args.push_back(casted_result.get().llvm_value_bind);
         }
 
-        faker::llvm_value* value = builder.create_temporary_var();
+        faker::llvm_value* value =
+            (selected.type->get_return_type()->get_category()
+            != ckx_type::category::type_void) ?
+                builder.create_temporary_var() : nullptr;
         builder.create_call(
             value,
             ckx_llvm_type_builder::build(selected.type->get_return_type()),
