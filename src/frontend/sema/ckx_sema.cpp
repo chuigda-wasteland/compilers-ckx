@@ -99,7 +99,7 @@ ckx_expr_result ckx_sema_engine::decay_to_rvalue(ckx_expr_result _expr)
 }
 
 saber::optional<ckx_expr_result>
-ckx_sema_engine::try_implicit_cast(ckx_expr_result& _expr, ckx_type *_desired)
+ckx_sema_engine::try_implicit_cast(ckx_expr_result _expr, ckx_type *_desired)
 {
     if (!ckx_type_helper::can_implicit_cast(_expr.type, _desired))
         return saber::optional<ckx_expr_result>();
@@ -156,6 +156,10 @@ ckx_sema_engine::visit_binary_expr(ckx_ast_binary_expr *_binary_expr)
     {
     case ckx_op::op_assign:
         return visit_assign_expr(_binary_expr);
+    case ckx_op::op_add:
+        return visit_add_expr(_binary_expr);
+    case ckx_op::op_sub:
+        return visit_sub_expr(_binary_expr);
     default:
         C8ASSERT(false);
     }
@@ -670,6 +674,97 @@ ckx_sema_engine::visit_assign_expr(ckx_ast_binary_expr* _assign_expr)
             loperand_result.get().llvm_value_bind);
         return loperand_result;
     }
+}
+
+saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_add_expr(ckx_ast_binary_expr *_add_expr)
+{
+    C8ASSERT(_add_expr->opercode == ckx_op::op_add);
+
+    saber::optional<ckx_expr_result> loperand_result =
+        _add_expr->loperand->accept(*this);
+    saber::optional<ckx_expr_result> roperand_result =
+        _add_expr->roperand->accept(*this);
+
+    if (!loperand_result.is_type() || !roperand_result.is_type())
+    {
+        error();
+        return saber::optional<ckx_expr_result>();
+    }
+
+    if (loperand_result.get().type->is_numeric()
+        && roperand_result.get().type->is_numeric())
+    {
+        ckx_type *common =
+            ckx_type_helper::common_numeric_type(loperand_result.get().type,
+                                                 roperand_result.get().type);
+        if (common == nullptr)
+        {
+            error();
+            return saber::optional<ckx_expr_result>();
+        }
+
+        ckx_expr_result casted_result1 =
+            try_implicit_cast(
+                decay_to_rvalue(loperand_result.get()), common).get();
+        ckx_expr_result casted_result2 =
+            try_implicit_cast(
+                decay_to_rvalue(roperand_result.get()), common).get();
+
+        faker::llvm_value *llvm_value = builder.create_temporary_var();
+        if (common->is_floating())
+            builder.create_fadd(llvm_value,
+                               ckx_llvm_type_builder::build(common),
+                               casted_result1.llvm_value_bind,
+                               casted_result2.llvm_value_bind);
+        else
+            builder.create_add(llvm_value,
+                               ckx_llvm_type_builder::build(common),
+                               casted_result1.llvm_value_bind,
+                               casted_result2.llvm_value_bind);
+        return saber::optional<ckx_expr_result>(
+            common, ckx_expr_result::value_category::prvalue, llvm_value);
+    }
+    else if ( (loperand_result.get().type->is_pointer()
+               || roperand_result.get().type->is_pointer())
+              && (loperand_result.get().type->is_numeric()
+                  || roperand_result.get().type->is_numeric()) )
+    {
+        saber::pair<ckx_expr_result, ckx_expr_result> casted_results = [&]() {
+            if (loperand_result.get().type->is_pointer())
+                return make_pair(decay_to_rvalue(loperand_result.get()),
+                                 decay_to_rvalue(roperand_result.get()));
+            else
+                return make_pair(decay_to_rvalue(roperand_result.get()),
+                                 decay_to_rvalue(loperand_result.get()));
+        }();
+
+        ckx_pointer_type *pointer =
+            static_cast<ckx_pointer_type*>(casted_results.first.type);
+
+        faker::llvm_value *llvm_value = builder.create_temporary_var();
+        builder.create_getelementptr(
+            llvm_value,
+            /// Tricky
+            ckx_llvm_type_builder::build(pointer->get_pointee()),
+            casted_results.first.llvm_value_bind,
+            ckx_llvm_type_builder::build(casted_results.second.type),
+            casted_results.second.llvm_value_bind);
+        return saber::optional<ckx_expr_result>(
+            loperand_result.get().type,
+            ckx_expr_result::value_category::prvalue, llvm_value);
+    }
+    else
+    {
+        error();
+        return saber::optional<ckx_expr_result>();
+    }
+}
+
+saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_sub_expr(ckx_ast_binary_expr *_sub_expr)
+{
+
 }
 
 saber::optional<ckx_expr_result>

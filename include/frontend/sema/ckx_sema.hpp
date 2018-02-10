@@ -33,7 +33,7 @@ public:
     ckx_expr_result decay_to_rvalue(ckx_expr_result _expr);
 
     saber::optional<ckx_expr_result>
-    try_implicit_cast(ckx_expr_result &_expr, ckx_type *_desired);
+    try_implicit_cast(ckx_expr_result _expr, ckx_type *_desired);
     saber::optional<ckx_expr_result>
     try_static_cast(ckx_expr_result _expr, ckx_type *_desired);
     saber::optional<ckx_expr_result>
@@ -98,6 +98,12 @@ private:
 
     saber::optional<ckx_expr_result>
     visit_assign_expr(ckx_ast_binary_expr *_assign_expr);
+
+    saber::optional<ckx_expr_result>
+    visit_add_expr(ckx_ast_binary_expr *_add_expr);
+
+    saber::optional<ckx_expr_result>
+    visit_sub_expr(ckx_ast_binary_expr *_sub_expr);
 
     saber::optional<ckx_expr_result>
     visit_addressof_expr(ckx_ast_unary_expr *_unary_expr);

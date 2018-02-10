@@ -611,9 +611,9 @@ ckx_type_helper::common_numeric_type(ckx_type *_ty1, ckx_type *_ty2)
     C8ASSERT(_ty1->is_numeric());
     C8ASSERT(_ty2->is_numeric());
 
-    if (_ty1->is_signed() && _ty2->is_signed()
-        || _ty1->is_unsigned() && _ty2->is_unsigned()
-        || _ty1->is_floating() && _ty2->is_floating())
+    if ((_ty1->is_signed() && _ty2->is_signed())
+        || (_ty1->is_unsigned() && _ty2->is_unsigned())
+        || (_ty1->is_floating() && _ty2->is_floating()) )
         return rank_of(_ty1->get_category()) > rank_of(_ty2->get_category()) ?
                _ty1 : _ty2;
     return nullptr;
