@@ -72,6 +72,13 @@ bool ckx_op_helper::is_assign(ckx_op _op)
             && _op <= ckx_op::op_mod_assign);
 }
 
+bool ckx_op_helper::is_logical(ckx_op _op)
+{
+    return _op == ckx_op::op_logic_and
+           || _op == ckx_op::op_logic_or
+           || _op == ckx_op::op_logic_not;
+}
+
 quint8 ckx_op_helper::precedence(ckx_op _op)
 {
     switch (_op)

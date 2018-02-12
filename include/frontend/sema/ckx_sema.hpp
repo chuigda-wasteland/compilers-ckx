@@ -92,22 +92,16 @@ private:
 
     ckx_env::result_add_func
     try_register_func(function_header_info&& _func_header_info);
-
     saber::optional<function_header_info>
     visit_function_header(ckx_ast_func_stmt *_func_stmt);
-
     saber::optional<ckx_expr_result>
-    visit_assign_expr(ckx_ast_binary_expr *_assign_expr);
-
+    visit_assign(ckx_expr_result _dest, ckx_expr_result _from);
     saber::optional<ckx_expr_result>
-    visit_add_expr(ckx_ast_binary_expr *_add_expr);
-
+    visit_add(ckx_expr_result _expr1, ckx_expr_result _expr2);
     saber::optional<ckx_expr_result>
-    visit_sub_expr(ckx_ast_binary_expr *_sub_expr);
-
+    visit_sub(ckx_expr_result _expr1, ckx_expr_result _expr2);
     saber::optional<ckx_expr_result>
     visit_addressof_expr(ckx_ast_unary_expr *_unary_expr);
-
     saber::optional<ckx_expr_result>
     visit_deref_expr(ckx_ast_unary_expr *_unary_expr);
 
