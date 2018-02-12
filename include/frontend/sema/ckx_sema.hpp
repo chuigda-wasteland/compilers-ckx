@@ -100,11 +100,11 @@ private:
     visit_add(ckx_expr_result _expr1, ckx_expr_result _expr2);
     saber::optional<ckx_expr_result>
     visit_sub(ckx_expr_result _expr1, ckx_expr_result _expr2);
-    template <typename ActionOnInt, typename ActionOnFloat>
+    template <typename ActionOnFloat, typename ActionOnInt>
     saber::optional<ckx_expr_result>
     visit_numeric_calc(ckx_expr_result _expr1, ckx_expr_result _expr2,
-                       ActionOnInt&& _action_on_int,
-                       ActionOnFloat&& _action_on_float);
+                       ActionOnFloat&& _action_on_float,
+                       ActionOnInt&& _action_on_int);
     saber::optional<ckx_expr_result>
     visit_ptroffset(ckx_expr_result _expr1, ckx_expr_result _expr2, bool _add);
     saber::optional<ckx_expr_result>

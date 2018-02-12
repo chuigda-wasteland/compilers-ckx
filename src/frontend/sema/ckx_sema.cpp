@@ -755,12 +755,12 @@ ckx_sema_engine::visit_ptroffset(ckx_expr_result _expr1, ckx_expr_result _expr2,
         ckx_expr_result::value_category::prvalue, llvm_value);
 }
 
-template <typename ActionOnInt, typename ActionOnFloat>
+template <typename ActionOnFloat, typename ActionOnInt>
 saber::optional<ckx_expr_result>
 ckx_sema_engine::visit_numeric_calc(ckx_expr_result _expr1,
                                     ckx_expr_result _expr2,
-                                    ActionOnInt&& _action_on_int,
-                                    ActionOnFloat&& _action_on_float)
+                                    ActionOnFloat&& _action_on_float,
+                                    ActionOnInt&& _action_on_int)
 {
     C8ASSERT(_expr1.type->is_numeric() && _expr2.type->is_numeric());
     ckx_type *common_type = ckx_type_helper::common_numeric_type(_expr1.type,
