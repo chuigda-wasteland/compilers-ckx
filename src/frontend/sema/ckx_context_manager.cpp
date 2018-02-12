@@ -8,6 +8,12 @@ ckx_context_manager::ckx_context_manager()
     context_chain.push_back(new ckx_global_context());
 }
 
+ckx_context_manager::~ckx_context_manager()
+{
+    for (ckx_context *context : context_chain)
+        delete context;
+}
+
 ckx_func_context* ckx_context_manager::lookup_func_context()
 {
     for (auto it = context_chain.rbegin(); it != context_chain.rend(); ++it)

@@ -12,7 +12,7 @@ class ckx_context_manager
     friend class func_context_raii;
 public:
     ckx_context_manager();
-    ~ckx_context_manager() = default;
+    ~ckx_context_manager();
 
     ckx_context_manager(const ckx_context_manager&) = delete;
     ckx_context_manager(ckx_context_manager&&) = delete;
