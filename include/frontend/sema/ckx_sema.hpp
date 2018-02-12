@@ -71,27 +71,27 @@ private:
     void visit_func_decl(ckx_ast_func_stmt *_func_stmt);
     void visit_func_def(ckx_ast_func_stmt *_func_stmt);
 
-    struct function_header_info
+    open_class function_header_info
     {
-        ckx_type* ret_type;
-        saber::vector<ckx_type*> param_types;
+        ckx_func_type *func_type;
         saber::vector<saber_string_view> param_names;
 
         function_header_info(
-            ckx_type* _ret_type,
-            saber::vector<ckx_type*> &&_param_types,
+            ckx_func_type *_func_type,
             saber::vector<saber_string_view> &&_param_names) :
-                ret_type(_ret_type),
-                param_types(saber::move(_param_types)),
+                func_type(_func_type),
                 param_names(saber::move(_param_names)) {}
 
         function_header_info(function_header_info&& _another) :
-            function_header_info(_another.ret_type,
-                                 saber::move(_another.param_types),
-                                 saber::move(_another.param_names)) {}
+            function_header_info(_another.func_type,
+                                 saber::move(_another.param_names))
+        { _another.func_type = nullptr; }
 
         function_header_info(const function_header_info&) = delete;
     };
+
+    ckx_env::result_add_func
+    try_register_func(function_header_info&& _func_header_info);
 
     saber::optional<function_header_info>
     visit_function_header(ckx_ast_func_stmt *_func_stmt);
