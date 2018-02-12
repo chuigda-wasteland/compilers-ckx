@@ -692,59 +692,14 @@ ckx_sema_engine::visit_add(ckx_expr_result _expr1, ckx_expr_result _expr2)
 {
     if (_expr1.type->is_numeric() && _expr2.type->is_numeric())
     {
-        ckx_type *common_type =
-            ckx_type_helper::common_numeric_type(_expr1.type, _expr2.type);
-        if (common_type == nullptr)
-        {
-            error();
-            return saber::optional<ckx_expr_result>();
-        }
-
-        ckx_expr_result casted_result1 =
-            try_implicit_cast(decay_to_rvalue(_expr1), common_type).get();
-        ckx_expr_result casted_result2 =
-            try_implicit_cast(decay_to_rvalue(_expr2), common_type).get();
-
-        faker::llvm_value *llvm_value = builder.create_temporary_var();
-        if (common_type->is_floating())
-            builder.create_fadd(llvm_value,
-                               ckx_llvm_type_builder::build(common_type),
-                               casted_result1.llvm_value_bind,
-                               casted_result2.llvm_value_bind);
-        else
-            builder.create_add(llvm_value,
-                               ckx_llvm_type_builder::build(common_type),
-                               casted_result1.llvm_value_bind,
-                               casted_result2.llvm_value_bind);
-        return saber::optional<ckx_expr_result>(
-            common_type, ckx_expr_result::value_category::prvalue, llvm_value);
+        return visit_numeric_calc(_expr1, _expr2,
+                                  &faker::llvm_ir_builder::create_fadd,
+                                  &faker::llvm_ir_builder::create_add);
     }
     else if ( (_expr1.type->is_pointer() || _expr2.type->is_pointer())
-              && (_expr1.type->is_numeric() || _expr2.type->is_numeric()) )
+              && (_expr1.type->is_integral() || _expr2.type->is_integral()) )
     {
-        saber::pair<ckx_expr_result, ckx_expr_result> casted_results = [&]() {
-            if (_expr1.type->is_pointer())
-                return make_pair(decay_to_rvalue(_expr1),
-                                 decay_to_rvalue(_expr2));
-            else
-                return make_pair(decay_to_rvalue(_expr2),
-                                 decay_to_rvalue(_expr1));
-        }();
-
-        ckx_pointer_type *pointer =
-            static_cast<ckx_pointer_type*>(casted_results.first.type);
-
-        faker::llvm_value *llvm_value = builder.create_temporary_var();
-        builder.create_getelementptr(
-            llvm_value,
-            /// Tricky
-            ckx_llvm_type_builder::build(pointer->get_pointee()),
-            casted_results.first.llvm_value_bind,
-            ckx_llvm_type_builder::build(casted_results.second.type),
-            casted_results.second.llvm_value_bind);
-        return saber::optional<ckx_expr_result>(
-            casted_results.first.type,
-            ckx_expr_result::value_category::prvalue, llvm_value);
+        return visit_ptroffset(_expr1, _expr2, true);
     }
     else
     {
@@ -758,6 +713,85 @@ ckx_sema_engine::visit_sub(ckx_expr_result _expr1, ckx_expr_result _expr2)
 {
 
 }
+
+saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_ptroffset(ckx_expr_result _expr1, ckx_expr_result _expr2,
+                                 bool _add)
+{
+    C8ASSERT((_expr1.type->is_pointer() || _expr2.type->is_pointer())
+             && (_expr1.type->is_integral() || _expr2.type->is_integral()));
+    saber::pair<ckx_expr_result, ckx_expr_result> casted_results = [&]() {
+        if (_expr1.type->is_pointer())
+            return make_pair(decay_to_rvalue(_expr1),
+                             decay_to_rvalue(_expr2));
+        else
+            return make_pair(decay_to_rvalue(_expr2),
+                             decay_to_rvalue(_expr1));
+    }();
+
+    ckx_pointer_type *pointer =
+        static_cast<ckx_pointer_type*>(casted_results.first.type);
+
+    faker::llvm_value *offset_value = _add ?
+        casted_results.second.llvm_value_bind :
+        [&] {
+            faker::llvm_value *ret = builder.create_temporary_var();
+            faker::llvm_value *zero = builder.create_unsigned_constant(0);
+            builder.create_sub(
+                ret, ckx_llvm_type_builder::build(casted_results.second.type),
+                zero, casted_results.second.llvm_value_bind);
+            return ret;
+        }();
+
+    faker::llvm_value *llvm_value = builder.create_temporary_var();
+    builder.create_getelementptr(
+        llvm_value,
+        ckx_llvm_type_builder::build(pointer->get_pointee()),
+        casted_results.first.llvm_value_bind,
+        ckx_llvm_type_builder::build(casted_results.second.type),
+        offset_value);
+    return saber::optional<ckx_expr_result>(
+        casted_results.first.type,
+        ckx_expr_result::value_category::prvalue, llvm_value);
+}
+
+template <typename ActionOnInt, typename ActionOnFloat>
+saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_numeric_calc(ckx_expr_result _expr1,
+                                    ckx_expr_result _expr2,
+                                    ActionOnInt&& _action_on_int,
+                                    ActionOnFloat&& _action_on_float)
+{
+    C8ASSERT(_expr1.type->is_numeric() && _expr2.type->is_numeric());
+    ckx_type *common_type = ckx_type_helper::common_numeric_type(_expr1.type,
+                                                                 _expr2.type);
+
+    if (common_type == nullptr)
+    {
+        error();
+        return saber::optional<ckx_expr_result>();
+    }
+
+    ckx_expr_result casted_result1 =
+        try_implicit_cast(decay_to_rvalue(_expr1), common_type).get();
+    ckx_expr_result casted_result2 =
+        try_implicit_cast(decay_to_rvalue(_expr2), common_type).get();
+
+    faker::llvm_value *llvm_value = builder.create_temporary_var();
+    if (common_type->is_floating())
+        ((builder).*(_action_on_float))
+            (llvm_value, ckx_llvm_type_builder::build(common_type),
+             casted_result1.llvm_value_bind, casted_result2.llvm_value_bind);
+    else
+        ((builder).*(_action_on_int))
+            (llvm_value, ckx_llvm_type_builder::build(common_type),
+             casted_result1.llvm_value_bind, casted_result2.llvm_value_bind);
+
+    return saber::optional<ckx_expr_result>(
+       common_type, ckx_expr_result::value_category::prvalue, llvm_value);
+}
+
+
 
 saber::optional<ckx_expr_result>
 ckx_sema_engine::visit_addressof_expr(ckx_ast_unary_expr *_unary_expr)
