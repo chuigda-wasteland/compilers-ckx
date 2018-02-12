@@ -174,6 +174,10 @@ ckx_sema_engine::visit_binary_expr(ckx_ast_binary_expr *_binary_expr)
             return visit_add(loperand_result.get(), roperand_result.get());
         case ckx_op::op_sub:
             return visit_sub(loperand_result.get(), roperand_result.get());
+        case ckx_op::op_mul:
+            return visit_mul(loperand_result.get(), roperand_result.get());
+        case ckx_op::op_div:
+            return visit_div(loperand_result.get(), roperand_result.get());
         default:
             C8ASSERT(false);
         }
@@ -182,6 +186,7 @@ ckx_sema_engine::visit_binary_expr(ckx_ast_binary_expr *_binary_expr)
     {
         /// @note logical operators involves shortcuts and must be evaluated
         /// individually.
+        C8ASSERT(false);
     }
 }
 
@@ -694,6 +699,7 @@ ckx_sema_engine::visit_add(ckx_expr_result _expr1, ckx_expr_result _expr2)
     {
         return visit_numeric_calc(_expr1, _expr2,
                                   &faker::llvm_ir_builder::create_fadd,
+                                  &faker::llvm_ir_builder::create_add,
                                   &faker::llvm_ir_builder::create_add);
     }
     else if ( (_expr1.type->is_pointer() || _expr2.type->is_pointer())
@@ -711,7 +717,51 @@ ckx_sema_engine::visit_add(ckx_expr_result _expr1, ckx_expr_result _expr2)
 saber::optional<ckx_expr_result>
 ckx_sema_engine::visit_sub(ckx_expr_result _expr1, ckx_expr_result _expr2)
 {
+    if (_expr1.type->is_numeric() && _expr2.type->is_numeric())
+    {
+        return visit_numeric_calc(_expr1, _expr2,
+                                  &faker::llvm_ir_builder::create_fsub,
+                                  &faker::llvm_ir_builder::create_sub,
+                                  &faker::llvm_ir_builder::create_sub);
+    }
+    else if (_expr1.type->is_pointer() && _expr2.type->is_pointer())
+    {
+        return visit_ptrdiff(_expr1, _expr2);
+    }
+    else if ( (_expr1.type->is_pointer() || _expr2.type->is_pointer())
+              && (_expr1.type->is_integral() || _expr2.type->is_integral()) )
+    {
+        return visit_ptroffset(_expr1, _expr2, false);
+    }
+    else
+    {
+        error();
+        return saber::optional<ckx_expr_result>();
+    }
+}
 
+saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_mul(ckx_expr_result _expr1, ckx_expr_result _expr2)
+{
+    if (_expr1.type->is_numeric() && _expr2.type->is_numeric())
+        return visit_numeric_calc(_expr1, _expr2,
+                                  &faker::llvm_ir_builder::create_fmul,
+                                  &faker::llvm_ir_builder::create_mul,
+                                  &faker::llvm_ir_builder::create_mul);
+    error();
+    return saber::optional<ckx_expr_result>();
+}
+
+saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_div(ckx_expr_result _expr1, ckx_expr_result _expr2)
+{
+    if (_expr1.type->is_numeric() && _expr2.type->is_numeric())
+        return visit_numeric_calc(_expr1, _expr2,
+                                  &faker::llvm_ir_builder::create_fdiv,
+                                  &faker::llvm_ir_builder::create_sdiv,
+                                  &faker::llvm_ir_builder::create_udiv);
+    error();
+    return saber::optional<ckx_expr_result>();
 }
 
 saber::optional<ckx_expr_result>
@@ -752,15 +802,23 @@ ckx_sema_engine::visit_ptroffset(ckx_expr_result _expr1, ckx_expr_result _expr2,
         offset_value);
     return saber::optional<ckx_expr_result>(
         casted_results.first.type,
-        ckx_expr_result::value_category::prvalue, llvm_value);
+            ckx_expr_result::value_category::prvalue, llvm_value);
 }
 
-template <typename ActionOnFloat, typename ActionOnInt>
 saber::optional<ckx_expr_result>
-ckx_sema_engine::visit_numeric_calc(ckx_expr_result _expr1,
-                                    ckx_expr_result _expr2,
-                                    ActionOnFloat&& _action_on_float,
-                                    ActionOnInt&& _action_on_int)
+ckx_sema_engine::visit_ptrdiff(ckx_expr_result _expr1, ckx_expr_result _expr2)
+{
+    /// @note maybe we need the official LLVM IRBuilder.
+    error();
+    return saber::optional<ckx_expr_result>();
+}
+
+template <typename ActionOnFloat,typename ActionOnInt,typename ActionOnUInt>
+saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_numeric_calc(
+    ckx_expr_result _expr1, ckx_expr_result _expr2,
+    ActionOnFloat&& _action_on_float, ActionOnInt&& _action_on_int,
+    ActionOnUInt&& _action_on_uint)
 {
     C8ASSERT(_expr1.type->is_numeric() && _expr2.type->is_numeric());
     ckx_type *common_type = ckx_type_helper::common_numeric_type(_expr1.type,
@@ -782,8 +840,12 @@ ckx_sema_engine::visit_numeric_calc(ckx_expr_result _expr1,
         ((builder).*(_action_on_float))
             (llvm_value, ckx_llvm_type_builder::build(common_type),
              casted_result1.llvm_value_bind, casted_result2.llvm_value_bind);
-    else
+    else if (common_type->is_signed())
         ((builder).*(_action_on_int))
+            (llvm_value, ckx_llvm_type_builder::build(common_type),
+             casted_result1.llvm_value_bind, casted_result2.llvm_value_bind);
+    else /* if (common_type->is_unsigned()) */
+        ((builder).*(_action_on_uint))
             (llvm_value, ckx_llvm_type_builder::build(common_type),
              casted_result1.llvm_value_bind, casted_result2.llvm_value_bind);
 
