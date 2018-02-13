@@ -144,6 +144,17 @@ ckx_sema_engine::try_implicit_cast(ckx_expr_result _expr, ckx_type *_desired)
         return saber::optional<ckx_expr_result>(
             _desired, ckx_expr_result::value_category::prvalue, destloc);
     }
+    else if ( (_expr.type->is_pointer() && _desired->is_nullptr())
+              || (_expr.type->is_nullptr() && _desired->is_pointer()))
+    {
+        faker::llvm_value *destloc = builder.create_temporary_var();
+        builder.create_bitcast(destloc,
+                               ckx_llvm_type_builder::build(_expr.type),
+                               _expr.llvm_value_bind,
+                               ckx_llvm_type_builder::build(_desired));
+        return saber::optional<ckx_expr_result>(
+            _desired, ckx_expr_result::value_category::prvalue, destloc);
+    }
     else
     {
         C8ASSERT(false);
@@ -538,7 +549,24 @@ ckx_sema_engine::visit_vr_literal_node(ckx_ast_vr_literal_expr *_literal_expr)
 
     return ckx_expr_result(
         expr_type, ckx_expr_result::value_category::prvalue,
-        builder.create_floating_constant(expr_value));
+                builder.create_floating_constant(expr_value));
+}
+
+ckx_expr_result
+ckx_sema_engine::visit_vbool_literal_expr(
+        ckx_ast_bool_literal_expr *_literal_expr)
+{
+    return ckx_expr_result(ckx_type_helper::get_vbool_type(),
+                           ckx_expr_result::value_category::prvalue,
+                           builder.create_unsigned_constant(_literal_expr->val));
+}
+
+ckx_expr_result
+ckx_sema_engine::visit_nullptr_expr(ckx_ast_nullptr_expr *_nullptr_expr)
+{
+    return ckx_expr_result(ckx_type_helper::get_vnullptr_type(),
+                           ckx_expr_result::value_category::prvalue,
+                           builder.create_null());
 }
 
 
@@ -546,7 +574,7 @@ void
 ckx_sema_engine::visit_global_decl(ckx_ast_decl_stmt *_decl_stmt)
 {
     C8ASSERT(!is_in_func());
-    error(); /// @todo currently I don't know how to implement it.
+    error(); /// @todo currkently I don't know how to implement it.
 }
 
 void ckx_sema_engine::visit_local_decl(ckx_ast_decl_stmt *_decl_stmt)

@@ -112,6 +112,18 @@ ckx_ast_vr_literal_expr::accept(ckx_sema_engine& _sema)
 }
 
 saber::optional<ckx_expr_result>
+ckx_ast_bool_literal_expr::accept(ckx_sema_engine& _sema)
+{
+    return _sema.visit_vbool_literal_expr(this);
+}
+
+saber::optional<ckx_expr_result>
+ckx_ast_nullptr_expr::accept(ckx_sema_engine& _sema)
+{
+    return _sema.visit_nullptr_expr(this);
+}
+
+saber::optional<ckx_expr_result>
 ckx_ast_array_expr::accept(ckx_sema_engine&) { return bwsb(); }
 
 } // namespace ckx

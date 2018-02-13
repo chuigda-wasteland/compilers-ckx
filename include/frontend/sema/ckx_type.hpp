@@ -53,6 +53,9 @@ public:
         type_vr32,
         type_vr64,
 
+        type_vnullptr_t,
+        type_vbool,
+
         type_void,
 
         type_function,
@@ -91,7 +94,9 @@ public:
     bool is_integral() const;
     bool is_floating() const;
     bool is_numeric() const;
+    bool is_bool() const;
     bool is_pointer() const;
+    bool is_nullptr() const;
     bool is_function() const;
     bool is_record() const;
     bool is_enum() const;
@@ -340,6 +345,9 @@ public:
     static ckx_type* get_vch_type();
     static ckx_type* get_vr32_type();
     static ckx_type* get_vr64_type();
+
+    static ckx_type* get_vbool_type();
+    static ckx_type* get_vnullptr_type();
 
     static ckx_type* get_void_type();
 

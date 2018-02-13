@@ -97,9 +97,12 @@ open_class ckx_token
         tk_vr32,             // vr32
         tk_vr64,             // vr64
 
+        tk_vnullptr_t,        // vnptr_t
+        tk_vbool,            // vb1
+
         tk_void,             // void
 
-        tk_function,           // function
+        tk_function,           // fn
 
         tk_struct,             // struct
         tk_variant,            // variant
@@ -130,6 +133,9 @@ open_class ckx_token
         tk_vchar_literal,      // char literal
         // reserved
         tk_string_literal,     // string literal
+        tk_nullptr,            // nullptr
+        tk_true,               // true
+        tk_false,              // false
 
         tk_static_cast,        // static_cast
         tk_reinterpret_cast,   // reinterpret_cast

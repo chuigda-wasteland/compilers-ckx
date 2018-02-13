@@ -333,6 +333,12 @@ ckx_ast_vi_literal_expr::ckx_ast_vi_literal_expr(ckx_src_rng _rng, qint64 _val):
 ckx_ast_vr_literal_expr::ckx_ast_vr_literal_expr(ckx_src_rng _rng, qreal _val) :
     rng(_rng), val(_val) {}
 
+ckx_ast_bool_literal_expr::ckx_ast_bool_literal_expr(ckx_src_rng _rng,
+                                                     bool _val) :
+    rng(_rng), val(_val) {}
+
+ckx_ast_nullptr_expr::ckx_ast_nullptr_expr(ckx_src_rng _rng) : rng(_rng) {}
+
 ckx_ast_array_expr::ckx_ast_array_expr(ckx_prelexed_type _array_of_type) :
     array_of_type(saber::move(_array_of_type)) {}
 

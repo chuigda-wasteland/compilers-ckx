@@ -267,6 +267,12 @@ llvm_value* llvm_ir_builder_impl::create_bool_constant(bool _b)
     return insert_into_table(new llvm_constant(_b));
 }
 
+llvm_value *llvm_ir_builder_impl::create_null()
+{
+    static llvm_null null;
+    return &null;
+}
+
 llvm_value* llvm_ir_builder_impl::create_temporary_var()
 {
     return insert_into_table(

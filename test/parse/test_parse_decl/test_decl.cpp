@@ -125,6 +125,36 @@ ckx_parser_impl_test::test()
         assert(base::warn_list.empty());
         cleanup_test();
     }
+
+    {
+        ckx_test_filereader reader {"vnptr_t p = nullptr;"};
+        base::token_stream = new ckx_token_stream(reader);
+        initialize_test();
+        base::typename_table.add_typename(
+            saber_string_pool::create_view("student"));
+        ckx_ast_decl_stmt *decl = base::parse_decl_stmt();
+        decl->ast_dump(writer, 0);
+        delete decl;
+
+        assert(base::error_list.empty());
+        assert(base::warn_list.empty());
+        cleanup_test();
+    }
+
+    {
+        ckx_test_filereader reader {"vb1 n = true;"};
+        base::token_stream = new ckx_token_stream(reader);
+        initialize_test();
+        base::typename_table.add_typename(
+            saber_string_pool::create_view("student"));
+        ckx_ast_decl_stmt *decl = base::parse_decl_stmt();
+        decl->ast_dump(writer, 0);
+        delete decl;
+
+        assert(base::error_list.empty());
+        assert(base::warn_list.empty());
+        cleanup_test();
+    }
 }
 
 

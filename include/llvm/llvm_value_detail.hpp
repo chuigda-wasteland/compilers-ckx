@@ -78,6 +78,16 @@ private:
     saber_string_view name;
 };
 
+class llvm_null final implements llvm_value
+{
+public:
+    llvm_null() = default;
+    llvm_null(const llvm_null&) = delete;
+    ~llvm_null() override final = default;
+
+    saber_string_view to_string() override final;
+};
+
 } // namespace faker
 
 #endif // LLVM_VALUE_DETAIL_HPP

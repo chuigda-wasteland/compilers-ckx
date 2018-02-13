@@ -619,6 +619,37 @@ private:
     qreal val;
 };
 
+class ckx_ast_bool_literal_expr final implements ckx_ast_expr
+{
+    friend class ckx_sema_engine;
+public:
+    ckx_ast_bool_literal_expr(ckx_src_rng _rng, bool _val);
+    ~ckx_ast_bool_literal_expr() override final = default;
+
+    void ast_dump(we::we_file_writer &_writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
+
+private:
+    ckx_src_rng rng;
+    bool val;
+};
+
+class ckx_ast_nullptr_expr final implements ckx_ast_expr
+{
+    friend class ckx_sema_engine;
+public:
+    ckx_ast_nullptr_expr(ckx_src_rng _rng);
+    ~ckx_ast_nullptr_expr() override final = default;
+
+    void ast_dump(we::we_file_writer &_writer, quint16 _level) override final;
+    saber::optional<ckx_expr_result>
+    accept(ckx_sema_engine& _sema) override final;
+
+private:
+    ckx_src_rng rng;
+};
+
 class ckx_ast_array_expr final implements ckx_ast_expr
 {
 public:

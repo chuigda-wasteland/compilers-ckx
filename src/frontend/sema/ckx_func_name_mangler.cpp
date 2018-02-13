@@ -24,18 +24,20 @@ static saber_string type2str(ckx_type *_type)
         saber_string str;
         switch (_type->get_category())
         {
-        case ckx_type::category::type_vi8:   str = "b"; break;
-        case ckx_type::category::type_vi16:  str = "s"; break;
-        case ckx_type::category::type_vi32:  str = "i"; break;
-        case ckx_type::category::type_vi64:  str = "l"; break;
-        case ckx_type::category::type_vu8:   str = "B"; break;
-        case ckx_type::category::type_vu16:  str = "S"; break;
-        case ckx_type::category::type_vu32:  str = "U"; break;
-        case ckx_type::category::type_vu64:  str = "L"; break;
-        case ckx_type::category::type_vch:   str = "K"; break;
-        case ckx_type::category::type_vr32:  str = "F"; break;
-        case ckx_type::category::type_vr64:  str = "D"; break;
-        case ckx_type::category::type_void:  str = "N"; break;
+        case ckx_type::category::type_vi8:        str = "b";  break;
+        case ckx_type::category::type_vi16:       str = "s";  break;
+        case ckx_type::category::type_vi32:       str = "i";  break;
+        case ckx_type::category::type_vi64:       str = "l";  break;
+        case ckx_type::category::type_vu8:        str = "B";  break;
+        case ckx_type::category::type_vu16:       str = "S";  break;
+        case ckx_type::category::type_vu32:       str = "U";  break;
+        case ckx_type::category::type_vu64:       str = "L";  break;
+        case ckx_type::category::type_vch:        str = "K";  break;
+        case ckx_type::category::type_vr32:       str = "F";  break;
+        case ckx_type::category::type_vr64:       str = "D";  break;
+        case ckx_type::category::type_vnullptr_t: str = "Pz"; break;
+        case ckx_type::category::type_vbool:      str = "Tf"; break;
+        case ckx_type::category::type_void:       str = "N";  break;
         default:
             C8ASSERT(false); // What the fuck!
         }

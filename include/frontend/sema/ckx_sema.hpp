@@ -59,6 +59,10 @@ public:
     visit_vi_literal_node(ckx_ast_vi_literal_expr* _literal_expr);
     ckx_expr_result
     visit_vr_literal_node(ckx_ast_vr_literal_expr* _literal_expr);
+    ckx_expr_result
+    visit_vbool_literal_expr(ckx_ast_bool_literal_expr *_literal_expr);
+    ckx_expr_result
+    visit_nullptr_expr(ckx_ast_nullptr_expr *_nullptr_expr);
 
     /// @note for test only.
     void test_print(we::we_file_writer& writer);

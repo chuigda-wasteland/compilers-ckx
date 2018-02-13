@@ -37,6 +37,8 @@ ckx_basic_type::to_string() const
         {category::type_vr32, "vr32"},
         {category::type_vr64, "vr64"},
         {category::type_vch,  "vch"},
+        {category::type_vnullptr_t, "vnptr_t"},
+        {category::type_vbool, "vb1"},
         {category::type_void, "void"}
     };
 

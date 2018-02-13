@@ -6,14 +6,14 @@
 saber_string str =
 R"cc(
 
-fn heap_alloc(vu64 size): void*;
+fn heap_alloc(vi64 size): vnptr_t;
 fn heap_free(void* ptr): void;
 
 fn input(vi8* ptr): void;
 fn print(vi8 number): void;
 
 fn main(): vi32 {
-    vi8 *array = reinterpret_cast<vi8*>(heap_alloc(4));
+    vi8 *array = heap_alloc(4);
     input(array);
     input(array + 1);
     input(array + 2);

@@ -243,6 +243,11 @@ llvm_value *llvm_ir_builder::create_bool_constant(bool _b)
     return impl->create_bool_constant(_b);
 }
 
+llvm_value *llvm_ir_builder::create_null()
+{
+    return impl->create_null();
+}
+
 llvm_value *llvm_ir_builder::create_temporary_var()
 {
     return impl->create_temporary_var();

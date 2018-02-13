@@ -12,6 +12,8 @@ ckx_llvm_type_builder::build(ckx_type *_type)
     static saber_string_view i64str = saber_string_pool::create_view("i64");
     static saber_string_view fstr = saber_string_pool::create_view("float");
     static saber_string_view dstr = saber_string_pool::create_view("double");
+    static saber_string_view nullstr = saber_string_pool::create_view("i8*");
+    static saber_string_view i1str = saber_string_pool::create_view("i1");
     static saber_string_view voidstr = saber_string_pool::create_view("void");
 
     switch (_type->get_category())
@@ -39,6 +41,12 @@ ckx_llvm_type_builder::build(ckx_type *_type)
 
     case ckx_type::category::type_vr64:
         return dstr;
+
+    case ckx_type::category::type_vnullptr_t:
+        return nullstr;
+
+    case ckx_type::category::type_vbool:
+        return i1str;
 
     case ckx_type::category::type_void:
         return voidstr;

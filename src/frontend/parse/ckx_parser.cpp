@@ -97,6 +97,8 @@ ckx_parser_impl::parse_global_stmt()
     case ckx_token::type::tk_vch:
     case ckx_token::type::tk_vr32:
     case ckx_token::type::tk_vr64:
+    case ckx_token::type::tk_vbool:
+    case ckx_token::type::tk_vnullptr_t:
         return parse_decl_stmt();
 
     /// @attention
@@ -154,6 +156,8 @@ ckx_parser_impl::parse_stmt()
     case ckx_token::type::tk_vch:
     case ckx_token::type::tk_vr32:
     case ckx_token::type::tk_vr64:
+    case ckx_token::type::tk_vbool:
+    case ckx_token::type::tk_vnullptr_t:
         return parse_decl_stmt();
 
     case ckx_token::type::tk_id:
@@ -178,6 +182,10 @@ ckx_parser_impl::parse_stmt()
     case ckx_token::type::tk_inc:
     case ckx_token::type::tk_dec:
     case ckx_token::type::tk_lparen:
+
+    case ckx_token::type::tk_nullptr:
+    case ckx_token::type::tk_true:
+    case ckx_token::type::tk_false:
 
     case ckx_token::type::tk_static_cast:
     case ckx_token::type::tk_reinterpret_cast:
@@ -818,6 +826,29 @@ ckx_parser_impl::parse_basic_expr()
         {
             ckx_ast_expr* ret = new ckx_ast_vr_literal_expr(
                 current_token().rng, current_token().v.r);
+            next_token();
+            return ret;
+        }
+
+    case ckx_token::type::tk_true:
+        {
+            ckx_ast_expr* ret = new ckx_ast_bool_literal_expr(
+                current_token().rng, true);
+            next_token();
+            return ret;
+        }
+
+    case ckx_token::type::tk_false:
+        {
+            ckx_ast_expr* ret = new ckx_ast_bool_literal_expr(
+                current_token().rng, false);
+            next_token();
+            return ret;
+        }
+
+    case ckx_token::type::tk_nullptr:
+        {
+            ckx_ast_expr* ret = new ckx_ast_nullptr_expr(current_token().rng);
             next_token();
             return ret;
         }

@@ -227,8 +227,8 @@ void ckx_token_stream_impl::do_split_tokens()
             solve_array_or_lbracket(); break;
 
         case 'a': case 'b': case 'c': case 'd': case 'e':
-        case 'f': case 'i': case 'o': case 'r': case 's':
-        case 'v': case 'w':
+        case 'f': case 'i': case 'n': case 'o': case 'r':
+        case 's': case 't': case 'v': case 'w':
             {
                 auto scan_str_result = scan_full_id_string();
                 if (!solve_keyword(scan_str_result.first,
@@ -239,14 +239,13 @@ void ckx_token_stream_impl::do_split_tokens()
             }
 
         case 'g': case 'h': case 'j': case 'k': case 'l':
-        case 'm': case 'n': case 'p': case 'q': case 't':
-        case 'u': case 'x': case 'y': case 'z': case 'A':
-        case 'B': case 'C': case 'D': case 'E': case 'F':
-        case 'G': case 'H': case 'I': case 'J': case 'K':
-        case 'L': case 'M': case 'N': case 'O': case 'P':
-        case 'Q': case 'R': case 'S': case 'T': case 'U':
-        case 'V': case 'W': case 'X': case 'Y': case 'Z':
-        case '_':
+        case 'm': case 'p': case 'q': case 'u': case 'x':
+        case 'y': case 'z': case 'A': case 'B': case 'C':
+        case 'D': case 'E': case 'F': case 'G': case 'H':
+        case 'I': case 'J': case 'K': case 'L': case 'M':
+        case 'N': case 'O': case 'P': case 'Q': case 'R':
+        case 'S': case 'T': case 'U': case 'V': case 'W':
+        case 'X': case 'Y': case 'Z': case '_':
             {
                 auto scan_str_result = scan_full_id_string();
                 solve_identifier(scan_str_result.first, scan_str_result.second);

@@ -94,5 +94,9 @@ saber_string_view llvm_variable::to_string()
         saber::string_paste("%", name));
 }
 
+saber_string_view llvm_null::to_string()
+{
+    return saber_string_pool::create_view("null");
+}
 
 } // namespace faker

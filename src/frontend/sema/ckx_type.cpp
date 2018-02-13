@@ -81,9 +81,20 @@ bool ckx_type::is_numeric() const
     return is_integral() || is_floating();
 }
 
+bool ckx_type::is_bool() const
+{
+    return get_category() == category::type_vbool;
+}
+
 bool ckx_type::is_pointer() const
 {
-    return get_category() == ckx_type::category::type_pointer;
+    return get_category() == ckx_type::category::type_pointer
+            || get_category() == ckx_type::category::type_vnullptr_t;
+}
+
+bool ckx_type::is_nullptr() const
+{
+    return get_category() == ckx_type::category::type_vnullptr_t;
 }
 
 bool ckx_type::is_function() const
@@ -170,7 +181,7 @@ bool ckx_type::more_qual_than(unsigned char _another_qual_bits) const
 
 ckx_basic_type::ckx_basic_type(category _basic_category) :
     ckx_type(_basic_category)
-{}
+{ C8ASSERT(this->is_basic()); }
 
 bool ckx_basic_type::equal_to_no_cvr(ckx_type *_another) const
 {
@@ -180,8 +191,7 @@ bool ckx_basic_type::equal_to_no_cvr(ckx_type *_another) const
 
 ckx_struct_type::ckx_struct_type(saber_string_view _struct_name) :
     ckx_type(ckx_type::category::type_struct),
-    struct_name(_struct_name)
-{}
+    struct_name(_struct_name) {}
 
 bool ckx_struct_type::equal_to_no_cvr(ckx_type *_another) const
 {
@@ -283,8 +293,7 @@ ckx_func_type::ckx_func_type(
         saber::vector<ckx_type*> &&_param_type_list) :
     ckx_type(ckx_type::category::type_function),
     return_type(saber::move(_return_type)),
-    param_type_list(saber::move(_param_type_list))
-{}
+    param_type_list(saber::move(_param_type_list)) {}
 
 bool ckx_func_type::equal_to_no_cvr(ckx_type *_another) const
 {
@@ -320,8 +329,7 @@ ckx_func_type::get_param_type_list()
 
 ckx_pointer_type::ckx_pointer_type(ckx_type* _target) :
     ckx_type(ckx_type::category::type_pointer),
-    target(_target)
-{}
+    target(_target) {}
 
 bool ckx_pointer_type::equal_to_no_cvr(ckx_type *_another) const
 {
@@ -381,18 +389,20 @@ ckx_type_helper::get_type_by_token(ckx_token::type _basic_type_token)
 {
     switch ( _basic_type_token )
     {
-    case ckx_token::type::tk_vi8:   return get_vi8_type();
-    case ckx_token::type::tk_vi16:  return get_vi16_type();
-    case ckx_token::type::tk_vi32:  return get_vi32_type();
-    case ckx_token::type::tk_vi64:  return get_vi64_type();
-    case ckx_token::type::tk_vu8:   return get_vu8_type();
-    case ckx_token::type::tk_vu16:  return get_vu16_type();
-    case ckx_token::type::tk_vu32:  return get_vu32_type();
-    case ckx_token::type::tk_vu64:  return get_vu64_type();
-    case ckx_token::type::tk_vch:   return get_vch_type();
-    case ckx_token::type::tk_vr32:  return get_vr32_type();
-    case ckx_token::type::tk_vr64:  return get_vr64_type();
-    case ckx_token::type::tk_void:  return get_void_type();
+    case ckx_token::type::tk_vi8:        return get_vi8_type();
+    case ckx_token::type::tk_vi16:       return get_vi16_type();
+    case ckx_token::type::tk_vi32:       return get_vi32_type();
+    case ckx_token::type::tk_vi64:       return get_vi64_type();
+    case ckx_token::type::tk_vu8:        return get_vu8_type();
+    case ckx_token::type::tk_vu16:       return get_vu16_type();
+    case ckx_token::type::tk_vu32:       return get_vu32_type();
+    case ckx_token::type::tk_vu64:       return get_vu64_type();
+    case ckx_token::type::tk_vch:        return get_vch_type();
+    case ckx_token::type::tk_vr32:       return get_vr32_type();
+    case ckx_token::type::tk_vr64:       return get_vr64_type();
+    case ckx_token::type::tk_vbool:      return get_vbool_type();
+    case ckx_token::type::tk_vnullptr_t: return get_vnullptr_type();
+    case ckx_token::type::tk_void:       return get_void_type();
     default: C8ASSERT(false);
     }
 }
@@ -401,18 +411,20 @@ ckx_type *ckx_type_helper::get_basic_type(ckx_type::category _basic_type_categ)
 {
     switch (_basic_type_categ)
     {
-    case ckx_type::category::type_vi8:   return get_vi8_type();
-    case ckx_type::category::type_vi16:  return get_vi16_type();
-    case ckx_type::category::type_vi32:  return get_vi32_type();
-    case ckx_type::category::type_vi64:  return get_vi64_type();
-    case ckx_type::category::type_vu8:   return get_vu8_type();
-    case ckx_type::category::type_vu16:  return get_vu16_type();
-    case ckx_type::category::type_vu32:  return get_vu32_type();
-    case ckx_type::category::type_vu64:  return get_vu64_type();
-    case ckx_type::category::type_vch:   return get_vch_type();
-    case ckx_type::category::type_vr32:  return get_vr32_type();
-    case ckx_type::category::type_vr64:  return get_vr64_type();
-    case ckx_type::category::type_void:  return get_void_type();
+    case ckx_type::category::type_vi8:        return get_vi8_type();
+    case ckx_type::category::type_vi16:       return get_vi16_type();
+    case ckx_type::category::type_vi32:       return get_vi32_type();
+    case ckx_type::category::type_vi64:       return get_vi64_type();
+    case ckx_type::category::type_vu8:        return get_vu8_type();
+    case ckx_type::category::type_vu16:       return get_vu16_type();
+    case ckx_type::category::type_vu32:       return get_vu32_type();
+    case ckx_type::category::type_vu64:       return get_vu64_type();
+    case ckx_type::category::type_vch:        return get_vch_type();
+    case ckx_type::category::type_vr32:       return get_vr32_type();
+    case ckx_type::category::type_vr64:       return get_vr64_type();
+    case ckx_type::category::type_vbool:      return get_vbool_type();
+    case ckx_type::category::type_vnullptr_t: return get_vnullptr_type();
+    case ckx_type::category::type_void:       return get_void_type();
     default: C8ASSERT(false);
     }
 }
@@ -546,6 +558,18 @@ ckx_type* ckx_type_helper::get_vr64_type()
     return &ret;
 }
 
+ckx_type *ckx_type_helper::get_vbool_type()
+{
+    static ckx_basic_type ret(ckx_type::category::type_vbool);
+    return &ret;
+}
+
+ckx_type *ckx_type_helper::get_vnullptr_type()
+{
+    static ckx_basic_type ret(ckx_type::category::type_vnullptr_t);
+    return &ret;
+}
+
 ckx_type* ckx_type_helper::get_void_type()
 {
     static ckx_basic_type ret(ckx_type::category::type_void);
@@ -575,6 +599,10 @@ bool ckx_type_helper::can_implicit_cast(ckx_type *_from, ckx_type *_dest)
         if (rank_of(_from->get_category()) < rank_of(_dest->get_category()))
             return true;
 
+    if ((_from->is_pointer() && _dest->is_nullptr())
+        || (_from->is_nullptr() && _dest->is_pointer()))
+            return true;
+
     return false;
 }
 
@@ -583,6 +611,10 @@ bool ckx_type_helper::can_static_cast(ckx_type *_from, ckx_type *_dest)
     if (_dest->more_qual_than(_from->get_qual_bits()))
     {
         if (_from->is_numeric() && _dest->is_numeric())
+            return true;
+
+        if ((_from->is_numeric() && _dest->is_bool())
+            || (_from->is_basic() && _dest->is_numeric()))
             return true;
 
         if ((_from->is_integral() && _dest->is_enum())

@@ -469,7 +469,8 @@ void ckx_ast_sizeof_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
 }
 
 
-void ckx_ast_vi_literal_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
+void ckx_ast_vi_literal_expr::ast_dump(we::we_file_writer &_writer,
+                                       quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Integral literal "));
@@ -478,12 +479,29 @@ void ckx_ast_vi_literal_expr::ast_dump(we::we_file_writer &_writer, quint16 _lev
 }
 
 
-void ckx_ast_vr_literal_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
+void ckx_ast_vr_literal_expr::ast_dump(we::we_file_writer &_writer,
+                                       quint16 _level)
 {
     _writer.write_whitespace(_level*indent_size);
     _writer.write(reinterpret_cast<const qchar*>("Real literal "));
     _writer.write(val);
     _writer.write(reinterpret_cast<const qchar*>("\n"));
+}
+
+
+void ckx_ast_bool_literal_expr::ast_dump(we::we_file_writer &_writer,
+                                         quint16 _level)
+{
+    _writer.write_whitespace(_level*indent_size);
+    if (val) _writer.write(reinterpret_cast<const qchar*>("True\n"));
+    else _writer.write(reinterpret_cast<const qchar*>("False\n"));
+}
+
+
+void ckx_ast_nullptr_expr::ast_dump(we::we_file_writer &_writer, quint16 _level)
+{
+    _writer.write_whitespace(_level*indent_size);
+    _writer.write(reinterpret_cast<const qchar*>("Nullptr\n"));
 }
 
 

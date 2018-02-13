@@ -132,6 +132,8 @@ COMMENT(END_BLOCK)
     llvm_value *create_unsigned_constant(quint64 _u);
     llvm_value *create_floating_constant(qreal _r);
     llvm_value *create_bool_constant(bool _b);
+    llvm_value *create_null();
+
 
     llvm_value *create_temporary_var();
     llvm_value *create_named_var(saber_string_view _name);
