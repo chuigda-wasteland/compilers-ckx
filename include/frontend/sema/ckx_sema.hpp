@@ -134,7 +134,6 @@ private:
     public:
         enter_func_protection_raii(ckx_sema_engine& _sema,
                                    ckx_func_type* _func_type);
-
         ~enter_func_protection_raii();
 
     private:

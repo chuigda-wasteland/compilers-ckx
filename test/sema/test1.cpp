@@ -6,23 +6,19 @@
 saber_string str =
 R"cc(
 
-fn print(vi64 number): void;
-fn print(vr64 number): void;
-fn print(vu64 number): void;
+fn heap_alloc(vu64 size): void*;
+fn heap_free(void* ptr): void;
 
-fn i2u(vi64 number): vu64 {
-    return static_cast<vu64>(number);
-}
-
-fn i2f(vi64 number): vr64 {
-    return static_cast<vr64>(number);
-}
+fn input(vi8* ptr): void;
+fn print(vi8 number): void;
 
 fn main(): vi32 {
-    vi64 number = 65536;
-    print(number);
-    print(i2u(number));
-    print(i2f(number));
+    vi8 *array = reinterpret_cast<vi8*>(heap_alloc(4));
+    input(array);
+    input(array + 1);
+    input(array + 2);
+    *(array+3) = *(array+1) * *(array+2) + *(array);
+    print(*array+3);
     return 0;
 }
 

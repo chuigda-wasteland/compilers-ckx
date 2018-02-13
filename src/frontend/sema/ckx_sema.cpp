@@ -248,6 +248,38 @@ ckx_sema_engine::try_static_cast(ckx_expr_result _expr, ckx_type *_desired)
 }
 
 saber::optional<ckx_expr_result>
+ckx_sema_engine::try_const_cast(ckx_expr_result _expr, ckx_type *_desired)
+{
+    return saber::optional<ckx_expr_result>(
+        _desired, _expr.categ, _expr.llvm_value_bind);
+}
+
+saber::optional<ckx_expr_result>
+ckx_sema_engine::try_reinter_cast(ckx_expr_result _expr, ckx_type *_desired)
+{
+    C8ASSERT(_expr.categ == ckx_expr_result::value_category::prvalue);
+    if (_expr.type->is_pointer() && _desired->is_pointer())
+    {
+        if (_expr.type->get_qual_bits() != _desired->get_qual_bits())
+        {
+            error();
+            return saber::optional<ckx_expr_result>();
+        }
+
+        faker::llvm_value *destloc = builder.create_temporary_var();
+        builder.create_bitcast(destloc,
+                               ckx_llvm_type_builder::build(_expr.type),
+                               _expr.llvm_value_bind,
+                               ckx_llvm_type_builder::build(_desired));
+        return saber::optional<ckx_expr_result>(
+            _desired, ckx_expr_result::value_category::prvalue, destloc);
+    }
+
+    error();
+    return saber::optional<ckx_expr_result>();
+}
+
+saber::optional<ckx_expr_result>
 ckx_sema_engine::visit_binary_expr(ckx_ast_binary_expr *_binary_expr)
 {
     if (!ckx_op_helper::is_logical(_binary_expr->opercode))
@@ -394,6 +426,10 @@ ckx_sema_engine::visit_cast_expr(ckx_ast_cast_expr *_cast_expr)
     {
     case ckx_ast_cast_expr::castop::cst_static:
         return try_static_cast(decay_to_rvalue(operand_result.get()), desired);
+    case ckx_ast_cast_expr::castop::cst_reinterpret:
+        return try_reinter_cast(decay_to_rvalue(operand_result.get()), desired);
+    case ckx_ast_cast_expr::castop::cst_const:
+        return try_const_cast(operand_result.get(), desired);
     default:
         C8ASSERT(false);
     }
