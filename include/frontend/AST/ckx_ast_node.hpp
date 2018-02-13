@@ -550,6 +550,7 @@ private:
 
 class ckx_ast_cast_expr final implements ckx_ast_expr
 {
+    friend class ckx_sema_engine;
 public:
     enum class castop : qchar
     { cst_static, cst_const, cst_reinterpret, cst_ckx };

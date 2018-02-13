@@ -170,7 +170,7 @@ class llvm_cast_instruction final implements llvm_instruction
 public:
     enum class operator_type : qchar
     {
-        ot_trunc, ot_zext, ot_sext, ot_fpext,
+        ot_trunc, ot_fptrunc, ot_zext, ot_sext, ot_fpext,
         ot_fptoui, ot_uitofp, ot_fptosi, ot_sitofp,
         ot_inttoptr, ot_ptrtoint,
         ot_bitcast

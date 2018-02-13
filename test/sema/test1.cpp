@@ -6,27 +6,23 @@
 saber_string str =
 R"cc(
 
-struct s { vi8 a; vi16 b, c; s* d; }
+fn print(vi64 number): void;
+fn print(vr64 number): void;
+fn print(vu64 number): void;
 
-fn one(): vi32 {
-    return 1;
+fn i2u(vi64 number): vu64 {
+    return static_cast<vu64>(number);
 }
 
-fn fuck(): s {
-    s s1;
-    s1.a = 0;
-    s1.b = s1.c = 0;
-    return s1;
+fn i2f(vi64 number): vr64 {
+    return static_cast<vr64>(number);
 }
 
-fn print(vi16 number): vi16;
-
-fn main(vi8 argc, vi8** argv): vi32 {
-    vi64 number;
-    number = one();
-    s shit;
-    shit = fuck();
-    print(fuck().c);
+fn main(): vi32 {
+    vi64 number = 65536;
+    print(number);
+    print(i2u(number));
+    print(i2f(number));
     return 0;
 }
 

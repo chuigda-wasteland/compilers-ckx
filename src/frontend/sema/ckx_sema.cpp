@@ -101,6 +101,8 @@ ckx_expr_result ckx_sema_engine::decay_to_rvalue(ckx_expr_result _expr)
 saber::optional<ckx_expr_result>
 ckx_sema_engine::try_implicit_cast(ckx_expr_result _expr, ckx_type *_desired)
 {
+    C8ASSERT(_expr.categ == ckx_expr_result::value_category::prvalue);
+
     if (!ckx_type_helper::can_implicit_cast(_expr.type, _desired))
         return saber::optional<ckx_expr_result>();
 
@@ -147,6 +149,102 @@ ckx_sema_engine::try_implicit_cast(ckx_expr_result _expr, ckx_type *_desired)
         C8ASSERT(false);
         return saber::optional<ckx_expr_result>();
     }
+}
+
+saber::optional<ckx_expr_result>
+ckx_sema_engine::try_static_cast(ckx_expr_result _expr, ckx_type *_desired)
+{
+    if (_expr.type->is_numeric() && _desired->is_numeric())
+    {
+        if ( (_expr.type->is_signed() && _desired->is_signed())
+             || ( _expr.type->is_unsigned() && _desired->is_unsigned()) )
+        {
+            if (ckx_type_helper::rank_of(_expr.type->get_category())
+                > ckx_type_helper::rank_of(_desired->get_category()))
+            {
+                faker::llvm_value *value = builder.create_temporary_var();
+                builder.create_trunc(value,
+                                     ckx_llvm_type_builder::build(_expr.type),
+                                     _expr.llvm_value_bind,
+                                     ckx_llvm_type_builder::build(_desired));
+                return saber::optional<ckx_expr_result>(
+                    _desired, ckx_expr_result::value_category::prvalue, value);
+            }
+            else
+            {
+                return try_implicit_cast(_expr, _desired);
+            }
+        }
+        else if (_expr.type->is_floating() && _desired->is_floating())
+        {
+            if (ckx_type_helper::rank_of(_expr.type->get_category())
+                > ckx_type_helper::rank_of(_desired->get_category()))
+            {
+                faker::llvm_value *value = builder.create_temporary_var();
+                builder.create_fptrunc(value,
+                                       ckx_llvm_type_builder::build(_expr.type),
+                                       _expr.llvm_value_bind,
+                                       ckx_llvm_type_builder::build(_desired));
+                return saber::optional<ckx_expr_result>(
+                    _desired, ckx_expr_result::value_category::prvalue, value);
+            }
+            else
+            {
+                return try_implicit_cast(_expr, _desired);
+            }
+        }
+        else if (_expr.type->is_floating() && _desired->is_signed())
+        {
+            faker::llvm_value *value = builder.create_temporary_var();
+            builder.create_fptosi(value,
+                                  ckx_llvm_type_builder::build(_expr.type),
+                                  _expr.llvm_value_bind,
+                                  ckx_llvm_type_builder::build(_desired));
+            return saber::optional<ckx_expr_result>(
+                _desired, ckx_expr_result::value_category::prvalue, value);
+        }
+        else if (_expr.type->is_floating() && _desired->is_unsigned())
+        {
+            faker::llvm_value *value = builder.create_temporary_var();
+            builder.create_fptoui(value,
+                                  ckx_llvm_type_builder::build(_expr.type),
+                                  _expr.llvm_value_bind,
+                                  ckx_llvm_type_builder::build(_desired));
+            return saber::optional<ckx_expr_result>(
+                _desired, ckx_expr_result::value_category::prvalue, value);
+        }
+        else if (_expr.type->is_signed() && _desired->is_floating())
+        {
+            faker::llvm_value *value = builder.create_temporary_var();
+            builder.create_sitofp(value,
+                                  ckx_llvm_type_builder::build(_expr.type),
+                                  _expr.llvm_value_bind,
+                                  ckx_llvm_type_builder::build(_desired));
+            return saber::optional<ckx_expr_result>(
+                _desired, ckx_expr_result::value_category::prvalue, value);
+        }
+        else if (_expr.type->is_unsigned() && _desired->is_floating())
+        {
+            faker::llvm_value *value = builder.create_temporary_var();
+            builder.create_uitofp(value,
+                                  ckx_llvm_type_builder::build(_expr.type),
+                                  _expr.llvm_value_bind,
+                                  ckx_llvm_type_builder::build(_desired));
+            return saber::optional<ckx_expr_result>(
+                _desired, ckx_expr_result::value_category::prvalue, value);
+        }
+        else if ((_expr.type->is_signed() && _desired->is_unsigned())
+                 || (_expr.type->is_unsigned() && _desired->is_signed()))
+        {
+            /// @note this implementation is buggy
+            return saber::optional<ckx_expr_result>(
+                _desired, ckx_expr_result::value_category::prvalue,
+                _expr.llvm_value_bind);
+        }
+    }
+
+    error();
+    return saber::optional<ckx_expr_result>();
 }
 
 saber::optional<ckx_expr_result>
@@ -282,6 +380,23 @@ ckx_sema_engine::visit_invoke_expr(ckx_ast_invoke_expr *_invoke_expr)
     }
 
     C8ASSERT(false);
+}
+
+saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_cast_expr(ckx_ast_cast_expr *_cast_expr)
+{
+    saber::optional<ckx_expr_result> operand_result =
+        _cast_expr->expr->accept(*this);
+    ckx_type *desired = re_lex_type(_cast_expr->desired_type);
+    if (!operand_result.is_type())
+        return saber::optional<ckx_expr_result>();
+    switch (_cast_expr->op)
+    {
+    case ckx_ast_cast_expr::castop::cst_static:
+        return try_static_cast(decay_to_rvalue(operand_result.get()), desired);
+    default:
+        C8ASSERT(false);
+    }
 }
 
 saber::optional<ckx_expr_result>

@@ -50,6 +50,8 @@ public:
     saber::optional<ckx_expr_result>
     visit_invoke_expr(ckx_ast_invoke_expr *_invoke_expr);
     saber::optional<ckx_expr_result>
+    visit_cast_expr(ckx_ast_cast_expr *_cast_expr);
+    saber::optional<ckx_expr_result>
     visit_extract_expr(ckx_ast_extract_expr *_extract_expr);
     saber::optional<ckx_expr_result>
     visit_id_expr(ckx_ast_id_expr *_id_expr);

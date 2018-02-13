@@ -34,9 +34,12 @@ BINOP(xor)
 
 
 CASTOP(trunc)
+CASTOP(fptrunc)
 CASTOP(zext)
 CASTOP(sext)
 CASTOP(fpext)
+CASTOP(fptosi)
+CASTOP(sitofp)
 CASTOP(fptoui)
 CASTOP(uitofp)
 CASTOP(inttoptr)

@@ -232,6 +232,7 @@ void llvm_cast_instruction::pretty_print(we::we_file_writer &_writer)
     switch (op)
     {
     case operator_type::ot_trunc:    _writer.write("trunc ");    break;
+    case operator_type::ot_fptrunc:  _writer.write("fptrunc ");  break;
     case operator_type::ot_zext:     _writer.write("zext ");     break;
     case operator_type::ot_sext:     _writer.write("sext ");     break;
     case operator_type::ot_fpext:    _writer.write("fpext ");    break;

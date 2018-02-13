@@ -91,7 +91,11 @@ ckx_ast_id_expr::accept(ckx_sema_engine& _sema)
 }
 
 saber::optional<ckx_expr_result>
-ckx_ast_cast_expr::accept(ckx_sema_engine&) { return bwsb(); }
+ckx_ast_cast_expr::accept(ckx_sema_engine& _sema)
+{
+    return _sema.visit_cast_expr(this);
+}
+
 saber::optional<ckx_expr_result>
 ckx_ast_sizeof_expr::accept(ckx_sema_engine&) { return bwsb(); }
 
