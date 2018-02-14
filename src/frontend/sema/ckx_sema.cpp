@@ -1,5 +1,6 @@
 ﻿#include "frontend/sema/ckx_sema.hpp"
 #include "frontend/sema/ckx_llvm_type_builder.hpp"
+#include "llvm/llvm_inst_detail.hpp"
 
 #include <algorithm>
 
@@ -78,6 +79,41 @@ void ckx_sema_engine::visit_return_stmt(ckx_ast_return_stmt *_return_stmt)
     {
         builder.create_return_void();
     }
+}
+
+void ckx_sema_engine::visit_if_stmt(ckx_ast_if_stmt *_if_stmt)
+{
+    saber::optional<ckx_expr_result> result_cond_expr =
+        _if_stmt->condition->accept(*this);
+    if (!result_cond_expr.is_type()) return;
+
+    saber::optional<ckx_expr_result> casted_result =
+        try_implicit_cast(decay_to_rvalue(result_cond_expr.get()),
+                          ckx_type_helper::get_vbool_type());
+
+    if (!casted_result.is_type())
+    {
+        error();
+        return;
+    }
+
+    faker::llvm_instruction* br_pos = builder.get_insert_point();
+    faker::llvm_label* then_label = builder.create_temporary_label();
+    faker::llvm_label* else_label = builder.create_temporary_label();
+    faker::llvm_label* endif_label = builder.create_temporary_label();
+    enter_if_protection_raii(
+        *this, new ckx_if_context(then_label, else_label, endif_label));
+    builder.set_insert_after(br_pos);
+    builder.create_cond_branch(casted_result.get().llvm_value_bind,
+                               then_label, else_label);
+    builder.set_insert_after(then_label);
+    _if_stmt->then_clause->accept(*this);
+    builder.create_branch(endif_label);
+    builder.set_insert_after(else_label);
+    if (_if_stmt->else_clause)
+        _if_stmt->else_clause->accept(*this);
+    builder.create_branch(endif_label);
+    builder.set_insert_after(endif_label);
 }
 
 ckx_expr_result ckx_sema_engine::decay_to_rvalue(ckx_expr_result _expr)
@@ -1255,6 +1291,22 @@ enter_func_protection_raii::~enter_func_protection_raii()
     sema.context_manager.exit_func_context();
     sema.leave_scope();
     sema.vname_mangle_count = 0;
+}
+
+ckx_sema_engine::
+enter_if_protection_raii::enter_if_protection_raii(ckx_sema_engine &_sema,
+                                                   ckx_if_context *_context) :
+    sema(_sema),
+    context(_context)
+{
+    sema.context_manager.enter_if_context(_context);
+}
+
+ckx_sema_engine::
+enter_if_protection_raii::~enter_if_protection_raii()
+{
+    sema.builder.set_insert_after(context->endif_label);
+    sema.context_manager.exit_if_context();
 }
 
 } // namespace ckx

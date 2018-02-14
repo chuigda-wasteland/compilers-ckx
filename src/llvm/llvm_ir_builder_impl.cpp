@@ -92,6 +92,11 @@ void llvm_ir_builder_impl::leave_func()
     stashed_global_insertion_point = nullptr;
 }
 
+llvm_instruction *llvm_ir_builder_impl::get_insert_point()
+{
+    return static_cast<llvm_instruction*>(cur_insertion_point);
+}
+
 void llvm_ir_builder_impl::set_insert_after(llvm_instruction *_instruction)
 {
     cur_insertion_point = _instruction;

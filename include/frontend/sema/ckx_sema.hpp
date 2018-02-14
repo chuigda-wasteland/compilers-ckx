@@ -29,6 +29,7 @@ public:
     void visit_record_stmt(ckx_ast_record_stmt* _record_stmt);
     void visit_func_stmt(ckx_ast_func_stmt* _func_stmt);
     void visit_return_stmt(ckx_ast_return_stmt* _return_stmt);
+    void visit_if_stmt(ckx_ast_if_stmt* _if_stmt);
 
     ckx_expr_result decay_to_rvalue(ckx_expr_result _expr);
 
@@ -145,9 +146,19 @@ private:
         enter_func_protection_raii(ckx_sema_engine& _sema,
                                    ckx_func_type* _func_type);
         ~enter_func_protection_raii();
-
     private:
         ckx_sema_engine& sema;
+    };
+
+    class enter_if_protection_raii
+    {
+    public:
+        enter_if_protection_raii(ckx_sema_engine& _sema,
+                                 ckx_if_context *_context);
+        ~enter_if_protection_raii();
+    private:
+        ckx_sema_engine& sema;
+        ckx_if_context *context;
     };
 
     bool is_in_func();

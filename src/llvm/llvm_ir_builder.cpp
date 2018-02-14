@@ -55,6 +55,11 @@ void llvm_ir_builder::leave_func()
     impl->leave_func();
 }
 
+llvm_instruction *llvm_ir_builder::get_insert_point()
+{
+    return impl->get_insert_point();
+}
+
 void llvm_ir_builder::set_insert_after(llvm_instruction *_instruction)
 {
     impl->set_insert_after(_instruction);

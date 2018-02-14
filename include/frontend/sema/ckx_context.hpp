@@ -43,6 +43,23 @@ open_class ckx_func_context final make_use_of ckx_context
     ~ckx_func_context() = default;
 };
 
+open_class ckx_if_context final make_use_of ckx_context
+{
+    faker::llvm_label *const then_label;
+    faker::llvm_label *const else_label;
+    faker::llvm_label *const endif_label;
+
+    ckx_if_context(faker::llvm_label *const _then_label,
+                   faker::llvm_label *const _else_label,
+                   faker::llvm_label *const _endif_label) :
+        ckx_context(context_type::cxt_if),
+        then_label(_then_label),
+        else_label(_else_label),
+        endif_label(_endif_label) {}
+
+    ~ckx_if_context() = default;
+};
+
 } // namespace ckx
 
 #endif // CKX_CONTEXT_HPP

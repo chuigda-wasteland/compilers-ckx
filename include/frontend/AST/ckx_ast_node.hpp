@@ -91,6 +91,7 @@ private:
 
 class ckx_ast_if_stmt final implements ckx_ast_stmt
 {
+    friend class ckx_sema_engine;
 public:
     ckx_ast_if_stmt(ckx_src_rng _if_rng, ckx_src_rng _else_rng,
                     ckx_ast_expr* _condition,
@@ -104,7 +105,7 @@ public:
     ~ckx_ast_if_stmt() override final;
 
     void ast_dump(we::we_file_writer& _writer, quint16 _level) override final;
-    void accept(ckx_sema_engine &sema) override final;
+    void accept(ckx_sema_engine &_sema) override final;
 
 private:
     ckx_src_rng if_rng;
