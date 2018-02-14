@@ -319,6 +319,36 @@ ckx_sema_engine::visit_binary_expr(ckx_ast_binary_expr *_binary_expr)
             return visit_mul(loperand_result.get(), roperand_result.get());
         case ckx_op::op_div:
             return visit_div(loperand_result.get(), roperand_result.get());
+        case ckx_op::op_eq:
+            return visit_comparsion(loperand_result.get(),roperand_result.get(),
+                                    &faker::llvm_ir_builder::create_fcmp_oeq,
+                                    &faker::llvm_ir_builder::create_icmp_eq,
+                                    &faker::llvm_ir_builder::create_icmp_eq);
+        case ckx_op::op_neq:
+            return visit_comparsion(loperand_result.get(),roperand_result.get(),
+                                    &faker::llvm_ir_builder::create_fcmp_one,
+                                    &faker::llvm_ir_builder::create_icmp_ne,
+                                    &faker::llvm_ir_builder::create_icmp_ne);
+        case ckx_op::op_lt:
+            return visit_comparsion(loperand_result.get(),roperand_result.get(),
+                                    &faker::llvm_ir_builder::create_fcmp_olt,
+                                    &faker::llvm_ir_builder::create_icmp_slt,
+                                    &faker::llvm_ir_builder::create_icmp_ult);
+        case ckx_op::op_gt:
+            return visit_comparsion(loperand_result.get(),roperand_result.get(),
+                                    &faker::llvm_ir_builder::create_fcmp_ogt,
+                                    &faker::llvm_ir_builder::create_icmp_sgt,
+                                    &faker::llvm_ir_builder::create_icmp_ugt);
+        case ckx_op::op_geq:
+            return visit_comparsion(loperand_result.get(),roperand_result.get(),
+                                    &faker::llvm_ir_builder::create_fcmp_oge,
+                                    &faker::llvm_ir_builder::create_icmp_sge,
+                                    &faker::llvm_ir_builder::create_icmp_uge);
+        case ckx_op::op_leq:
+            return visit_comparsion(loperand_result.get(),roperand_result.get(),
+                                    &faker::llvm_ir_builder::create_fcmp_ole,
+                                    &faker::llvm_ir_builder::create_icmp_sle,
+                                    &faker::llvm_ir_builder::create_icmp_ule);
         default:
             C8ASSERT(false);
         }
@@ -1032,6 +1062,71 @@ ckx_sema_engine::visit_numeric_calc(
        common_type, ckx_expr_result::value_category::prvalue, llvm_value);
 }
 
+
+template<typename ActionOnFloat, typename ActionOnInt, typename ActionOnUInt>
+saber::optional<ckx_expr_result>
+ckx_sema_engine::visit_comparsion(ckx_expr_result _expr1,ckx_expr_result _expr2,
+                                  ActionOnFloat &&_action_on_float,
+                                  ActionOnInt &&_action_on_int,
+                                  ActionOnUInt &&_action_on_uint)
+{
+    if (_expr1.type->is_numeric() && _expr2.type->is_numeric())
+    {
+        ckx_type *common_type =
+            ckx_type_helper::common_numeric_type(_expr1.type, _expr2.type);
+
+        if (common_type == nullptr)
+        {
+            error();
+            return saber::optional<ckx_expr_result>();
+        }
+
+        ckx_expr_result casted_result1 =
+            try_implicit_cast(decay_to_rvalue(_expr1), common_type).get();
+        ckx_expr_result casted_result2 =
+            try_implicit_cast(decay_to_rvalue(_expr2), common_type).get();
+
+        faker::llvm_value *llvm_value = builder.create_temporary_var();
+        if (common_type->is_floating())
+            ((builder).*(_action_on_float))
+                (llvm_value, ckx_llvm_type_builder::build(common_type),
+                casted_result1.llvm_value_bind, casted_result2.llvm_value_bind);
+        else if (common_type->is_signed())
+            ((builder).*(_action_on_int))
+                (llvm_value, ckx_llvm_type_builder::build(common_type),
+                casted_result1.llvm_value_bind, casted_result2.llvm_value_bind);
+        else /* if (common_type->is_unsigned()) */
+            ((builder).*(_action_on_uint))
+                (llvm_value, ckx_llvm_type_builder::build(common_type),
+                casted_result1.llvm_value_bind, casted_result2.llvm_value_bind);
+
+        return saber::optional<ckx_expr_result>(
+            ckx_type_helper::get_vbool_type(),
+            ckx_expr_result::value_category::prvalue, llvm_value);
+    }
+    else if (_expr1.type->is_pointer() && _expr2.type->is_pointer())
+    {
+        if (!_expr1.type->equal_to_no_cvr(_expr2.type))
+        {
+            error();
+            return saber::optional<ckx_expr_result>();
+        }
+
+        faker::llvm_value *llvm_value = builder.create_temporary_var();
+        ((builder).*(_action_on_uint))
+             (llvm_value, ckx_llvm_type_builder::build(_expr1.type),
+              _expr1.llvm_value_bind, _expr2.llvm_value_bind);
+
+        return saber::optional<ckx_expr_result>(
+            ckx_type_helper::get_vbool_type(),
+            ckx_expr_result::value_category::prvalue, llvm_value);
+    }
+    else
+    {
+        error();
+        return saber::optional<ckx_expr_result>();
+    }
+}
 
 
 saber::optional<ckx_expr_result>

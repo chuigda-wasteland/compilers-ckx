@@ -282,7 +282,7 @@ void llvm_cmp_instruction::pretty_print(we::we_file_writer &_writer)
             _writer.write("s");
     }
 
-    switch (comp_type_bitmask & 0x04)
+    switch (comp_type_bitmask & 0x07)
     {
     case 0: _writer.write("ne "); break;
     case 1: _writer.write("eq "); break;

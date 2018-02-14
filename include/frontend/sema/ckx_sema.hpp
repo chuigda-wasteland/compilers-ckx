@@ -116,6 +116,12 @@ private:
                        ActionOnFloat&& _action_on_float,
                        ActionOnInt&& _action_on_int,
                        ActionOnUInt&& _action_on_uint);
+    template <typename ActionOnFloat,typename ActionOnInt,typename ActionOnUInt>
+    saber::optional<ckx_expr_result>
+    visit_comparsion(ckx_expr_result _expr1, ckx_expr_result _expr2,
+                     ActionOnFloat&& _action_on_float,
+                     ActionOnInt&& _action_on_int,
+                     ActionOnUInt&& _action_on_uint);
     saber::optional<ckx_expr_result>
     visit_ptroffset(ckx_expr_result _expr1, ckx_expr_result _expr2, bool _add);
     saber::optional<ckx_expr_result>
