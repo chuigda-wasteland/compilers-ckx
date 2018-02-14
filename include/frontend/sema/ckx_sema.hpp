@@ -30,6 +30,7 @@ public:
     void visit_func_stmt(ckx_ast_func_stmt* _func_stmt);
     void visit_return_stmt(ckx_ast_return_stmt* _return_stmt);
     void visit_if_stmt(ckx_ast_if_stmt* _if_stmt);
+    void visit_while_stmt(ckx_ast_while_stmt* _while_stmt);
 
     ckx_expr_result decay_to_rvalue(ckx_expr_result _expr);
 
@@ -159,6 +160,17 @@ private:
     private:
         ckx_sema_engine& sema;
         ckx_if_context *context;
+    };
+
+    class enter_while_protection_raii
+    {
+    public:
+        enter_while_protection_raii(ckx_sema_engine& _sema,
+                                    ckx_while_context *_context);
+        ~enter_while_protection_raii();
+    private:
+        ckx_sema_engine& sema;
+        ckx_while_context *context;
     };
 
     bool is_in_func();

@@ -276,9 +276,9 @@ void llvm_cmp_instruction::pretty_print(we::we_file_writer &_writer)
     else
     {
         _writer.write("icmp ");
-        if (comp_type_bitmask & 0x10)
+        if (comp_type_bitmask & 0x08)
             _writer.write("u");
-        else if (comp_type_bitmask & 0x04)
+        else if (comp_type_bitmask >= 0x02)
             _writer.write("s");
     }
 

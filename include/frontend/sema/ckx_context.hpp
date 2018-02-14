@@ -56,8 +56,23 @@ open_class ckx_if_context final make_use_of ckx_context
         then_label(_then_label),
         else_label(_else_label),
         endif_label(_endif_label) {}
-
     ~ckx_if_context() = default;
+};
+
+open_class ckx_while_context final make_use_of ckx_context
+{
+    faker::llvm_label *const while_label;
+    faker::llvm_label *const while_body;
+    faker::llvm_label *const end_while;
+
+    ckx_while_context(faker::llvm_label *const _while_label,
+                      faker::llvm_label *const _while_body,
+                      faker::llvm_label *const _end_while) :
+        ckx_context(context_type::cxt_while),
+        while_label(_while_label),
+        while_body(_while_body),
+        end_while(_end_while) {}
+    ~ckx_while_context() = default;
 };
 
 } // namespace ckx

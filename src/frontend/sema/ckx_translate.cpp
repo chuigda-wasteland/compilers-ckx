@@ -23,7 +23,11 @@ void ckx_ast_if_stmt::accept(ckx_sema_engine& _sema)
     _sema.visit_if_stmt(this);
 }
 
-void ckx_ast_while_stmt::accept(ckx_sema_engine&) {}
+void ckx_ast_while_stmt::accept(ckx_sema_engine& _sema)
+{
+    _sema.visit_while_stmt(this);
+}
+
 void ckx_ast_do_while_stmt::accept(ckx_sema_engine&) {}
 void ckx_ast_for_stmt::accept(ckx_sema_engine&) {}
 void ckx_ast_break_stmt::accept(ckx_sema_engine&) {}

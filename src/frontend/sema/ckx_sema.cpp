@@ -97,23 +97,63 @@ void ckx_sema_engine::visit_if_stmt(ckx_ast_if_stmt *_if_stmt)
         return;
     }
 
-    faker::llvm_instruction* br_pos = builder.get_insert_point();
-    faker::llvm_label* then_label = builder.create_temporary_label();
-    faker::llvm_label* else_label = builder.create_temporary_label();
-    faker::llvm_label* endif_label = builder.create_temporary_label();
+    faker::llvm_instruction *br_pos = builder.get_insert_point();
+    faker::llvm_label *then_label = builder.create_temporary_label();
+    faker::llvm_label *else_label = builder.create_temporary_label();
+    faker::llvm_label *endif_label = builder.create_temporary_label();
     enter_if_protection_raii(
         *this, new ckx_if_context(then_label, else_label, endif_label));
     builder.set_insert_after(br_pos);
     builder.create_cond_branch(casted_result.get().llvm_value_bind,
                                then_label, else_label);
+
     builder.set_insert_after(then_label);
     _if_stmt->then_clause->accept(*this);
     builder.create_branch(endif_label);
+
     builder.set_insert_after(else_label);
     if (_if_stmt->else_clause)
         _if_stmt->else_clause->accept(*this);
     builder.create_branch(endif_label);
+
     builder.set_insert_after(endif_label);
+}
+
+void ckx_sema_engine::visit_while_stmt(ckx_ast_while_stmt *_while_stmt)
+{
+    faker::llvm_instruction *br_pos = builder.get_insert_point();
+    faker::llvm_label *while_label = builder.create_temporary_label();
+    faker::llvm_label *while_body = builder.create_temporary_label();
+    faker::llvm_label *end_while = builder.create_temporary_label();
+    enter_while_protection_raii(
+        *this, new ckx_while_context(while_label, while_body, end_while));
+
+    builder.set_insert_after(br_pos);
+    builder.create_branch(while_label);
+
+    builder.set_insert_after(while_label);
+    saber::optional<ckx_expr_result> result_cond_expr =
+        _while_stmt->condition->accept(*this);
+    if (!result_cond_expr.is_type()) return;
+
+    saber::optional<ckx_expr_result> casted_result =
+        try_implicit_cast(decay_to_rvalue(result_cond_expr.get()),
+                          ckx_type_helper::get_vbool_type());
+
+    if (!casted_result.is_type())
+    {
+        error();
+        return;
+    }
+
+    builder.create_cond_branch(casted_result.get().llvm_value_bind,
+                               while_body, end_while);
+
+    builder.set_insert_after(while_body);
+    _while_stmt->clause->accept(*this);
+    builder.create_branch(while_label);
+
+    builder.set_insert_after(end_while);
 }
 
 ckx_expr_result ckx_sema_engine::decay_to_rvalue(ckx_expr_result _expr)
@@ -1296,8 +1336,7 @@ enter_func_protection_raii::~enter_func_protection_raii()
 ckx_sema_engine::
 enter_if_protection_raii::enter_if_protection_raii(ckx_sema_engine &_sema,
                                                    ckx_if_context *_context) :
-    sema(_sema),
-    context(_context)
+    sema(_sema), context(_context)
 {
     sema.context_manager.enter_if_context(_context);
 }
@@ -1307,6 +1346,20 @@ enter_if_protection_raii::~enter_if_protection_raii()
 {
     sema.builder.set_insert_after(context->endif_label);
     sema.context_manager.exit_if_context();
+}
+
+ckx_sema_engine::
+enter_while_protection_raii::enter_while_protection_raii(
+        ckx_sema_engine &_sema, ckx_while_context *_context) :
+    sema(_sema), context(_context)
+{
+    sema.context_manager.enter_while_context(_context);
+}
+
+ckx_sema_engine::enter_while_protection_raii::~enter_while_protection_raii()
+{
+    sema.builder.set_insert_after(context->end_while);;
+    sema.context_manager.exit_while_context();
 }
 
 } // namespace ckx

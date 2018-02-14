@@ -54,6 +54,18 @@ void ckx_context_manager::exit_if_context()
     context_chain.pop_back();
 }
 
+void ckx_context_manager::enter_while_context(ckx_while_context *_while_context)
+{
+    context_chain.push_back(_while_context);
+}
+
+void ckx_context_manager::exit_while_context()
+{
+    C8ASSERT(context_chain.back()->type ==ckx_context::context_type::cxt_while);
+    delete context_chain.back();
+    context_chain.pop_back();
+}
+
 ckx_context::context_type
 ckx_context_manager::current_context_type_intern() const
 {

@@ -117,6 +117,7 @@ private:
 
 class ckx_ast_while_stmt final implements ckx_ast_stmt
 {
+    friend class ckx_sema_engine;
 public:
     ckx_ast_while_stmt(ckx_src_rng _while_rng,
                        ckx_ast_expr *_condition,
