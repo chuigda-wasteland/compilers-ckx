@@ -1,7 +1,8 @@
-﻿# The programming language - ckx
+# The programming language - ckx
+
+[![CircleCI](https://circleci.com/gh/ILoveChenKX/compilers-ckx.svg?style=svg)](https://circleci.com/gh/ILoveChenKX/compilers-ckx)
 
 A general purposed programming language -- for my honey -- chenkx
-
 
 <br/>
 <hr/>
@@ -12,17 +13,19 @@ Originally I decided to write a C compiler as a practice in my university. And i
 
 But unfortunately, I don't like the `array` in C
 
-	int array[10]; // Ok, that's an array.
-	...	
+```c
+int array[10]; // Ok, that's an array.
+// ...	
 
-	int max(int array[10]); // But this function takes a pointer instead of an array
-	int m = max(array); // Well, array decays to pointer int* now.
+int max(int array[10]); // But this function takes a pointer instead of an array
+int m = max(array); // Well, array decays to pointer int* now.
+```
 
 So I decided to create another language that would merely improve C...
 
 And finally I designed ckx which is absolutely not C.
 
-## Basic grammer
+## Basic syntax
 
 > Note : the grammers may change in the further future. Before the version 1.0, everything is uncertain and newer versions may be no compatibility with the former versions.
 
@@ -109,7 +112,7 @@ Pointers in ckx is the same as pointers in C. The powerful low-level operator.
 
 Unlike in C, an `array` in ckx means a `range`. That is to say, for any array, it is possible to calculate its size according to its start point and finish point.
 
-There are four "create array" grammers:
+There are four "create array" syntax:
     
     type[] array = type[]()(start-point, finish-point);           (1)
     type[] array = type[](array-size)(start-point);               (2)
@@ -141,4 +144,4 @@ There are four "create array" grammers:
 
 ##### Closures
 
-> Still under work. If you have a good idea about it, contact me and I'll be appreciated.
+> Still in progress. If you have a good idea about it, contact me and I'll be appreciated.
