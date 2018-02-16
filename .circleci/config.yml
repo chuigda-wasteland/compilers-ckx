@@ -1,0 +1,26 @@
+version: 2
+
+step-library:
+  - &setup-llvm-symbolizer
+      run:
+        name: Environment Setup
+        command: |
+          # LLVM has a hard check for "llvm-symbolizer" and doesn't support suffixed executables
+          ln -s /usr/bin/llvm-symbolizer-* /usr/bin/llvm-symbolizer
+          # We'll use tee to redirect stderr to a file so we can check for sanitiziation
+          # https://bugs.launchpad.net/ubuntu/+source/xorg-server/+bug/1059947
+          sed -i 's/"$@" 2>&1/"$@"/' /usr/bin/xvfb-run
+
+jobs:
+  build:
+    docker:
+      - image: mbgl/7d2403f42e:linux-clang-4
+    steps:
+      - checkout
+      - *setup-llvm-symbolizer
+      - run:
+          name: Generate CMake
+          command: cmake .
+      - run:
+          name: Build CMake
+          command: cmake --build . --target all -- -j 8
