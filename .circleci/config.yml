@@ -24,3 +24,6 @@ jobs:
       - run:
           name: Build CMake
           command: cmake --build . --target all -- -j 8
+      - run:
+          name: ??
+          command: ls -l
