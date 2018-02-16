@@ -1,5 +1,10 @@
 version: 2
 
+machine:
+  environment:
+    CMAKE_C_COMPILER: clang-4.0
+    CMAKE_CXX_COMPILER: clang++-4.0
+
 step-library:
   - &setup-llvm-symbolizer
       run:
