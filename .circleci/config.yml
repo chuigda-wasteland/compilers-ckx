@@ -25,5 +25,8 @@ jobs:
           name: Build CMake
           command: cmake --build . --target all -- -j 8
       - run:
-          name: ??
+          name: List all files
           command: ls -l
+
+      - store_artifacts:
+          path: ckxc
