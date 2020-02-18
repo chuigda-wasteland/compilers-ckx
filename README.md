@@ -9,7 +9,7 @@ A general purposed programming language -- for my honey -- chenkx
 
 ## Original idea
 
-Originally I decided to write a C compiler as a practice in my university. And it may also become a good compiler for freshmens to learn how to build compilers.
+Originally I decided to write a C compiler as a practice in my university. And it may also become a good compiler for freshmen to learn how to build compilers.
 
 But unfortunately, I don't like the `array` in C
 
